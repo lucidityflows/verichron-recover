@@ -1,0 +1,513 @@
+# Docker Compose for E2E Testing
+# Provides only the infrastructure dependencies needed for running E2E tests
+# Run with: docker compose -f docker-compose.test.yml up -d
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: verichron-postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./scripts/postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d users_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: verichron-redis-test
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    tmpfs:
+      - /data
+
+  mongo-test:
+    image: mongo:6
+    container_name: verichron-mongo-test
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: communications
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    tmpfs:
+      - /data/db
+
+  pubsub-emulator-test:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:emulators
+    container_name: verichron-pubsub-test
+    command: gcloud beta emulators pubsub start --project=test-project --host-port=0.0.0.0:8085
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-users-test:
+    container_name: verichron-api-users-test
+    build:
+      context: .
+      dockerfile: apps/api-users/Dockerfile.e2e
+    ports:
+      - "3001:3001"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/users_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-organizations-test:
+    container_name: verichron-api-organizations-test
+    build:
+      context: .
+      dockerfile: apps/api-organizations/Dockerfile.e2e
+    ports:
+      - "3002:3002"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/organizations_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-debts-test:
+    container_name: verichron-api-debts-test
+    build:
+      context: .
+      dockerfile: apps/api-debts/Dockerfile.e2e
+    ports:
+      - "3003:3003"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/debts_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3003/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-debtors-test:
+    container_name: verichron-api-debtors-test
+    build:
+      context: .
+      dockerfile: apps/api-debtors/Dockerfile.e2e
+    ports:
+      - "3004:3004"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/debtors_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3004/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-transactions-test:
+    container_name: verichron-api-transactions-test
+    build:
+      context: .
+      dockerfile: apps/api-transactions/Dockerfile.e2e
+    ports:
+      - "3005:3005"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/transactions_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3005/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-communications-test:
+    container_name: verichron-api-communications-test
+    build:
+      context: .
+      dockerfile: apps/api-communications/Dockerfile.e2e
+    ports:
+      - "3006:3006"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/communications_db
+      - MONGODB_URI=mongodb://mongo-test:27017/communications
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      mongo-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-collectors-test:
+    container_name: verichron-api-collectors-test
+    build:
+      context: .
+      dockerfile: apps/api-collectors/Dockerfile.e2e
+    ports:
+      - "3007:3007"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/collectors_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3007/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-voice-test:
+    container_name: verichron-api-voice-test
+    build:
+      context: .
+      dockerfile: apps/api-voice/Dockerfile.e2e
+    ports:
+      - "3008:3008"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/voice_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+      - APP_URL=http://api-voice-test:3008
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3008/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-workflows-test:
+    container_name: verichron-api-workflows-test
+    build:
+      context: .
+      dockerfile: apps/api-workflows/Dockerfile.e2e
+    ports:
+      - "3009:3009"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/workflows_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3009/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-automations-test:
+    container_name: verichron-api-automations-test
+    build:
+      context: .
+      dockerfile: apps/api-automations/Dockerfile.e2e
+    ports:
+      - "3010:3010"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      - postgres-test
+      - pubsub-emulator-test
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3010/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-analytics-test:
+    container_name: verichron-api-analytics-test
+    build:
+      context: .
+      dockerfile: apps/api-analytics/Dockerfile.e2e
+    ports:
+      - "3011:3011"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/analytics_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3011/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  api-audits-test:
+    container_name: verichron-api-audits-test
+    build:
+      context: .
+      dockerfile: apps/api-audits/Dockerfile.e2e
+    ports:
+      - "3012:3012"
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator-test:8085
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/audits_db
+      - API_USERS_URL=http://api-users-test:3001
+      - API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+      - API_DEBTS_URL=http://api-debts-test:3003
+      - API_DEBTORS_URL=http://api-debtors-test:3004
+      - API_TRANSACTIONS_URL=http://api-transactions-test:3005
+      - API_COMMUNICATIONS_URL=http://api-communications-test:3006
+      - API_COLLECTORS_URL=http://api-collectors-test:3007
+      - API_VOICE_URL=http://api-voice-test:3008
+      - API_WORKFLOWS_URL=http://api-workflows-test:3009
+      - API_AUTOMATIONS_URL=http://api-automations-test:3010
+      - API_ANALYTICS_URL=http://api-analytics-test:3011
+      - API_AUDITS_URL=http://api-audits-test:3012
+      - API_AUDITS_URL=http://api-audits-test:3012
+    env_file:
+      - .env.test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      pubsub-emulator-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3012/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s

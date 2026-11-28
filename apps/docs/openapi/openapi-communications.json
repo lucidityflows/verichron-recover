@@ -1,0 +1,3097 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/public/communications/webhooks/sendgrid": {
+      "post": {
+        "description": "Receives and processes email event notifications from SendGrid",
+        "operationId": "SendGridWebhookController_handleWebhook",
+        "parameters": [
+          {
+            "name": "x-twilio-email-event-webhook-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-twilio-email-event-webhook-timestamp",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Events processed successfully"
+          },
+          "401": {
+            "description": "Invalid webhook signature"
+          }
+        },
+        "summary": "Handle SendGrid webhook events",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/public/communications/webhooks/twilio": {
+      "post": {
+        "description": "Receives and processes SMS status update notifications from Twilio",
+        "operationId": "TwilioWebhookController_handleWebhook",
+        "parameters": [
+          {
+            "name": "x-twilio-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwilioWebhookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event processed successfully"
+          },
+          "401": {
+            "description": "Invalid webhook signature"
+          }
+        },
+        "summary": "Handle Twilio SMS status callback",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/v1/communications/logs/orgs/{organizationId}": {
+      "get": {
+        "operationId": "LogsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor ID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt ID",
+            "schema": {
+              "example": "456fcdeb-51a2-43d7-b890-987654321xyz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by communication status",
+            "schema": {
+              "$ref": "#/components/schemas/CommunicationStatus"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by communication type",
+            "schema": {
+              "$ref": "#/components/schemas/CommunicationType"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "description": "Filter by gateway provider",
+            "schema": {
+              "example": "sendgrid",
+              "type": "string",
+              "enum": [
+                "sendgrid",
+                "twilio",
+                "mock"
+              ]
+            }
+          },
+          {
+            "name": "templateId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template ID",
+            "schema": {
+              "example": "789fcdeb-51a2-43d7-b890-123456789xyz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "templateName",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template name",
+            "schema": {
+              "example": "payment-receipt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by start date (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by end date (ISO 8601)",
+            "schema": {
+              "example": "2024-01-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "default": "sentAt",
+              "example": "sentAt",
+              "type": "string",
+              "enum": [
+                "sentAt",
+                "deliveredAt",
+                "createdAt",
+                "status"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "default": "DESC",
+              "example": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of communication logs."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Query communication logs for an organization",
+        "tags": [
+          "Communication Logs"
+        ]
+      }
+    },
+    "/v1/communications/logs/orgs/{organizationId}/{id}": {
+      "get": {
+        "operationId": "LogsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested communication log."
+          },
+          "404": {
+            "description": "Log not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific communication log by ID",
+        "tags": [
+          "Communication Logs"
+        ]
+      }
+    },
+    "/internal/communications/logs/recent/{organizationId}": {
+      "get": {
+        "description": "Internal endpoint for event-orchestrator to fetch latest outreach logs for the activity feed.",
+        "operationId": "LogsInternalController_findRecent",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommunicationLog"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recent communications (internal)",
+        "tags": [
+          "Communications (Internal)"
+        ]
+      }
+    },
+    "/v1/communications/compliance/check": {
+      "post": {
+        "description": "Validates a potential communication action against FDCPA, TCPA, and internal rules without performing dispatch.",
+        "operationId": "ComplianceController_checkCompliance",
+        "parameters": [
+          {
+            "name": "x-org-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckComplianceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compliance result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceCheckResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Proactively check communication compliance",
+        "tags": [
+          "Compliance"
+        ]
+      }
+    },
+    "/v1/communications/compliance/stats": {
+      "get": {
+        "operationId": "ComplianceController_getStats",
+        "parameters": [
+          {
+            "name": "x-org-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated prevention statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get compliance prevention statistics",
+        "tags": [
+          "Compliance"
+        ]
+      }
+    },
+    "/v1/communications/compliance/activity": {
+      "get": {
+        "operationId": "ComplianceController_getActivity",
+        "parameters": [
+          {
+            "name": "x-org-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recent blocked attempts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComplianceActivityDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get recent compliance activity feed",
+        "tags": [
+          "Compliance"
+        ]
+      }
+    },
+    "/v1/communications/compliance/invitation-metrics/{batchId}": {
+      "get": {
+        "operationId": "ComplianceController_getInvitationMetrics",
+        "parameters": [
+          {
+            "name": "x-org-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "description": "Invitation Batch UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get engagement metrics for an invitation wave",
+        "tags": [
+          "Compliance"
+        ]
+      }
+    },
+    "/v1/communications/preferences/orgs/{organizationId}/{debtorId}": {
+      "get": {
+        "operationId": "PreferencesController_findByDebtor",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The debtor preferences."
+          },
+          "404": {
+            "description": "Preferences not found for the debtor."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a debtor's communication preferences",
+        "tags": [
+          "Communication Preferences"
+        ]
+      },
+      "put": {
+        "operationId": "PreferencesController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated preferences."
+          },
+          "400": {
+            "description": "Invalid preference data."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a debtor's communication preferences",
+        "tags": [
+          "Communication Preferences"
+        ]
+      }
+    },
+    "/v1/communications/preferences/orgs/{organizationId}/{debtorId}/opt-out": {
+      "post": {
+        "operationId": "PreferencesController_optOut",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptOutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Opt-out successful."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Opt a debtor out of a communication channel",
+        "tags": [
+          "Communication Preferences"
+        ]
+      }
+    },
+    "/v1/communications/preferences/orgs/{organizationId}/{debtorId}/opt-in": {
+      "post": {
+        "operationId": "PreferencesController_optIn",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Opt-in successful."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Opt a debtor back into a communication channel",
+        "tags": [
+          "Communication Preferences"
+        ]
+      }
+    },
+    "/internal/communications/analytics/dashboard-summary/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates communication metrics for the dashboard.\n      Called by the event orchestrator to build the dashboard summary.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDashboardSummary",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Specific date to fetch stats for (ISO 8601)",
+            "schema": {
+              "example": "2025-12-20",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Communication analytics retrieved successfully"
+          }
+        },
+        "summary": "Get communication analytics for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/recent/{organizationId}": {
+      "get": {
+        "description": "Retrieves the most recent communication logs for the activity feed.",
+        "operationId": "InternalAnalyticsController_getRecentLogs",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get recent communications for an organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/debtor-focus/{organizationId}/{debtorProfileId}": {
+      "get": {
+        "description": "\n      Retrieves all communication logs for a specific debtor.\n      Called by the event orchestrator to build the debtor focus view for collectors.\n\n      Returns communication history with delivery status and engagement metrics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDebtorCommunications",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorProfileId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor Profile UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtor communications retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorFocusCommunicationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get communication history for a debtor (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/collector-stats/{organizationId}/{collectorUserId}": {
+      "get": {
+        "description": "\n      Retrieves aggregated communication metrics for a specific collector within a time period.\n      Called by api-collectors to calculate performance dashboards.\n\n      Returns counts of calls, emails, SMS, unique accounts contacted, and email response rates.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getCollectorStats",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "collectorUserId",
+            "required": true,
+            "in": "path",
+            "description": "Collector User UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collector communication statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorCommunicationStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get communication statistics for a collector (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/organization-stats/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves aggregated communication metrics for all collectors in an organization within a time period.\n      Called by api-collectors to calculate leaderboards.\n\n      Returns per-collector metrics including calls, emails, SMS, unique accounts contacted, and email response rates.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getOrganizationStats",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization communication statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationCommunicationStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get communication statistics for all collectors in an organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/collectors/{collectorUserId}/dashboard-metrics": {
+      "get": {
+        "description": "\n      Retrieves comprehensive dashboard metrics for a specific collector.\n      Returns both the requested period stats AND today's stats in a single response\n      to optimize performance for dashboard rendering.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getCollectorDashboardMetrics",
+        "parameters": [
+          {
+            "name": "collectorUserId",
+            "required": true,
+            "in": "path",
+            "description": "Collector User UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "query",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collector dashboard metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorDashboardMetricsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get collector dashboard metrics (period + today in single call)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/communications/analytics/recent/recent/{organizationId}": {
+      "post": {
+        "description": "Retrieves the most recent communication logs for the activity feed.",
+        "operationId": "CommunicationsInternalController_getRecentLogs",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Get recent communications for an organization (internal only)",
+        "tags": [
+          "Internal - Communications"
+        ]
+      }
+    },
+    "/v1/communications/templates/orgs/{organizationId}": {
+      "post": {
+        "operationId": "TemplatesController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The template has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new communication template",
+        "tags": [
+          "Communication Templates"
+        ]
+      },
+      "get": {
+        "operationId": "TemplatesController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template name (partial match)",
+            "schema": {
+              "example": "payment",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template type",
+            "schema": {
+              "$ref": "#/components/schemas/TemplateType"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "default": true,
+              "example": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query (searches name and displayName)",
+            "schema": {
+              "example": "receipt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "default": "name",
+              "example": "name",
+              "type": "string",
+              "enum": [
+                "name",
+                "displayName",
+                "type",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "default": "ASC",
+              "example": "ASC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Template"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all communication templates for an organization",
+        "tags": [
+          "Communication Templates"
+        ]
+      }
+    },
+    "/v1/communications/templates/orgs/{organizationId}/{id}": {
+      "get": {
+        "operationId": "TemplatesController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested template.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Template not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single template by ID",
+        "tags": [
+          "Communication Templates"
+        ]
+      },
+      "put": {
+        "description": "This creates a new, active version of the template.",
+        "operationId": "TemplatesController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated template.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Template not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a template",
+        "tags": [
+          "Communication Templates"
+        ]
+      },
+      "delete": {
+        "operationId": "TemplatesController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The template has been successfully deactivated."
+          },
+          "404": {
+            "description": "Template not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deactivate a template",
+        "tags": [
+          "Communication Templates"
+        ]
+      }
+    },
+    "/v1/communications/templates/orgs/{organizationId}/{id}/preview": {
+      "post": {
+        "operationId": "TemplatesController_preview",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The rendered template output."
+          },
+          "404": {
+            "description": "Template not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Preview a rendered template",
+        "tags": [
+          "Communication Templates"
+        ]
+      }
+    },
+    "/v1/communications/dispatch": {
+      "post": {
+        "operationId": "DispatchController_dispatch",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Communication dispatched successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "403": {
+            "description": "Compliance violation"
+          }
+        },
+        "summary": "Manually dispatch a communication",
+        "tags": [
+          "dispatch"
+        ]
+      }
+    },
+    "/ops/communications/sandbox/dispatch": {
+      "post": {
+        "operationId": "SandboxOpsController_dispatch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SandboxOpsDispatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Test communication dispatched"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a test communication (QA Sandbox)",
+        "tags": [
+          "Ops: Sandbox"
+        ]
+      }
+    },
+    "/ops/communications/logs": {
+      "get": {
+        "operationId": "CommunicationsOpsController_findAllLogs",
+        "parameters": [
+          {
+            "name": "debtorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor ID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt ID",
+            "schema": {
+              "example": "456fcdeb-51a2-43d7-b890-987654321xyz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by communication status",
+            "schema": {
+              "$ref": "#/components/schemas/CommunicationStatus"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by communication type",
+            "schema": {
+              "$ref": "#/components/schemas/CommunicationType"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "description": "Filter by gateway provider",
+            "schema": {
+              "example": "sendgrid",
+              "type": "string",
+              "enum": [
+                "sendgrid",
+                "twilio",
+                "mock"
+              ]
+            }
+          },
+          {
+            "name": "templateId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template ID",
+            "schema": {
+              "example": "789fcdeb-51a2-43d7-b890-123456789xyz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "templateName",
+            "required": false,
+            "in": "query",
+            "description": "Filter by template name",
+            "schema": {
+              "example": "payment-receipt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by start date (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by end date (ISO 8601)",
+            "schema": {
+              "example": "2024-01-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "default": "sentAt",
+              "example": "sentAt",
+              "type": "string",
+              "enum": [
+                "sentAt",
+                "deliveredAt",
+                "createdAt",
+                "status"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "default": "DESC",
+              "example": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of communication logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommunicationLog"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get global communication logs (System Wide)",
+        "tags": [
+          "Ops: Communications"
+        ]
+      }
+    },
+    "/ops/communications/templates": {
+      "get": {
+        "operationId": "CommunicationsOpsController_findAllTemplates",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of all templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Template"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all templates across the platform",
+        "tags": [
+          "Ops: Communications"
+        ]
+      }
+    },
+    "/ops/communications/gateways/status": {
+      "get": {
+        "operationId": "CommunicationsOpsController_getGatewayStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Consolidated gateway health report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current health and configuration status of communication gateways",
+        "tags": [
+          "Ops: Communications"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Communications API",
+    "description": "The Communications Microservice API - Manages notifications, messaging, and event-driven communications",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Communications",
+      "description": "Communication and notification management"
+    },
+    {
+      "name": "Notifications",
+      "description": "Notification delivery and tracking"
+    },
+    {
+      "name": "Messages",
+      "description": "Messaging and template management"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "TwilioWebhookDto": {
+        "type": "object",
+        "properties": {
+          "MessageSid": {
+            "type": "string",
+            "description": "Twilio message SID (unique identifier)",
+            "example": "SM1234567890abcdef1234567890abcdef"
+          },
+          "MessageStatus": {
+            "type": "string",
+            "description": "Message status",
+            "example": "delivered",
+            "enum": [
+              "queued",
+              "sending",
+              "sent",
+              "delivered",
+              "undelivered",
+              "failed",
+              "receiving",
+              "received"
+            ]
+          },
+          "To": {
+            "type": "string",
+            "description": "Recipient phone number (E.164 format)",
+            "example": "+11234567890"
+          },
+          "From": {
+            "type": "string",
+            "description": "Sender phone number (E.164 format)",
+            "example": "+10987654321"
+          },
+          "Body": {
+            "type": "string",
+            "description": "SMS message body",
+            "example": "Your payment of $123.45 is due on 2024-02-01."
+          },
+          "NumSegments": {
+            "type": "string",
+            "description": "Number of message segments",
+            "example": "1"
+          },
+          "AccountSid": {
+            "type": "string",
+            "description": "Twilio account SID",
+            "example": "AC_EXAMPLE_ACCOUNT_SID"
+          },
+          "MessagingServiceSid": {
+            "type": "string",
+            "description": "Messaging service SID (if using messaging service)",
+            "example": "MG1234567890abcdef1234567890abcdef"
+          },
+          "ErrorCode": {
+            "type": "string",
+            "description": "Error code (for failed/undelivered messages)",
+            "example": "30003"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Error message (for failed/undelivered messages)",
+            "example": "Unreachable destination handset"
+          },
+          "DateSent": {
+            "type": "string",
+            "description": "Timestamp when message was sent (RFC 2822 format)",
+            "example": "Mon, 15 Jan 2024 10:30:00 +0000"
+          },
+          "DateCreated": {
+            "type": "string",
+            "description": "Timestamp when message was created (RFC 2822 format)",
+            "example": "Mon, 15 Jan 2024 10:30:00 +0000"
+          },
+          "DateUpdated": {
+            "type": "string",
+            "description": "Timestamp when status was last updated (RFC 2822 format)",
+            "example": "Mon, 15 Jan 2024 10:30:05 +0000"
+          },
+          "Price": {
+            "type": "string",
+            "description": "Price of the message",
+            "example": "-0.00750"
+          },
+          "PriceUnit": {
+            "type": "string",
+            "description": "Price unit (currency)",
+            "example": "USD"
+          },
+          "Direction": {
+            "type": "string",
+            "description": "Message direction (inbound/outbound)",
+            "example": "outbound-api"
+          },
+          "ApiVersion": {
+            "type": "string",
+            "description": "API version used",
+            "example": "2010-04-01"
+          }
+        },
+        "required": [
+          "MessageSid",
+          "MessageStatus",
+          "To",
+          "From"
+        ]
+      },
+      "CommunicationStatus": {
+        "type": "string",
+        "enum": [
+          "SENDING",
+          "SENT",
+          "DELIVERED",
+          "FAILED",
+          "OPENED",
+          "CLICKED",
+          "BLOCKED"
+        ]
+      },
+      "CommunicationType": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "SMS",
+          "LETTER",
+          "CALL"
+        ]
+      },
+      "ObjectId": {
+        "type": "object",
+        "properties": {}
+      },
+      "CommunicationContent": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Email subject line (emails only)",
+            "example": "Payment Receipt - $100.00"
+          },
+          "body": {
+            "type": "string",
+            "description": "Message body (HTML for email, plain text for SMS)",
+            "example": "<p>Thank you for your payment.</p>"
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "StatusHistoryEntry": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status at this point in time",
+            "example": "DELIVERED",
+            "enum": [
+              "SENDING",
+              "SENT",
+              "DELIVERED",
+              "FAILED",
+              "OPENED",
+              "CLICKED",
+              "BLOCKED"
+            ]
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp of status change",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata about status change",
+            "example": {
+              "provider": "sendgrid",
+              "event": "delivered"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "timestamp"
+        ]
+      },
+      "CommunicationLog": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "description": "MongoDB ObjectId",
+            "example": "507f1f77bcf86cd799439011",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc"
+          },
+          "debtorId": {
+            "type": "string",
+            "description": "Debtor ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "debtId": {
+            "type": "string",
+            "description": "Debt ID (if communication is debt-specific)",
+            "example": "456fcdeb-51a2-43d7-b890-987654321xyz"
+          },
+          "collectorUserId": {
+            "type": "string",
+            "description": "Collector User ID (if communication was initiated by a collector)",
+            "example": "789fcdeb-51a2-43d7-b890-123456789xyz"
+          },
+          "type": {
+            "description": "Communication type",
+            "example": "EMAIL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommunicationType"
+              }
+            ]
+          },
+          "status": {
+            "description": "Current communication status",
+            "example": "DELIVERED",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommunicationStatus"
+              }
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "description": "Gateway provider used",
+            "example": "sendgrid",
+            "enum": [
+              "sendgrid",
+              "twilio",
+              "mock"
+            ]
+          },
+          "providerMessageId": {
+            "type": "string",
+            "description": "Provider-specific message ID (for webhook lookups)",
+            "example": "msg_abc123def456"
+          },
+          "templateId": {
+            "type": "string",
+            "description": "Template ID used to generate content",
+            "example": "789fcdeb-51a2-43d7-b890-123456789xyz"
+          },
+          "templateName": {
+            "type": "string",
+            "description": "Template name (for reference)",
+            "example": "payment-receipt"
+          },
+          "content": {
+            "description": "Communication content (subject and body)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommunicationContent"
+              }
+            ]
+          },
+          "sentAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when communication was sent to gateway",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "deliveredAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when communication was delivered to recipient",
+            "example": "2024-01-15T10:31:00Z"
+          },
+          "openedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when email was opened by recipient",
+            "example": "2024-01-15T11:00:00Z"
+          },
+          "clickedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when link in email was clicked",
+            "example": "2024-01-15T11:05:00Z"
+          },
+          "blockedReason": {
+            "type": "string",
+            "description": "Reason communication was blocked (compliance violation)",
+            "example": "Time restriction: Outside allowed hours (8am-9pm)"
+          },
+          "failureReason": {
+            "type": "string",
+            "description": "Reason communication failed",
+            "example": "Invalid email address"
+          },
+          "statusHistory": {
+            "description": "Append-only status history (audit trail)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusHistoryEntry"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata (provider-specific, event context, etc.)",
+            "example": {
+              "campaignId": "spring-2024",
+              "priority": "high"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when log was created",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when log was last updated",
+            "example": "2024-01-15T10:31:00Z"
+          }
+        },
+        "required": [
+          "_id",
+          "organizationId",
+          "debtorId",
+          "type",
+          "status",
+          "statusHistory",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CheckComplianceDto": {
+        "type": "object",
+        "properties": {
+          "debtorId": {
+            "type": "string",
+            "description": "Debtor ID to check compliance for",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "communicationType": {
+            "description": "The type of communication being checked",
+            "example": "CALL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommunicationType"
+              }
+            ]
+          },
+          "scheduledAt": {
+            "type": "string",
+            "description": "Simulated time for the check (defaults to now)",
+            "example": "2025-12-27T21:15:00Z"
+          }
+        },
+        "required": [
+          "debtorId",
+          "communicationType"
+        ]
+      },
+      "ComplianceCheckResponseDto": {
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "type": "boolean",
+            "example": false
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable reason if blocked",
+            "example": "It is 09:15 PM in Chicago (CST). Allowed: 08:00-21:00."
+          },
+          "ruleName": {
+            "type": "string",
+            "description": "The internal rule name that triggered the block",
+            "example": "TIME_OF_DAY"
+          },
+          "nextAllowedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the next contact might be allowed"
+          }
+        },
+        "required": [
+          "allowed"
+        ]
+      },
+      "ComplianceStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalPrevented": {
+            "type": "number",
+            "description": "Total number of violations prevented in the period",
+            "example": 247
+          },
+          "byType": {
+            "type": "object",
+            "description": "Breakdown of prevented violations by rule name",
+            "example": {
+              "TIME_OF_DAY": 89,
+              "FREQUENCY_LIMIT": 67,
+              "OPT_OUT": 28
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "totalPrevented",
+          "byType"
+        ]
+      },
+      "ComplianceActivityDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "658c1234567890abcdef1234"
+          },
+          "organizationId": {
+            "type": "string",
+            "example": "api-organizations-id"
+          },
+          "debtorId": {
+            "type": "string",
+            "example": "debtor-uuid"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of communication blocked",
+            "example": "CALL"
+          },
+          "blockedReason": {
+            "type": "string",
+            "description": "The reason why the communication was blocked",
+            "example": "Outside 8am-9pm debtor local time"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2025-12-27T21:15:00Z"
+          }
+        },
+        "required": [
+          "_id",
+          "organizationId",
+          "debtorId",
+          "type",
+          "blockedReason",
+          "createdAt"
+        ]
+      },
+      "PreferenceChannel": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "SMS",
+          "LETTER"
+        ],
+        "description": "Channels debtor has opted out of"
+      },
+      "UpdatePreferenceDto": {
+        "type": "object",
+        "properties": {
+          "doNotContact": {
+            "type": "boolean",
+            "description": "Global do not contact flag (overrides all channels)",
+            "example": false
+          },
+          "optedOutChannels": {
+            "type": "array",
+            "description": "Channels debtor has opted out of",
+            "example": [
+              "SMS"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PreferenceChannel"
+            }
+          },
+          "allowedStartHour": {
+            "type": "number",
+            "description": "Allowed contact start hour (24-hour format, FDCPA: 8am default)",
+            "example": 8,
+            "minimum": 0,
+            "maximum": 23
+          },
+          "allowedEndHour": {
+            "type": "number",
+            "description": "Allowed contact end hour (24-hour format, FDCPA: 9pm default)",
+            "example": 21,
+            "minimum": 0,
+            "maximum": 23
+          },
+          "dailyContactLimit": {
+            "type": "number",
+            "description": "Maximum communications allowed per day",
+            "example": 3,
+            "minimum": 0
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Debtor's timezone (IANA timezone string)",
+            "example": "America/New_York",
+            "maxLength": 100
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "description": "Preferred language for communications (ISO 639-1 code)",
+            "example": "en",
+            "maxLength": 10
+          },
+          "preferredChannels": {
+            "type": "array",
+            "description": "Preferred communication channels (priority order)",
+            "example": [
+              "EMAIL",
+              "SMS"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PreferenceChannel"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes about preferences",
+            "example": "Debtor prefers email-only communication"
+          }
+        }
+      },
+      "OptOutDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "description": "Channel to opt out of",
+            "example": "SMS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PreferenceChannel"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Optional reason for opt-out (for compliance tracking)",
+            "example": "Requested via customer service call"
+          }
+        },
+        "required": [
+          "channel"
+        ]
+      },
+      "OptInDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "description": "Channel to opt in to",
+            "example": "EMAIL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PreferenceChannel"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Optional reason for opt-in (for compliance tracking)",
+            "example": "Consent provided via web portal"
+          }
+        },
+        "required": [
+          "channel"
+        ]
+      },
+      "DebtorFocusCommunicationDto": {
+        "type": "object",
+        "properties": {
+          "communicationId": {
+            "type": "string",
+            "description": "Communication log ID",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "type": {
+            "type": "string",
+            "description": "Communication type",
+            "enum": [
+              "EMAIL",
+              "SMS",
+              "LETTER",
+              "CALL"
+            ],
+            "example": "EMAIL"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status",
+            "enum": [
+              "SENDING",
+              "SENT",
+              "DELIVERED",
+              "FAILED",
+              "OPENED",
+              "CLICKED",
+              "BLOCKED"
+            ],
+            "example": "DELIVERED"
+          },
+          "debtId": {
+            "type": "object",
+            "description": "Debt ID if communication is debt-specific",
+            "example": "debt-456",
+            "nullable": true
+          },
+          "templateName": {
+            "type": "object",
+            "description": "Template name used",
+            "example": "payment-receipt",
+            "nullable": true
+          },
+          "subject": {
+            "type": "object",
+            "description": "Subject line (for emails)",
+            "example": "Payment Receipt - $100.00",
+            "nullable": true
+          },
+          "provider": {
+            "type": "object",
+            "description": "Gateway provider used",
+            "example": "sendgrid",
+            "nullable": true
+          },
+          "sentAt": {
+            "type": "object",
+            "description": "Timestamp when sent",
+            "example": "2024-11-15T10:30:00Z",
+            "nullable": true
+          },
+          "deliveredAt": {
+            "type": "object",
+            "description": "Timestamp when delivered",
+            "example": "2024-11-15T10:31:00Z",
+            "nullable": true
+          },
+          "openedAt": {
+            "type": "object",
+            "description": "Timestamp when opened (emails only)",
+            "example": "2024-11-15T11:00:00Z",
+            "nullable": true
+          },
+          "failureReason": {
+            "type": "object",
+            "description": "Reason for failure if status is FAILED",
+            "example": "Invalid email address",
+            "nullable": true
+          },
+          "blockedReason": {
+            "type": "object",
+            "description": "Reason for blocking if status is BLOCKED",
+            "example": "Time restriction: Outside allowed hours",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Communication created timestamp",
+            "example": "2024-11-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "communicationId",
+          "type",
+          "status",
+          "debtId",
+          "templateName",
+          "subject",
+          "provider",
+          "sentAt",
+          "deliveredAt",
+          "openedAt",
+          "failureReason",
+          "blockedReason",
+          "createdAt"
+        ]
+      },
+      "DebtorFocusCommunicationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "communications": {
+            "description": "List of communications for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusCommunicationDto"
+            }
+          },
+          "totalCommunications": {
+            "type": "number",
+            "description": "Total number of communications sent",
+            "example": 45
+          },
+          "emailCount": {
+            "type": "number",
+            "description": "Number of emails sent",
+            "example": 30
+          },
+          "smsCount": {
+            "type": "number",
+            "description": "Number of SMS messages sent",
+            "example": 15
+          },
+          "letterCount": {
+            "type": "number",
+            "description": "Number of letters sent",
+            "example": 0
+          },
+          "deliveredCount": {
+            "type": "number",
+            "description": "Number of delivered communications",
+            "example": 40
+          },
+          "failedCount": {
+            "type": "number",
+            "description": "Number of failed communications",
+            "example": 2
+          },
+          "openedCount": {
+            "type": "number",
+            "description": "Number of opened emails",
+            "example": 25
+          },
+          "lastCommunicationDate": {
+            "type": "object",
+            "description": "Date of last communication",
+            "example": "2024-11-15",
+            "nullable": true
+          },
+          "lastCommunicationType": {
+            "type": "object",
+            "description": "Type of last communication",
+            "example": "EMAIL",
+            "nullable": true
+          }
+        },
+        "required": [
+          "communications",
+          "totalCommunications",
+          "emailCount",
+          "smsCount",
+          "letterCount",
+          "deliveredCount",
+          "failedCount",
+          "openedCount",
+          "lastCommunicationDate",
+          "lastCommunicationType"
+        ]
+      },
+      "CollectorCommunicationStatsDto": {
+        "type": "object",
+        "properties": {
+          "collectorUserId": {
+            "type": "string",
+            "description": "Collector user ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "totalCalls": {
+            "type": "number",
+            "description": "Total phone calls made",
+            "example": 45
+          },
+          "totalEmails": {
+            "type": "number",
+            "description": "Total emails sent",
+            "example": 23
+          },
+          "totalSms": {
+            "type": "number",
+            "description": "Total SMS messages sent",
+            "example": 12
+          },
+          "uniqueAccountsContacted": {
+            "type": "number",
+            "description": "Number of unique debtor accounts contacted",
+            "example": 38
+          },
+          "emailResponseRate": {
+            "type": "number",
+            "description": "Email response rate (percentage of emails opened)",
+            "example": 78.3
+          },
+          "emailsDelivered": {
+            "type": "number",
+            "description": "Number of emails delivered",
+            "example": 21
+          },
+          "emailsOpened": {
+            "type": "number",
+            "description": "Number of emails opened",
+            "example": 18
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          }
+        },
+        "required": [
+          "collectorUserId",
+          "totalCalls",
+          "totalEmails",
+          "totalSms",
+          "uniqueAccountsContacted",
+          "emailResponseRate",
+          "emailsDelivered",
+          "emailsOpened",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "OrganizationCommunicationStatsDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "collectorStats": {
+            "description": "Communication statistics per collector",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectorCommunicationStatsDto"
+            }
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          }
+        },
+        "required": [
+          "organizationId",
+          "collectorStats",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "CollectorDashboardMetricsDto": {
+        "type": "object",
+        "properties": {
+          "collectorUserId": {
+            "type": "string",
+            "description": "Collector user ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the requested reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the requested reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          },
+          "totalCalls": {
+            "type": "number",
+            "description": "Total phone calls made in the period",
+            "example": 187
+          },
+          "totalEmails": {
+            "type": "number",
+            "description": "Total emails sent in the period",
+            "example": 95
+          },
+          "totalSms": {
+            "type": "number",
+            "description": "Total SMS messages sent in the period",
+            "example": 42
+          },
+          "uniqueAccountsContacted": {
+            "type": "number",
+            "description": "Number of unique debtor accounts contacted in the period",
+            "example": 85
+          },
+          "emailResponseRate": {
+            "type": "number",
+            "description": "Email response rate (percentage of emails opened) in the period",
+            "example": 78.3
+          },
+          "emailsDelivered": {
+            "type": "number",
+            "description": "Number of emails delivered in the period",
+            "example": 88
+          },
+          "emailsOpened": {
+            "type": "number",
+            "description": "Number of emails opened in the period",
+            "example": 69
+          },
+          "totalCallsToday": {
+            "type": "number",
+            "description": "Total phone calls made today",
+            "example": 15
+          },
+          "totalEmailsToday": {
+            "type": "number",
+            "description": "Total emails sent today",
+            "example": 8
+          },
+          "totalSmsToday": {
+            "type": "number",
+            "description": "Total SMS messages sent today",
+            "example": 3
+          },
+          "uniqueAccountsContactedToday": {
+            "type": "number",
+            "description": "Number of unique debtor accounts contacted today",
+            "example": 12
+          },
+          "emailResponseRateToday": {
+            "type": "number",
+            "description": "Email response rate (percentage of emails opened) today",
+            "example": 62.5
+          }
+        },
+        "required": [
+          "collectorUserId",
+          "periodStart",
+          "periodEnd",
+          "totalCalls",
+          "totalEmails",
+          "totalSms",
+          "uniqueAccountsContacted",
+          "emailResponseRate",
+          "emailsDelivered",
+          "emailsOpened",
+          "totalCallsToday",
+          "totalEmailsToday",
+          "totalSmsToday",
+          "uniqueAccountsContactedToday",
+          "emailResponseRateToday"
+        ]
+      },
+      "TemplateType": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "SMS",
+          "LETTER"
+        ],
+        "description": "Template type"
+      },
+      "CreateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Template identifier name (unique per organization)",
+            "example": "payment-receipt",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Human-readable display name",
+            "example": "Payment Receipt Email",
+            "maxLength": 255
+          },
+          "type": {
+            "description": "Template type",
+            "example": "EMAIL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TemplateType"
+              }
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line (required for EMAIL type, uses Handlebars syntax)",
+            "example": "Payment Receipt - {{currency amount}}",
+            "maxLength": 255
+          },
+          "body": {
+            "type": "string",
+            "description": "Template body (Handlebars syntax, HTML for email, plain text for SMS/LETTER)",
+            "example": "<p>Thank you for your payment of {{currency amount}}.</p>"
+          },
+          "description": {
+            "type": "string",
+            "description": "Template description for documentation",
+            "example": "Sent after successful payment transaction"
+          },
+          "requiredVariables": {
+            "description": "List of required Handlebars variables",
+            "example": [
+              "amount",
+              "transactionId",
+              "date"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for categorization",
+            "example": {
+              "category": "payment",
+              "priority": "high"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "displayName",
+          "type",
+          "body"
+        ]
+      },
+      "Template": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique template identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID that owns this template",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Template name (unique per organization)",
+            "example": "payment-receipt",
+            "maxLength": 100
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for template",
+            "example": "Payment Receipt Email",
+            "maxLength": 255
+          },
+          "type": {
+            "description": "Template type",
+            "example": "EMAIL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TemplateType"
+              }
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line (Handlebars template)",
+            "example": "Payment Receipt - {{amount}}",
+            "maxLength": 255
+          },
+          "body": {
+            "type": "string",
+            "description": "Template body (Handlebars template)",
+            "example": "<p>Thank you for your payment of {{currency amount}}.</p>"
+          },
+          "version": {
+            "type": "number",
+            "description": "Template version number",
+            "example": 1,
+            "minimum": 1
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether this template version is active",
+            "example": true,
+            "default": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of template purpose",
+            "example": "Sent after successful payment transaction"
+          },
+          "requiredVariables": {
+            "description": "JSON array of required context variables",
+            "example": [
+              "amount",
+              "transactionId",
+              "date"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional metadata for template",
+            "example": {
+              "category": "payment",
+              "priority": "high"
+            }
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "User ID who created this template version",
+            "example": "456fcdeb-51a2-43d7-b890-987654321xyz",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when template was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when template was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "displayName",
+          "type",
+          "body",
+          "version",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "description": "Updated display name",
+            "example": "Payment Receipt Email (Updated)",
+            "maxLength": 255
+          },
+          "subject": {
+            "type": "string",
+            "description": "Updated email subject line (Handlebars syntax)",
+            "example": "Payment Confirmation - {{currency amount}}",
+            "maxLength": 255
+          },
+          "body": {
+            "type": "string",
+            "description": "Updated template body (Handlebars syntax)",
+            "example": "<p>Your payment of {{currency amount}} has been received.</p>"
+          },
+          "description": {
+            "type": "string",
+            "description": "Updated description",
+            "example": "Sent after successful payment with enhanced messaging"
+          },
+          "requiredVariables": {
+            "description": "Updated list of required variables",
+            "example": [
+              "amount",
+              "transactionId",
+              "date",
+              "customerName"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Updated metadata",
+            "example": {
+              "category": "payment",
+              "priority": "high",
+              "tags": [
+                "receipt",
+                "confirmation"
+              ]
+            }
+          }
+        }
+      },
+      "PreviewTemplateDto": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "type": "object",
+            "description": "Context data for Handlebars variable substitution",
+            "example": {
+              "amount": 100,
+              "transactionId": "txn_abc123",
+              "date": "2024-01-15",
+              "customerName": "John Doe",
+              "debtorFirstName": "John",
+              "debtorLastName": "Doe"
+            }
+          }
+        },
+        "required": [
+          "context"
+        ]
+      },
+      "DispatchMethod": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "SMS",
+          "LETTER"
+        ],
+        "description": "Channel to send test communication via"
+      },
+      "SandboxOpsDispatchDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "description": "Channel to send test communication via",
+            "example": "EMAIL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DispatchMethod"
+              }
+            ]
+          },
+          "to": {
+            "type": "string",
+            "description": "Recipient address (Email or Phone Number)",
+            "example": "test@example.com"
+          },
+          "templateName": {
+            "type": "string",
+            "description": "Name of the template to render",
+            "example": "USER_INVITATION"
+          },
+          "context": {
+            "type": "object",
+            "description": "Context data for template rendering",
+            "example": {
+              "user": {
+                "firstName": "Test"
+              }
+            }
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID to simulate dispatch for",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "method",
+          "to",
+          "templateName",
+          "organizationId"
+        ]
+      },
+      "GatewayHealthDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Health status",
+            "example": "active"
+          },
+          "mode": {
+            "type": "string",
+            "description": "Integration mode",
+            "example": "sendgrid"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is failed"
+          }
+        },
+        "required": [
+          "status",
+          "mode"
+        ]
+      },
+      "GatewayStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/GatewayHealthDto"
+          },
+          "sms": {
+            "$ref": "#/components/schemas/GatewayHealthDto"
+          }
+        },
+        "required": [
+          "email",
+          "sms"
+        ]
+      }
+    }
+  }
+}

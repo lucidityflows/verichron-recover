@@ -1,0 +1,7 @@
+export enum AutoAssignmentStrategy {
+  ROUND_ROBIN = 'ROUND_ROBIN',
+  LEAST_WORKLOAD = 'LEAST_WORKLOAD',
+  SKILL_BASED = 'SKILL_BASED',
+  GEOGRAPHIC = 'GEOGRAPHIC',
+  CUSTOM = 'CUSTOM',
+}

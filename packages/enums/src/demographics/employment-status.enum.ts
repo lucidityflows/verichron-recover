@@ -1,0 +1,13 @@
+/**
+ * Employment status enumeration
+ */
+export enum EmploymentStatus {
+  EMPLOYED_FULL_TIME = 'EMPLOYED_FULL_TIME',
+  EMPLOYED_PART_TIME = 'EMPLOYED_PART_TIME',
+  SELF_EMPLOYED = 'SELF_EMPLOYED',
+  UNEMPLOYED = 'UNEMPLOYED',
+  RETIRED = 'RETIRED',
+  STUDENT = 'STUDENT',
+  DISABLED = 'DISABLED',
+  OTHER = 'OTHER',
+}

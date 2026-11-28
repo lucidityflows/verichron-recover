@@ -1,0 +1,21 @@
+{
+  "extends": "../../packages/tsconfig/base.json",
+  "include": ["src", "test", "datasource.ts", "migrations"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "baseUrl": ".",
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@verichron/*": [
+        "../../packages/*"
+      ]
+    }
+  }
+}

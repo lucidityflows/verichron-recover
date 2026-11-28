@@ -1,0 +1,15 @@
+{
+    "extends": "../../packages/tsconfig/base.json",
+    "compilerOptions": {
+        "lib": ["ES2020", "DOM"],
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "module": "ESNext",
+        "moduleResolution": "bundler"
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}

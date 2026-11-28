@@ -1,0 +1,3972 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/public/users/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful, returns organization list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthOrganizationListResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials."
+          }
+        },
+        "summary": "Step 1 of Login: Authenticate and get organization list",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/public/users/auth/token": {
+      "post": {
+        "operationId": "AuthController_getToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "JWTs created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid or expired Authentication Context Token."
+          }
+        },
+        "summary": "Step 2 of Login: Exchange ACT for a scoped JWT",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/public/users/auth/switch-context": {
+      "post": {
+        "operationId": "AuthController_switchContext",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "New context selection initiated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthOrganizationListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a new ACT to switch organization context",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/public/users/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New access token generated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token."
+          }
+        },
+        "summary": "Refresh an access token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/public/users/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent if account exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthForgotPasswordResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Request a password reset email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/public/users/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResetPasswordResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired reset token."
+          }
+        },
+        "summary": "Reset password using token from email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}": {
+      "get": {
+        "description": "Returns a paginated list of users in your organization.",
+        "operationId": "ProfilesController_listUsers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by user status",
+            "schema": {
+              "$ref": "#/components/schemas/UserStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name or email",
+            "schema": {
+              "example": "john",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by role ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedUsersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all users",
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "description": "Creates a user account in PENDING status and sends an invitation email with activation link.",
+        "operationId": "ProfilesController_inviteUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User invited successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A user with this email already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a new user to your organization",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}": {
+      "get": {
+        "description": "Returns detailed information about a specific user in your organization including memberships, contact info, etc.",
+        "operationId": "ProfilesController_getUserById",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found or does not belong to your organization"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user details",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "description": "Updates user profile information such as name and status for a user in your organization.",
+        "operationId": "ProfilesController_updateUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user to update",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user profile",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "description": "Soft deletes a user in your organization by setting their status to INACTIVE. The user record is retained for audit purposes.",
+        "operationId": "ProfilesController_deleteUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user to delete",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete user account",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/addresses": {
+      "get": {
+        "description": "Returns all addresses associated with a user in your organization.",
+        "operationId": "ProfilesController_getUserAddresses",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user addresses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user addresses",
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "description": "Adds a new address to a user profile in your organization.",
+        "operationId": "ProfilesController_addAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Address added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add address to user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/addresses/{addressId}": {
+      "put": {
+        "description": "Updates an existing address for a user in your organization.",
+        "operationId": "ProfilesController_updateAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the address",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user address",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "description": "Removes an address from a user profile in your organization.",
+        "operationId": "ProfilesController_deleteAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the address to delete",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Address deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete user address",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/emails": {
+      "get": {
+        "description": "Returns all email addresses associated with a user in your organization.",
+        "operationId": "ProfilesController_getUserEmails",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user emails",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmailResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user emails",
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "description": "Adds a new email address to a user profile in your organization.",
+        "operationId": "ProfilesController_addEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Email added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add email to user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/emails/{emailId}": {
+      "put": {
+        "description": "Updates an existing email address for a user in your organization.",
+        "operationId": "ProfilesController_updateEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the email",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user email",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "description": "Removes an email address from a user profile in your organization.",
+        "operationId": "ProfilesController_deleteEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the email to delete",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Email deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete user email",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/phones": {
+      "get": {
+        "description": "Returns all phone numbers associated with a user in your organization.",
+        "operationId": "ProfilesController_getUserPhoneNumbers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user phone numbers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PhoneNumberResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user phone numbers",
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "description": "Adds a new phone number to a user profile in your organization.",
+        "operationId": "ProfilesController_addPhoneNumber",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePhoneNumberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Phone number added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneNumberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add phone number to user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/v1/users/profiles/orgs/{organizationId}/{userId}/phones/{phoneId}": {
+      "put": {
+        "description": "Updates an existing phone number for a user in your organization.",
+        "operationId": "ProfilesController_updatePhoneNumber",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the phone number",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePhoneNumberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone number updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneNumberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user phone number",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "description": "Removes a phone number from a user profile in your organization.",
+        "operationId": "ProfilesController_deletePhoneNumber",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the phone number to delete",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Phone number deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete user phone number",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/public/users/profiles/activate": {
+      "post": {
+        "description": "Activates a pending user account using the invitation token and sets the password. This is a public endpoint.",
+        "operationId": "ProfilesPublicController_activateUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User account activated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired invitation token"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate user account",
+        "tags": [
+          "Users (Public)"
+        ]
+      }
+    },
+    "/internal/users/summaries": {
+      "post": {
+        "description": "Internal endpoint to fetch basic user profiles (names, emails) for orchestration.",
+        "operationId": "UsersInternalController_getUserSummariesInternal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetUsersDataDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User summaries retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get user summaries by IDs (internal)",
+        "tags": [
+          "Users (Internal)"
+        ]
+      }
+    },
+    "/internal/users/provision-initial-admin": {
+      "post": {
+        "description": "Internal endpoint called by the orchestrator to provision the initial admin user during organization onboarding.",
+        "operationId": "UsersInternalController_provisionInitialAdminInternal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProvisionInitialAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Initial admin user provisioned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Provision initial admin user for a new organization (internal)",
+        "tags": [
+          "Users (Internal)"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/roles": {
+      "post": {
+        "description": "Creates a new role within the organization with optional permissions. System roles cannot be created via this endpoint.",
+        "operationId": "RbacController_createRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The role has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new custom role",
+        "tags": [
+          "RBAC"
+        ]
+      },
+      "get": {
+        "description": "Returns a paginated list of roles in your organization with optional filtering.",
+        "operationId": "RbacController_listRoles",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by role name",
+            "schema": {
+              "example": "manager",
+              "type": "string"
+            }
+          },
+          {
+            "name": "isSystemRole",
+            "required": false,
+            "in": "query",
+            "description": "Filter to show only system roles",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "permissionId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by permission ID - returns roles that have this permission",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of roles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedRolesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all roles",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/roles/{roleId}": {
+      "get": {
+        "description": "Returns detailed information about a specific role in your organization, including all assigned permissions.",
+        "operationId": "RbacController_getRoleById",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The role details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get role details including permissions",
+        "tags": [
+          "RBAC"
+        ]
+      },
+      "patch": {
+        "description": "Updates the name and/or description of a role in your organization. System roles can be customized but not deleted.",
+        "operationId": "RbacController_updateRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role to update",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated role.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a role",
+        "tags": [
+          "RBAC"
+        ]
+      },
+      "delete": {
+        "description": "Deletes a custom role in your organization. System roles cannot be deleted. Users must be reassigned before deletion.",
+        "operationId": "RbacController_deleteRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role to delete",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The role has been successfully deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a custom role",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/permissions": {
+      "get": {
+        "description": "Returns a paginated list of all permissions available in the platform. These are platform-wide and cannot be modified.",
+        "operationId": "RbacController_listPermissions",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "resource",
+            "required": false,
+            "in": "query",
+            "description": "Filter by resource type",
+            "schema": {
+              "example": "debt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by action",
+            "schema": {
+              "example": "read",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by permission code or description",
+            "schema": {
+              "example": "debt",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedPermissionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all available platform permissions",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/permissions/grouped": {
+      "get": {
+        "description": "Returns all permissions organized by resource type for easier UI rendering.",
+        "operationId": "RbacController_getGroupedPermissions",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permissions grouped by resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupedPermissionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get permissions grouped by resource",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/roles/{roleId}/permissions": {
+      "post": {
+        "description": "Assigns a single permission to the specified role in your organization.",
+        "operationId": "RbacController_assignPermissionToRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignPermissionToRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The permission has been assigned to the role."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Assign a permission to a role",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/roles/{roleId}/permissions/bulk": {
+      "post": {
+        "description": "Assigns multiple permissions to the specified role in your organization in a single operation.",
+        "operationId": "RbacController_assignPermissionsToRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignPermissionsToRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The permissions have been assigned to the role."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Assign multiple permissions to a role",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/roles/{roleId}/permissions/{permissionId}": {
+      "delete": {
+        "description": "Removes the specified permission from the role in your organization.",
+        "operationId": "RbacController_removePermissionFromRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "permissionId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the permission to remove",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The permission has been removed from the role."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a permission from a role",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/users/{userId}/roles": {
+      "post": {
+        "description": "Assigns the specified role to a user within your organization context.",
+        "operationId": "RbacController_assignRoleToUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleToUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The role has been assigned to the user."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Assign a role to a user",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/users/{userId}/roles/{roleId}": {
+      "delete": {
+        "description": "Removes the specified role from a user. Note: This endpoint is deprecated. Use assignRoleToUser to change roles instead.",
+        "operationId": "RbacController_removeRoleFromUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the user",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "The UUID of the role to remove",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveRoleFromUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "The role has been removed from the user."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a role from a user",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/check-permission": {
+      "post": {
+        "description": "Validates whether a user has the specified permission within an organization context (or platform context). Useful for UI feature flags.",
+        "operationId": "RbacController_checkPermission",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckPermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission check result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionCheckResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check if a user has a specific permission",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/v1/users/rbac/orgs/{organizationId}/check-permissions": {
+      "post": {
+        "description": "Validates whether a user has all of the specified permissions. More efficient than multiple single checks.",
+        "operationId": "RbacController_checkPermissions",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckPermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk permission check results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionsCheckResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check if a user has multiple permissions",
+        "tags": [
+          "RBAC"
+        ]
+      }
+    },
+    "/ops/users/profiles": {
+      "get": {
+        "operationId": "ProfilesOpsController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by user status",
+            "schema": {
+              "$ref": "#/components/schemas/UserStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name or email",
+            "schema": {
+              "example": "john",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by role ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedUsersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all users (System Wide)",
+        "tags": [
+          "Ops: Users"
+        ]
+      }
+    },
+    "/ops/users/profiles/{id}": {
+      "get": {
+        "operationId": "ProfilesOpsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user details by ID",
+        "tags": [
+          "Ops: Users"
+        ]
+      }
+    },
+    "/ops/users/profiles/{id}/status": {
+      "patch": {
+        "operationId": "ProfilesOpsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "PROVISIONAL",
+                "ACTIVE",
+                "INACTIVE",
+                "SUSPENDED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Force update user status (Ban/Suspend)",
+        "tags": [
+          "Ops: Users"
+        ]
+      }
+    },
+    "/ops/users/rbac/roles": {
+      "get": {
+        "operationId": "RbacOpsController_findAllRoles",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by role name",
+            "schema": {
+              "example": "manager",
+              "type": "string"
+            }
+          },
+          {
+            "name": "isSystemRole",
+            "required": false,
+            "in": "query",
+            "description": "Filter to show only system roles",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "permissionId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by permission ID - returns roles that have this permission",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedRolesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all roles across the platform",
+        "tags": [
+          "Ops: RBAC"
+        ]
+      }
+    },
+    "/ops/users/rbac/roles/platform": {
+      "post": {
+        "operationId": "RbacOpsController_createPlatformRole",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new platform-level role",
+        "tags": [
+          "Ops: RBAC"
+        ]
+      }
+    },
+    "/ops/users/rbac/permissions": {
+      "get": {
+        "operationId": "RbacOpsController_findAllPermissions",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "resource",
+            "required": false,
+            "in": "query",
+            "description": "Filter by resource type",
+            "schema": {
+              "example": "debt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by action",
+            "schema": {
+              "example": "read",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by permission code or description",
+            "schema": {
+              "example": "debt",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedPermissionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all platform permissions",
+        "tags": [
+          "Ops: RBAC"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Users API",
+    "description": "The Users & Authentication Microservice API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "act"
+      }
+    },
+    "schemas": {
+      "AuthLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email address",
+            "example": "admin@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "!Str0ngP@ssw0rd"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "OrganizationSelectionDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "The ID of the organization",
+            "nullable": true
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The name of the organization",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "description": "The user's role in the organization"
+          }
+        },
+        "required": [
+          "organizationId",
+          "organizationName",
+          "role"
+        ]
+      },
+      "AuthOrganizationListResponseDto": {
+        "type": "object",
+        "properties": {
+          "organizations": {
+            "description": "A list of organizations the user is a member of",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationSelectionDto"
+            }
+          }
+        },
+        "required": [
+          "organizations"
+        ]
+      },
+      "AuthTokenDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "The ID of the organization to get a scoped token for. Omit for platform-level token.",
+            "format": "uuid",
+            "nullable": true
+          },
+          "fromOrganizationId": {
+            "type": "string",
+            "description": "The previous organization ID when switching contexts (for audit/event tracking).",
+            "format": "uuid"
+          }
+        }
+      },
+      "AuthTokenResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "The scoped access token for authentication",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "The refresh token for obtaining a new access token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ]
+      },
+      "AuthForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address associated with the account",
+            "example": "user@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthForgotPasswordResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "If an account exists with this email, a password reset link has been sent."
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "AuthResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Password reset token from email",
+            "example": "abc123def456..."
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "New password (minimum 8 characters, must contain uppercase, lowercase, number, and special character)",
+            "example": "N3wP@ssw0rd!",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "AuthResetPasswordResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Password has been reset successfully. You can now log in with your new password."
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "UserStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "PROVISIONAL",
+          "ACTIVE",
+          "INACTIVE",
+          "SUSPENDED"
+        ]
+      },
+      "UserSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserStatus"
+              }
+            ]
+          },
+          "roleName": {
+            "type": "string",
+            "description": "Primary role of the user in the current context",
+            "example": "ORG_ADMIN"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "status"
+        ]
+      },
+      "PaginatedUsersResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of users",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserSummaryDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of users matching the filters",
+            "example": 150
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Items per page",
+            "example": 20
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 8
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "RoleResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the role.",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "organizationId": {
+            "type": "object",
+            "description": "The organization this role belongs to.",
+            "format": "uuid",
+            "example": "b1ffcd99-9c0b-4ef8-bb6d-6bb9bd380a22"
+          },
+          "name": {
+            "description": "The name of the role.",
+            "oneOf": [
+              {
+                "enum": [
+                  "ORG_ADMIN",
+                  "ORG_MANAGER",
+                  "ORG_TEAM_LEAD",
+                  "ORG_COLLECTOR",
+                  "ORG_VIEWER"
+                ]
+              },
+              {
+                "enum": [
+                  "PLATFORM_ADMIN",
+                  "PLATFORM_VIEWER",
+                  "PLATFORM_SUPPORT"
+                ]
+              }
+            ],
+            "example": "Collection Manager"
+          },
+          "description": {
+            "type": "object",
+            "description": "A description of the role and its responsibilities.",
+            "example": "Manages a team of collectors and oversees portfolio assignments."
+          },
+          "isSystemRole": {
+            "type": "boolean",
+            "description": "Indicates if this is a system-defined role that cannot be deleted.",
+            "example": false
+          },
+          "userCount": {
+            "type": "number",
+            "description": "The number of users assigned to this role.",
+            "example": 12
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the role was created.",
+            "example": "2024-10-20T15:30:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the role was last updated.",
+            "example": "2024-10-21T10:15:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "description",
+          "isSystemRole",
+          "userCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UserMembershipDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "object",
+            "description": "The organization ID",
+            "format": "uuid",
+            "nullable": true
+          },
+          "organizationName": {
+            "type": "object",
+            "description": "The organization name",
+            "example": "Acme Collections",
+            "nullable": true
+          },
+          "role": {
+            "description": "The user's role within this organization",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RoleResponseDto"
+              }
+            ]
+          },
+          "joinedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the user joined this organization"
+          }
+        },
+        "required": [
+          "organizationId",
+          "organizationName",
+          "role",
+          "joinedAt"
+        ]
+      },
+      "EmailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the email record.",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address.",
+            "example": "john.doe@personal.com"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Indicates if this is the user's primary email."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the email was created."
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "isPrimary",
+          "createdAt"
+        ]
+      },
+      "PhoneCategory": {
+        "type": "string",
+        "enum": [
+          "MOBILE",
+          "HOME",
+          "WORK",
+          "BUSINESS",
+          "FAX",
+          "OTHER"
+        ],
+        "description": "The category of the phone number."
+      },
+      "PhoneNumberResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the phone number record.",
+            "format": "uuid"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The phone number.",
+            "example": "+15551234567"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Indicates if this is the user's primary phone number."
+          },
+          "category": {
+            "description": "The category of the phone number.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhoneCategory"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "phoneNumber",
+          "isPrimary",
+          "category"
+        ]
+      },
+      "AddressCategory": {
+        "type": "string",
+        "enum": [
+          "RESIDENCE_PRIMARY",
+          "RESIDENCE_SECONDARY",
+          "PLACE_OF_EMPLOYMENT",
+          "RELATIVE",
+          "PO_BOX",
+          "LEGAL_CORRESPONDENCE",
+          "HEADQUARTERS",
+          "BRANCH"
+        ],
+        "description": "The category of the address."
+      },
+      "AddressResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the address record.",
+            "format": "uuid"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Indicates if this is the user's primary address."
+          },
+          "street1": {
+            "type": "string",
+            "description": "The first line of the street address.",
+            "example": "123 Main St"
+          },
+          "street2": {
+            "type": "string",
+            "description": "The second line of the street address (e.g., Apt 4B).",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "The city.",
+            "example": "Anytown"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state or province.",
+            "example": "CA"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal or ZIP code.",
+            "example": "90210"
+          },
+          "country": {
+            "type": "string",
+            "description": "The country.",
+            "example": "USA"
+          },
+          "addressCategory": {
+            "description": "The category of the address.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressCategory"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the address record was created."
+          }
+        },
+        "required": [
+          "id",
+          "isPrimary",
+          "street1",
+          "street2",
+          "city",
+          "state",
+          "postalCode",
+          "country",
+          "addressCategory",
+          "createdAt"
+        ]
+      },
+      "UserDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserStatus"
+              }
+            ]
+          },
+          "roleName": {
+            "type": "string",
+            "description": "Primary role of the user in the current context",
+            "example": "ORG_ADMIN"
+          },
+          "memberships": {
+            "description": "The organizations this user belongs to and their roles.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserMembershipDto"
+            }
+          },
+          "emails": {
+            "description": "Additional email addresses",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailResponseDto"
+            }
+          },
+          "phoneNumbers": {
+            "description": "Phone numbers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhoneNumberResponseDto"
+            }
+          },
+          "addresses": {
+            "description": "Addresses",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressResponseDto"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "status",
+          "memberships",
+          "emails",
+          "phoneNumbers",
+          "addresses",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "InviteUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of the user to invite.",
+            "example": "new.employee@example.com",
+            "format": "email"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The first name of the invited user.",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "The last name of the invited user.",
+            "example": "Doe"
+          },
+          "roleId": {
+            "type": "string",
+            "description": "The ID of the role to assign to the new user within the organization.",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "roleId"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "The first name of the user.",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "The last name of the user.",
+            "example": "Doe"
+          },
+          "status": {
+            "description": "The status of the user account.",
+            "example": "ACTIVE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserStatus"
+              }
+            ]
+          }
+        }
+      },
+      "CreateAddressDto": {
+        "type": "object",
+        "properties": {
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Set this address as the user's primary address.",
+            "default": false
+          },
+          "street1": {
+            "type": "string",
+            "description": "The first line of the street address.",
+            "example": "123 Main St",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "The second line of the street address (e.g., Apt 4B).",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "The city.",
+            "example": "Anytown",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "The state or province (2-letter code).",
+            "example": "CA",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal or ZIP code.",
+            "example": "90210",
+            "minLength": 5,
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "The country (2-letter ISO code).",
+            "example": "US",
+            "default": "US"
+          },
+          "category": {
+            "description": "The category of the address.",
+            "example": "RESIDENCE_PRIMARY",
+            "default": "RESIDENCE_PRIMARY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressCategory"
+              }
+            ]
+          }
+        },
+        "required": [
+          "street1",
+          "city",
+          "state",
+          "postalCode",
+          "country"
+        ]
+      },
+      "UpdateAddressDto": {
+        "type": "object",
+        "properties": {
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Set this address as the user's primary address.",
+            "default": false
+          },
+          "street1": {
+            "type": "string",
+            "description": "The first line of the street address.",
+            "example": "123 Main St",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "The second line of the street address (e.g., Apt 4B).",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "The city.",
+            "example": "Anytown",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "The state or province (2-letter code).",
+            "example": "CA",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal or ZIP code.",
+            "example": "90210",
+            "minLength": 5,
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "The country (2-letter ISO code).",
+            "example": "US",
+            "default": "US"
+          },
+          "category": {
+            "description": "The category of the address.",
+            "example": "RESIDENCE_PRIMARY",
+            "default": "RESIDENCE_PRIMARY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressCategory"
+              }
+            ]
+          }
+        }
+      },
+      "CreateEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address.",
+            "example": "john.doe@personal.com"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Set this email as the user's primary email.",
+            "default": false
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "UpdateEmailDto": {
+        "type": "object",
+        "properties": {
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Set this email as the user's primary email.",
+            "default": true
+          }
+        },
+        "required": [
+          "isPrimary"
+        ]
+      },
+      "CreatePhoneNumberDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "description": "The phone number in E.164 format (e.g., +1 555 123 4567).",
+            "example": "+15551234567"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Indicates if this is the user's primary phone number.",
+            "default": false
+          },
+          "category": {
+            "description": "The category of the phone number.",
+            "default": "MOBILE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhoneCategory"
+              }
+            ]
+          }
+        },
+        "required": [
+          "phoneNumber"
+        ]
+      },
+      "UpdatePhoneNumberDto": {
+        "type": "object",
+        "properties": {
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Indicates if this is the user's primary phone number."
+          },
+          "category": {
+            "description": "The category of the phone number.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhoneCategory"
+              }
+            ]
+          }
+        }
+      },
+      "ActivateUserDto": {
+        "type": "object",
+        "properties": {
+          "invitationToken": {
+            "type": "string",
+            "description": "The one-time invitation token sent to the user.",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+          },
+          "password": {
+            "type": "string",
+            "description": "The desired password for the new user. Must be at least 8 characters.",
+            "example": "!Str0ngP@ssw0rd",
+            "minLength": 8
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "description": "Confirmation of the new password.",
+            "example": "!Str0ngP@ssw0rd"
+          }
+        },
+        "required": [
+          "invitationToken",
+          "password",
+          "passwordConfirmation"
+        ]
+      },
+      "GetUsersDataDto": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "description": "Array of User IDs to fetch",
+            "example": [
+              "a1b2c3d4-e5f6-4789-a012-3456789abcde"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "userIds"
+        ]
+      },
+      "ProvisionInitialAdminDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "The organization ID from the OrganizationCreated event",
+            "format": "uuid"
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "The organization name",
+            "example": "Acme Collections"
+          },
+          "email": {
+            "type": "string",
+            "description": "Initial admin email address",
+            "example": "admin@acme.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Initial admin first name",
+            "example": "Jane"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Initial admin last name",
+            "example": "Smith"
+          }
+        },
+        "required": [
+          "organizationId",
+          "organizationName",
+          "email",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the role. Must be unique within the organization.",
+            "example": "Collection Manager",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the role and its responsibilities.",
+            "example": "Manages a team of collectors and oversees portfolio assignments.",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "permissionIds": {
+            "description": "Optional array of permission IDs to assign to this role upon creation.",
+            "example": [
+              "perm-uuid-1",
+              "perm-uuid-2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ]
+      },
+      "PermissionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the permission.",
+            "format": "uuid",
+            "example": "c2aabbcc-9c0b-4ef8-bb6d-6bb9bd380a33"
+          },
+          "code": {
+            "description": "The permission code in resource:action format.",
+            "oneOf": [
+              {
+                "enum": [
+                  "orgs:read",
+                  "orgs:write",
+                  "orgs:delete",
+                  "orgs:settings:read",
+                  "orgs:settings:write",
+                  "goals:read",
+                  "goals:write",
+                  "teams:read",
+                  "teams:manage",
+                  "users:read",
+                  "users:write",
+                  "users:delete",
+                  "users:roles:assign",
+                  "debts:read",
+                  "debts:write",
+                  "debts:delete",
+                  "debts:notes:write",
+                  "portfolios:read",
+                  "portfolios:write",
+                  "portfolios:delete",
+                  "portfolios:transfer",
+                  "debtors:read",
+                  "debtors:write",
+                  "debtors:delete",
+                  "demographics:read",
+                  "demographics:write",
+                  "documents:read",
+                  "documents:write",
+                  "verifications:read",
+                  "verifications:write",
+                  "payments:read",
+                  "payments:write",
+                  "transactions:read",
+                  "transactions:write",
+                  "analytics:read",
+                  "audits:read",
+                  "voice:call",
+                  "voice:call:read",
+                  "voice:manage",
+                  "communications:manage",
+                  "workflows:auto-assignment:manage",
+                  "workflows:auto-assignment:view",
+                  "workflows:escalations:manage",
+                  "workflows:escalations:view",
+                  "workflows:analytics:view",
+                  "workflows:executions:view",
+                  "workflows:rules:create",
+                  "workflows:rules:view",
+                  "workflows:rules:edit",
+                  "workflows:rules:delete",
+                  "workflows:rules:toggle",
+                  "workflows:templates:view",
+                  "debtor:self:read",
+                  "debtor:self:pay",
+                  "debtor:self:update",
+                  "debtor:self:export",
+                  "debtor:self:payment_history",
+                  "debtor:self:documents",
+                  "debtor:self:preferences"
+                ]
+              },
+              {
+                "enum": [
+                  "platform:orgs:create",
+                  "platform:orgs:read",
+                  "platform:orgs:delete",
+                  "platform:orgs:update",
+                  "platform:orgs:suspend",
+                  "platform:orgs:manage",
+                  "platform:users:manage",
+                  "platform:users:impersonate",
+                  "platform:debtors:manage",
+                  "platform:roles:manage",
+                  "platform:system:settings",
+                  "platform:audit:view",
+                  "platform:debts:manage",
+                  "platform:teams:manage"
+                ]
+              }
+            ],
+            "example": "debt:read"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this permission allows.",
+            "example": "View debt details and account information"
+          },
+          "resource": {
+            "type": "string",
+            "description": "The resource this permission applies to.",
+            "example": "debt"
+          },
+          "action": {
+            "type": "string",
+            "description": "The action this permission allows on the resource.",
+            "example": "read"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope modifier for fine-grained permissions.",
+            "example": "own",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the permission was created.",
+            "example": "2024-01-15T10:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "description",
+          "resource",
+          "action",
+          "scope",
+          "createdAt"
+        ]
+      },
+      "RoleDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the role.",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "organizationId": {
+            "type": "object",
+            "description": "The organization this role belongs to.",
+            "format": "uuid",
+            "example": "b1ffcd99-9c0b-4ef8-bb6d-6bb9bd380a22"
+          },
+          "name": {
+            "description": "The name of the role.",
+            "oneOf": [
+              {
+                "enum": [
+                  "ORG_ADMIN",
+                  "ORG_MANAGER",
+                  "ORG_TEAM_LEAD",
+                  "ORG_COLLECTOR",
+                  "ORG_VIEWER"
+                ]
+              },
+              {
+                "enum": [
+                  "PLATFORM_ADMIN",
+                  "PLATFORM_VIEWER",
+                  "PLATFORM_SUPPORT"
+                ]
+              }
+            ],
+            "example": "Collection Manager"
+          },
+          "description": {
+            "type": "object",
+            "description": "A description of the role and its responsibilities.",
+            "example": "Manages a team of collectors and oversees portfolio assignments."
+          },
+          "isSystemRole": {
+            "type": "boolean",
+            "description": "Indicates if this is a system-defined role that cannot be deleted.",
+            "example": false
+          },
+          "userCount": {
+            "type": "number",
+            "description": "The number of users assigned to this role.",
+            "example": 12
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the role was created.",
+            "example": "2024-10-20T15:30:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The timestamp when the role was last updated.",
+            "example": "2024-10-21T10:15:00Z"
+          },
+          "permissions": {
+            "description": "The permissions assigned to this role.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "description",
+          "isSystemRole",
+          "userCount",
+          "createdAt",
+          "updatedAt",
+          "permissions"
+        ]
+      },
+      "PaginatedRolesResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of roles matching the filters",
+            "example": 15
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Items per page",
+            "example": 20
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 1
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the role. Must be unique within the organization.",
+            "example": "Senior Collection Manager",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the role and its responsibilities.",
+            "example": "Manages multiple teams of collectors and strategic portfolio decisions.",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        }
+      },
+      "PaginatedPermissionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of permissions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of permissions",
+            "example": 42
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Items per page",
+            "example": 50
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 1
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "PermissionsByResourceDto": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "description": "The resource name",
+            "example": "debt"
+          },
+          "permissions": {
+            "description": "Permissions for this resource",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionResponseDto"
+            }
+          }
+        },
+        "required": [
+          "resource",
+          "permissions"
+        ]
+      },
+      "GroupedPermissionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "description": "Permissions grouped by resource",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionsByResourceDto"
+            }
+          }
+        },
+        "required": [
+          "groups"
+        ]
+      },
+      "AssignPermissionToRoleDto": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "string",
+            "description": "The ID of the permission to assign to the role.",
+            "format": "uuid",
+            "example": "c2aabbcc-9c0b-4ef8-bb6d-6bb9bd380a33"
+          }
+        },
+        "required": [
+          "permissionId"
+        ]
+      },
+      "AssignPermissionsToRoleDto": {
+        "type": "object",
+        "properties": {
+          "permissionIds": {
+            "description": "Array of permission IDs to assign to the role.",
+            "example": [
+              "perm-uuid-1",
+              "perm-uuid-2",
+              "perm-uuid-3"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "permissionIds"
+        ]
+      },
+      "AssignRoleToUserDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "description": "The ID of the role to assign to the user.",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note about why this role was assigned.",
+            "example": "Promoted to team lead",
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "roleId"
+        ]
+      },
+      "RemoveRoleFromUserDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "description": "The ID of the role to remove from the user.",
+            "format": "uuid",
+            "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note about why this role was removed.",
+            "example": "User transferred to different department",
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "roleId"
+        ]
+      },
+      "CheckPermissionDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "The user ID to check permissions for",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "The organization context",
+            "format": "uuid"
+          },
+          "permissionCode": {
+            "type": "string",
+            "description": "The permission code to check",
+            "example": "debt:read"
+          }
+        },
+        "required": [
+          "userId",
+          "organizationId",
+          "permissionCode"
+        ]
+      },
+      "PermissionCheckResultDto": {
+        "type": "object",
+        "properties": {
+          "permissionCode": {
+            "type": "string",
+            "description": "The permission code that was checked",
+            "example": "debt:read"
+          },
+          "hasPermission": {
+            "type": "boolean",
+            "description": "Whether the user has this permission",
+            "example": true
+          }
+        },
+        "required": [
+          "permissionCode",
+          "hasPermission"
+        ]
+      },
+      "CheckPermissionsDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "The user ID to check permissions for",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "The organization context",
+            "format": "uuid"
+          },
+          "permissionCodes": {
+            "description": "Array of permission codes to check",
+            "example": [
+              "debt:read",
+              "debt:update",
+              "payment:create"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "userId",
+          "organizationId",
+          "permissionCodes"
+        ]
+      },
+      "PermissionsCheckResultDto": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "description": "Results for each permission check",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionCheckResultDto"
+            }
+          },
+          "hasAllPermissions": {
+            "type": "boolean",
+            "description": "Whether the user has ALL requested permissions",
+            "example": false
+          }
+        },
+        "required": [
+          "results",
+          "hasAllPermissions"
+        ]
+      }
+    }
+  }
+}

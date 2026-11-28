@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="600"
+   height="200"
+   viewBox="0 0 600 200"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="verichron-inc-gemini-logo.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="1.0403168"
+     inkscape:cx="208.10968"
+     inkscape:cy="37.007958"
+     inkscape:window-width="1863"
+     inkscape:window-height="792"
+     inkscape:window-x="-3"
+     inkscape:window-y="42"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg9" />
+  <defs
+     id="defs2">
+    <radialGradient
+       id="spiralGrad"
+       cx="50%"
+       cy="50%"
+       r="50%"
+       fx="50%"
+       fy="50%">
+      <stop
+         offset="30%"
+         stop-color="#4FD1C5"
+         id="stop1" />
+      <stop
+         offset="100%"
+         stop-color="#0E5A6F"
+         id="stop2" />
+    </radialGradient>
+  </defs>
+  <rect
+     width="430.82898"
+     height="120.64855"
+     fill="#fafcfd"
+     id="rect2"
+     x="58.473743"
+     y="31.050564"
+     style="stroke-width:0.658146" />
+  <g
+     transform="translate(110, 100)"
+     id="g8">
+    <path
+       d="M0,0 L0,-60 A60,60 0 0,1 42,-42 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       id="path2"
+       transform="rotate(0)" />
+    <polyline
+       points="10,-40 10,-30 20,-20"
+       fill="none"
+       stroke="#F5FFFF"
+       stroke-width="1"
+       opacity="0.8"
+       id="polyline2"
+       transform="rotate(0)" />
+    <circle
+       cx="10"
+       cy="-40"
+       r="1.5"
+       fill="#F5FFFF"
+       id="circle2"
+       transform="rotate(0)" />
+    <path
+       d="M0,0 L0,-52 A52,52 0 0,1 36,-36 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       transform="rotate(45)"
+       id="path3" />
+    <polyline
+       points="8,-35 8,-25 15,-15"
+       fill="none"
+       stroke="#F5FFFF"
+       stroke-width="1"
+       opacity="0.8"
+       transform="rotate(45)"
+       id="polyline3" />
+    <circle
+       cx="8"
+       cy="-35"
+       r="1.5"
+       fill="#F5FFFF"
+       transform="rotate(45)"
+       id="circle3" />
+    <path
+       d="M0,0 L0,-45 A45,45 0 0,1 31,-31 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       transform="rotate(90)"
+       id="path4" />
+    <polyline
+       points="6,-30 6,-20 12,-10"
+       fill="none"
+       stroke="#F5FFFF"
+       stroke-width="1"
+       opacity="0.8"
+       transform="rotate(90)"
+       id="polyline4" />
+    <circle
+       cx="6"
+       cy="-30"
+       r="1.5"
+       fill="#F5FFFF"
+       transform="rotate(90)"
+       id="circle4" />
+    <path
+       d="M0,0 L0,-38 A38,38 0 0,1 26,-26 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       transform="rotate(135)"
+       id="path5" />
+    <polyline
+       points="5,-25 5,-15 10,-8"
+       fill="none"
+       stroke="#F5FFFF"
+       stroke-width="1"
+       opacity="0.8"
+       transform="rotate(135)"
+       id="polyline5" />
+    <circle
+       cx="5"
+       cy="-25"
+       r="1.5"
+       fill="#F5FFFF"
+       transform="rotate(135)"
+       id="circle5" />
+    <path
+       d="M0,0 L0,-32 A32,32 0 0,1 22,-22 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       transform="rotate(180)"
+       id="path6" />
+    <path
+       d="M0,0 L0,-26 A26,26 0 0,1 18,-18 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       id="path7"
+       transform="rotate(225)" />
+    <path
+       d="M0,0 L0,-20 A20,20 0 0,1 14,-14 Z"
+       fill="url(#spiralGrad)"
+       stroke="#F5FFFF"
+       stroke-width="1.5"
+       id="path8"
+       transform="rotate(270)" />
+    <circle
+       cx="0"
+       cy="0"
+       r="8"
+       fill="#0E5A6F"
+       stroke="#F5FFFF"
+       stroke-width="2"
+       id="circle8" />
+  </g>
+  <g
+     font-family="Inter, 'SF Pro Display', Arial, sans-serif"
+     transform="matrix(1.0742397,0,0,1.247475,179.8445,114.884)"
+     id="g9">
+    <text
+       x="0"
+       y="0"
+       font-size="48px"
+       font-weight="600"
+       fill="#0b2a3f"
+       letter-spacing="-1"
+       id="text8">Verichron</text>
+    <text
+       x="235"
+       y="0"
+       font-size="24px"
+       font-weight="400"
+       fill="#0b2a3f"
+       opacity="0.8"
+       id="text9">Inc.</text>
+  </g>
+</svg>

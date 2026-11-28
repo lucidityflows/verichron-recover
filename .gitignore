@@ -1,0 +1,41 @@
+# Private Docs
+private-docs/
+reference-only/
+reference-docs/
+temp/
+
+# TanstackRouter
+.tanstack
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build Output
+dist/
+*.tsbuildinfo
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# IDE & Editor Directories
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Misc
+.npm
+.gemini/

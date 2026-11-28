@@ -1,0 +1,677 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/organizations/{organizationId}/voice/config": {
+      "post": {
+        "operationId": "TwilioConfigController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTwilioConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Twilio configuration successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwilioConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set Twilio credentials for an organization",
+        "tags": [
+          "Voice Configuration"
+        ]
+      },
+      "get": {
+        "operationId": "TwilioConfigController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Twilio configuration retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwilioConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get Twilio configuration for an organization",
+        "tags": [
+          "Voice Configuration"
+        ]
+      },
+      "patch": {
+        "operationId": "TwilioConfigController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTwilioConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Twilio configuration successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwilioConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update Twilio credentials for an organization",
+        "tags": [
+          "Voice Configuration"
+        ]
+      },
+      "delete": {
+        "operationId": "TwilioConfigController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Twilio configuration successfully deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete Twilio configuration for an organization",
+        "tags": [
+          "Voice Configuration"
+        ]
+      }
+    },
+    "/v1/voice/token": {
+      "get": {
+        "operationId": "TokensController_generateToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate a Twilio capability token for the client-side softphone",
+        "tags": [
+          "Voice Tokens"
+        ]
+      }
+    },
+    "/v1/voice/calls/orgs/{organizationId}": {
+      "post": {
+        "operationId": "CallsController_initiateCall",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiateCallDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Initiate an outbound call to a debtor",
+        "tags": [
+          "Voice Calls"
+        ]
+      }
+    },
+    "/v1/voice/calls/orgs/{organizationId}/{debtorId}": {
+      "get": {
+        "operationId": "CallsController_getCallHistory",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get call history for a specific debtor",
+        "tags": [
+          "Voice Calls"
+        ]
+      }
+    },
+    "/public/voice/webhooks/voice": {
+      "post": {
+        "operationId": "WebhooksController_handleVoice",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Voice Webhooks"
+        ]
+      }
+    },
+    "/public/voice/webhooks/status": {
+      "post": {
+        "operationId": "WebhooksController_handleStatusCallback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusCallbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Voice Webhooks"
+        ]
+      }
+    },
+    "/public/voice/webhooks/recording": {
+      "post": {
+        "operationId": "WebhooksController_handleRecordingCallback",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Voice Webhooks"
+        ]
+      }
+    },
+    "/v1/organizations/{organizationId}/voice/sandbox/call": {
+      "post": {
+        "operationId": "SandboxController_call",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SandboxCallDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Test call initiated"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Initiate a test call (QA Sandbox)",
+        "tags": [
+          "QA Sandbox"
+        ]
+      }
+    },
+    "/ops/voice/sandbox/call": {
+      "post": {
+        "operationId": "SandboxOpsController_call",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SandboxCallDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Test call initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SandboxCallResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Initiate a test call (Platform Sandbox)",
+        "tags": [
+          "Ops: Voice Sandbox"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Voice API",
+    "description": "The Voice Microservice API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreateTwilioConfigDto": {
+        "type": "object",
+        "properties": {
+          "accountSid": {
+            "type": "string",
+            "description": "Twilio Account SID",
+            "example": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "authToken": {
+            "type": "string",
+            "description": "Twilio Auth Token",
+            "example": "your_auth_token"
+          },
+          "apiKeySid": {
+            "type": "string",
+            "description": "Twilio API Key SID",
+            "example": "SKxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "apiKeySecret": {
+            "type": "string",
+            "description": "Twilio API Key Secret",
+            "example": "your_api_key_secret"
+          },
+          "outgoingApplicationSid": {
+            "type": "string",
+            "description": "Twilio TwiML App SID for outgoing calls",
+            "example": "APxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        },
+        "required": [
+          "accountSid",
+          "authToken",
+          "apiKeySid",
+          "apiKeySecret",
+          "outgoingApplicationSid"
+        ]
+      },
+      "TwilioConfigResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the Twilio configuration",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "ID of the organization this configuration belongs to",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "accountSid": {
+            "type": "string",
+            "description": "Twilio Account SID",
+            "example": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "apiKeySid": {
+            "type": "string",
+            "description": "Twilio API Key SID",
+            "example": "SKxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "outgoingApplicationSid": {
+            "type": "string",
+            "description": "Twilio TwiML App SID for outgoing calls",
+            "example": "APxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the configuration was created",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the configuration was last updated",
+            "example": "2023-10-27T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "accountSid",
+          "apiKeySid",
+          "outgoingApplicationSid",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateTwilioConfigDto": {
+        "type": "object",
+        "properties": {
+          "accountSid": {
+            "type": "string",
+            "description": "Twilio Account SID",
+            "example": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "authToken": {
+            "type": "string",
+            "description": "Twilio Auth Token",
+            "example": "your_auth_token"
+          },
+          "apiKeySid": {
+            "type": "string",
+            "description": "Twilio API Key SID",
+            "example": "SKxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "apiKeySecret": {
+            "type": "string",
+            "description": "Twilio API Key Secret",
+            "example": "your_api_key_secret"
+          },
+          "outgoingApplicationSid": {
+            "type": "string",
+            "description": "Twilio TwiML App SID for outgoing calls",
+            "example": "APxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        }
+      },
+      "InitiateCallDto": {
+        "type": "object",
+        "properties": {
+          "debtorId": {
+            "type": "string",
+            "description": "The UUID of the debtor to call",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The phone number to call",
+            "example": "+15551234567"
+          }
+        },
+        "required": [
+          "debtorId",
+          "phoneNumber"
+        ]
+      },
+      "StatusCallbackDto": {
+        "type": "object",
+        "properties": {
+          "CallSid": {
+            "type": "string"
+          },
+          "AccountSid": {
+            "type": "string"
+          },
+          "From": {
+            "type": "string"
+          },
+          "To": {
+            "type": "string"
+          },
+          "CallStatus": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "RINGING",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED",
+              "CANCELED",
+              "NO_ANSWER",
+              "BUSY"
+            ]
+          },
+          "CallDuration": {
+            "type": "string"
+          },
+          "RecordingUrl": {
+            "type": "string"
+          },
+          "RecordingSid": {
+            "type": "string"
+          },
+          "RecordingDuration": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "CallSid",
+          "AccountSid",
+          "From",
+          "To",
+          "CallStatus"
+        ]
+      },
+      "SandboxCallDto": {
+        "type": "object",
+        "properties": {
+          "toNumber": {
+            "type": "string",
+            "description": "Phone number to call (E.164 format)",
+            "example": "+12125551234"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message to say (Text-to-Speech)",
+            "example": "This is a test call from the Debt Lucidity QA Sandbox."
+          }
+        },
+        "required": [
+          "toNumber"
+        ]
+      },
+      "SandboxCallResponseDto": {
+        "type": "object",
+        "properties": {
+          "sid": {
+            "type": "string",
+            "description": "Twilio Call SID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current call status"
+          },
+          "direction": {
+            "type": "string",
+            "description": "Call direction"
+          },
+          "from": {
+            "type": "string",
+            "description": "Caller number"
+          },
+          "to": {
+            "type": "string",
+            "description": "Recipient number"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the call was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if call failed"
+          }
+        }
+      }
+    }
+  }
+}

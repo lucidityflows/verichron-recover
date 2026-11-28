@@ -1,0 +1,258 @@
+name: CI (Quality Gate)
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+  workflow_dispatch:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Dependencies
+        run: pnpm --filter "./packages/**" --filter "./libs/**" build
+
+      - name: Run Lint
+        run: pnpm lint
+
+      - name: Build Monorepo (Compilation Check)
+        run: pnpm build
+
+      - name: Run Unit Tests
+        run: |
+          export JWT_SECRET=supersecretkey
+          export JWT_ACCESS_TOKEN_EXPIRES_IN=1h
+          export JWT_REFRESH_SECRET=superrefreshsecretkey
+          export JWT_REFRESH_TOKEN_EXPIRES_IN=7d
+          export AUTH_CONTEXT_TOKEN_SECRET=superactsecretkey
+          pnpm --filter @verichron/api-users --filter @verichron/api-organizations --filter @verichron/api-debts --filter @verichron/api-debtors --filter @verichron/api-communications --filter @verichron/api-workflows test
+
+      - name: Create .env.test
+        run: |
+          cat <<EOF > .env.test
+          # .env.test
+
+          # E2E Test Configuration
+
+          # Environment
+          NODE_ENV=test
+
+          # ============================================================================
+          # Google Cloud Platform (GCP) Configuration
+          # ============================================================================
+          PUBSUB_PROJECT_ID=test-project
+          PUBSUB_EMULATOR_HOST=localhost:8085
+
+          LOG_LEVEL=debug
+
+          # Document AI Configuration (for api-debts import parsing)
+          DOCUMENT_AI_EMULATOR=true
+          DOCUMENT_AI_ENABLED=true
+          DOCUMENT_AI_PROCESSOR_ID=mock-processor
+          DOCUMENT_AI_LOCATION=us
+          DOCUMENT_AI_MAX_PAGES_PER_FILE=100
+          DOCUMENT_AI_TIMEOUT_MS=60000
+          DOCUMENT_AI_MIN_CONFIDENCE=0.8
+          DOCUMENT_AI_MOCK_DELAY_MS=500
+
+          # Vertex AI Configuration
+          VERTEX_AI_ENABLED=true
+          GCP_PROJECT_ID=verichron-recover-test
+          GCP_LOCATION=us-central1
+          VERTEX_AI_MODEL=gemini-1.5-flash
+
+          # The path to your service account JSON file
+          GOOGLE_APPLICATION_CREDENTIALS=./credentials/gcp-service-account.json
+
+          # GCS Bucket Configuration
+          DEBTORS_DOCUMENTS_BUCKET=verichron-debtors-documents-test
+          DOCUMENTS_BUCKET_NAME=verichron-payments-docs-test
+
+          # Redis Configuration
+          REDIS_URL=redis://redis-test:6379
+          REDIS_HOST=redis-test
+          REDIS_PORT=6379
+          REDIS_PASSWORD=
+          REDIS_DB=0
+          REDIS_KEY_PREFIX=comms:
+          REDIS_TLS_ENABLED=false
+
+          # BullMQ Configuration
+          BULLMQ_REDIS_HOST=redis-test
+          BULLMQ_REDIS_PORT=6379
+          BULLMQ_REDIS_DB=1
+          BULLMQ_MAX_RETRIES=3
+
+          # Rate Limiting Configuration (api-communications)
+          RATE_LIMIT_DISPATCH_POINTS=100
+          RATE_LIMIT_DISPATCH_DURATION=60
+          RATE_LIMIT_WEBHOOK_POINTS=1000
+          RATE_LIMIT_WEBHOOK_DURATION=60
+
+          # Database Configuration
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db
+
+          # MongoDB Configuration
+          MONGODB_URI=mongodb://localhost:27017/communications
+
+          # JWT Configuration
+          JWT_SECRET=fake_jwt_secret_for_ci_testing_only_12345
+          JWT_ACCESS_TOKEN_EXPIRES_IN=1h
+          JWT_REFRESH_SECRET=fake_jwt_refresh_secret_for_ci_testing_only_12345
+          JWT_REFRESH_TOKEN_EXPIRES_IN=7d
+          AUTH_CONTEXT_TOKEN_SECRET=fake_act_secret_for_ci_testing_only_12345
+
+          # API URLs for E2E Tests (running on host machine)
+          API_USERS_URL=http://api-users-test:3001
+          API_ORGANIZATIONS_URL=http://api-organizations-test:3002
+          API_DEBTS_URL=http://api-debts-test:3003
+          API_DEBTORS_URL=http://api-debtors-test:3004
+          API_TRANSACTIONS_URL=http://api-transactions-test:3005
+          API_COMMUNICATIONS_URL=http://api-communications-test:3006
+          API_COLLECTORS_URL=http://api-collectors-test:3007
+          API_VOICE_URL=http://api-voice-test:3008
+          API_WORKFLOWS_URL=http://api-workflows-test:3009
+          API_AUTOMATIONS_URL=http://api-automations-test:3010
+          API_ANALYTICS_URL=http://api-analytics-test:3011
+
+          # API-URLS for Microfrontends (browser access via localhost)
+          VITE_API_USERS_URL=http://localhost:3001
+          VITE_API_ORGANIZATIONS_URL=http://localhost:3002
+          VITE_API_DEBTS_URL=http://localhost:3003
+          VITE_API_DEBTORS_URL=http://localhost:3004
+          VITE_API_TRANSACTIONS_URL=http://localhost:3005
+          VITE_API_COMMUNICATIONS_URL=http://localhost:3006
+          VITE_API_COLLECTORS_URL=http://localhost:3007
+          VITE_API_VOICE_URL=http://localhost:3008
+          VITE_API_WORKFLOWS_URL=http://localhost:3009
+          VITE_API_ANALYTICS_URL=http://localhost:3011
+
+          # Dashboard URLs for Microfrontend Redirection
+          VITE_APP_NAME=Verichron Recover
+          VITE_APP_BASE_URL=http://localhost:5175
+          VITE_AUTH_URL=http://localhost:5173
+          VITE_DASHBOARD_OPS_URL=http://localhost:5174
+          VITE_DASHBOARD_MANAGERS_URL=http://localhost:5175
+          VITE_DASHBOARD_COLLECTORS_URL=http://localhost:5176
+          VITE_DASHBOARD_CONSUMERS_URL=http://localhost:5177
+          VITE_MARKETING_URL=http://localhost:5178
+
+          # Stripe Configuration (for api-transactions)
+          STRIPE_SECRET_KEY=sk_test_fake_unused_key
+          STRIPE_PUBLISHABLE_KEY=pk_test_fake_unused_key
+          STRIPE_WEBHOOK_SECRET=whsec_fake_unused_key
+
+          # Gateway Provider Configuration (api-communications)
+          EMAIL_PROVIDER=sendgrid
+          SMS_PROVIDER=twilio
+          USE_MOCK_GATEWAYS=true
+          MOCK_SIMULATE_FAILURES=false
+          MOCK_DELIVERY_DELAY_MS=1000
+
+          # SendGrid Configuration (for api-communications)
+          SENDGRID_API_KEY=SG.fake_key_for_testing_only
+          EMAIL_FROM_ADDRESS=noreply@test.verichroninc.com
+          SENDGRID_WEBHOOK_PUBLIC_KEY="MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE_fake_webhook_key_for_testing_only=="
+
+          # Email Branding
+          EMAIL_FROM_NAME=Verichron Recover (Test)
+          EMAIL_REPLY_TO=support@test.verichroninc.com
+          EMAIL_BRAND_COMPANY_NAME=Verichron Inc
+          EMAIL_BRAND_PRODUCT_NAME=Verichron Recover
+          ACTIVATION_BASE_URL=http://localhost:5173/activate
+          PASSWORD_RESET_BASE_URL=http://localhost:5173/reset-password
+          UNSUBSCRIBE_BASE_URL=http://localhost:5177/unsubscribe
+          EMAIL_LOGO_URL=https://verichroninc.com/branding/logo-email.png
+          EMAIL_LOGO_SYMBOL_URL=https://verichroninc.com/branding/logo-symbol.png
+
+          # SMS CONFIGURATION (Twilio - Test Environment)
+          TWILIO_ACCOUNT_SID=AC_fake_account_sid_for_testing
+          TWILIO_MASTER_ACCOUNT_SID=AC_fake_master_account_sid_for_testing
+          TWILIO_AUTH_TOKEN=fake_auth_token_for_testing
+          SMS_FROM_NUMBER=+15005550006
+          TWILIO_WEBHOOK_URL=http://localhost:3006/webhooks/twilio
+
+          # VOICE CONFIGURATION (Twilio Voice - Test Environment)
+          TWILIO_VOICE_ACCOUNT_SID=AC_fake_voice_account_sid
+          TWILIO_VOICE_AUTH_TOKEN=fake_voice_auth_token
+          TWILIO_VOICE_API_KEY_SID=SK_fake_voice_api_key_sid
+          TWILIO_VOICE_API_KEY_SECRET=fake_voice_api_key_secret
+          TWILIO_VOICE_OUTGOING_APP_SID=AP_fake_outgoing_app_sid
+          TWILIO_VOICE_NUMBER=+17373775701
+          API_VOICE_APP_URL=http://localhost:3008
+          API_VOICE_ENCRYPTION_KEY=fake_encryption_key_for_voice_32_bytes_1234567890123456
+
+          # Service-to-Service Authentication Keys
+          SERVICE_KEY_USERS=test-e2e-users-service-key-change-in-production-12345678
+          SERVICE_KEY_ORGANIZATIONS=test-e2e-org-service-key-change-in-production-12345678
+          SERVICE_KEY_DEBTS=test-e2e-debts-service-key-change-in-production-12345678
+          SERVICE_KEY_DEBTORS=test-e2e-debtors-service-key-change-in-production-12345
+          SERVICE_KEY_TRANSACTIONS=test-e2e-transactions-service-key-change-in-prod-123
+          SERVICE_KEY_COMMUNICATIONS=test-e2e-comms-service-key-change-in-production-123
+          SERVICE_KEY_COLLECTORS=test-e2e-collectors-service-key-change-in-production-1234
+          SERVICE_KEY_VOICE=test-e2e-voice-service-key-change-in-production-1234
+          SERVICE_KEY_WORKFLOWS=test-e2e-workflows-service-key-change-in-production-1234
+          SERVICE_KEY_AUTOMATIONS=test-e2e-automations-service-key-change-in-production-1234
+          SERVICE_KEY_ANALYTICS=test-e2e-analytics-service-key-change-in-production-1234
+
+          # Feature Flags
+          FEATURE_VERTEX_AI_ENTITY_RESOLUTION=true
+          FEATURE_AUTOMATED_DUNNING_WORKFLOWS=true
+          FEATURE_SOFT_PHONE_INTEGRATION=true
+          FEATURE_CONSUMER_SELF_SERVICE_PORTAL=true
+          FEATURE_WHITE_LABEL_BRANDING=false
+          FEATURE_MULTI_REGION_DEPLOYMENT=false
+
+          # Monitoring
+          ENABLE_CLOUD_LOGGING=false
+          ENABLE_CLOUD_TRACE=false
+          ENABLE_CLOUD_MONITORING=false
+          ENABLE_ERROR_REPORTING=false
+
+          # Rate Limiting
+          RATE_LIMIT_WINDOW_MS=60000
+          RATE_LIMIT_MAX_REQUESTS=1000
+
+          # CORS
+          CORS_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177,http://localhost:5178
+          CORS_CREDENTIALS=true
+          CSP_ENABLED=false
+
+          # Debugging
+          DEBUG_ENABLED=true
+          VERBOSE_LOGGING=true
+          LOG_API_REQUESTS=true
+          LOG_API_RESPONSES=true
+          ENABLE_SWAGGER_UI=true
+          SWAGGER_PATH=/api/docs
+
+          # Backup
+          DATABASE_BACKUP_ENABLED=false
+          REDIS_SNAPSHOT_ENABLED=false
+          EOF
+
+      - name: Start E2E Infrastructure
+        run: pnpm e2e:setup
+
+      - name: Run E2E Integration Tests
+        run: pnpm e2e:test
+
+      - name: Teardown E2E Infrastructure
+        if: always()
+        run: pnpm e2e:teardown

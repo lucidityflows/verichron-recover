@@ -1,0 +1,538 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Verichron ENTERPRISE THEME SYSTEM
+   High-contrast, polished design for debt collection SaaS platform
+   ============================================================================ */
+
+/* Base CSS Variables - 12-Step Color Scales */
+:root {
+  /* ============================================================================
+     NEUTRAL SCALE (Slate) - 12 Steps
+     Step 1-2: Page backgrounds
+     Step 3-4: Card backgrounds and subtle borders
+     Step 5-6: Component backgrounds (inputs, selects)
+     Step 7-8: Interactive borders and states
+     Step 9-10: Solid backgrounds with contrast
+     Step 11-12: Text colors (high contrast)
+     ============================================================================ */
+  --neutral-1: 248 250 252;   /* Slate-50 */
+  --neutral-2: 241 245 249;   /* Slate-100 */
+  --neutral-3: 226 232 240;   /* Slate-200 */
+  --neutral-4: 203 213 225;   /* Slate-300 */
+  --neutral-5: 148 163 184;   /* Slate-400 */
+  --neutral-6: 100 116 139;   /* Slate-500 */
+  --neutral-7: 71 85 105;     /* Slate-600 */
+  --neutral-8: 51 65 85;      /* Slate-700 */
+  --neutral-9: 30 41 59;      /* Slate-800 */
+  --neutral-10: 15 23 42;     /* Slate-900 */
+  --neutral-11: 30 41 59;     /* Slate-800 */
+  --neutral-12: 15 23 42;     /* Slate-900 */
+
+  /* ============================================================================
+     INDIGO SCALE (Primary Brand) - 12 Steps
+     ============================================================================ */
+  --indigo-1: 238 242 255;    /* Indigo-50 */
+  --indigo-2: 224 231 255;    /* Indigo-100 */
+  --indigo-3: 199 210 254;    /* Indigo-200 */
+  --indigo-4: 165 180 252;    /* Indigo-300 */
+  --indigo-5: 129 140 248;    /* Indigo-400 */
+  --indigo-6: 99 102 241;     /* Indigo-500 */
+  --indigo-7: 79 70 229;      /* Indigo-600 */
+  --indigo-8: 67 56 202;      /* Indigo-700 */
+  --indigo-9: 55 48 163;      /* Indigo-800 */
+  --indigo-10: 49 46 129;     /* Indigo-900 */
+  --indigo-11: 55 48 163;     /* Indigo-800 */
+  --indigo-12: 49 46 129;     /* Indigo-900 */
+
+  /* ============================================================================
+     EMERALD SCALE (Success/Secondary) - 12 Steps
+     ============================================================================ */
+  --emerald-1: 236 253 245;   /* Emerald-50 */
+  --emerald-2: 209 250 229;   /* Emerald-100 */
+  --emerald-3: 167 243 208;   /* Emerald-200 */
+  --emerald-4: 110 231 183;   /* Emerald-300 */
+  --emerald-5: 52 211 153;    /* Emerald-400 */
+  --emerald-6: 16 185 129;    /* Emerald-500 */
+  --emerald-7: 5 150 105;     /* Emerald-600 */
+  --emerald-8: 4 120 87;      /* Emerald-700 */
+  --emerald-9: 6 95 70;       /* Emerald-800 */
+  --emerald-10: 6 78 59;      /* Emerald-900 */
+  --emerald-11: 6 95 70;      /* Emerald-800 */
+  --emerald-12: 6 78 59;      /* Emerald-900 */
+
+  /* ============================================================================
+     AMBER SCALE (Warning/Accent) - 12 Steps
+     ============================================================================ */
+  --amber-1: 255 251 235;     /* Amber-50 */
+  --amber-2: 254 243 199;     /* Amber-100 */
+  --amber-3: 253 230 138;     /* Amber-200 */
+  --amber-4: 252 211 77;      /* Amber-300 */
+  --amber-5: 251 191 36;      /* Amber-400 */
+  --amber-6: 245 158 11;      /* Amber-500 */
+  --amber-7: 217 119 6;       /* Amber-600 */
+  --amber-8: 180 83 9;        /* Amber-700 */
+  --amber-9: 146 64 14;       /* Amber-800 */
+  --amber-10: 120 53 15;      /* Amber-900 */
+  --amber-11: 146 64 14;      /* Amber-800 */
+  --amber-12: 120 53 15;      /* Amber-900 */
+
+  /* ============================================================================
+     RED SCALE (Error) - 12 Steps
+     ============================================================================ */
+  --red-1: 254 242 242;       /* Red-50 */
+  --red-2: 254 226 226;       /* Red-100 */
+  --red-3: 254 202 202;       /* Red-200 */
+  --red-4: 252 165 165;       /* Red-300 */
+  --red-5: 248 113 113;       /* Red-400 */
+  --red-6: 239 68 68;         /* Red-500 */
+  --red-7: 220 38 38;         /* Red-600 */
+  --red-8: 185 28 28;         /* Red-700 */
+  --red-9: 153 27 27;         /* Red-800 */
+  --red-10: 127 29 29;        /* Red-900 */
+  --red-11: 153 27 27;        /* Red-800 */
+  --red-12: 127 29 29;        /* Red-900 */
+
+  /* ============================================================================
+     BLUE SCALE (Info) - 12 Steps
+     ============================================================================ */
+  --blue-1: 239 246 255;      /* Blue-50 */
+  --blue-2: 219 234 254;      /* Blue-100 */
+  --blue-3: 191 219 254;      /* Blue-200 */
+  --blue-4: 147 197 253;      /* Blue-300 */
+  --blue-5: 96 165 250;       /* Blue-400 */
+  --blue-6: 59 130 246;       /* Blue-500 */
+  --blue-7: 37 99 235;        /* Blue-600 */
+  --blue-8: 29 78 216;        /* Blue-700 */
+  --blue-9: 30 64 175;        /* Blue-800 */
+  --blue-10: 30 58 138;       /* Blue-900 */
+  --blue-11: 30 64 175;       /* Blue-800 */
+  --blue-12: 30 58 138;       /* Blue-900 */
+
+  /* ============================================================================
+     SEMANTIC TOKEN MAPPINGS (Light Mode Default)
+     Using proper step hierarchy
+     ============================================================================ */
+  --background-rgb: var(--neutral-1);        /* Step 1: Lightest page bg */
+  --foreground-rgb: var(--neutral-12);       /* Step 12: Highest contrast text */
+
+  --card-rgb: var(--neutral-3);              /* Step 3: Slightly darker than bg */
+  --card-foreground-rgb: var(--neutral-12);  /* Step 12: Text on cards */
+
+  --popover-rgb: var(--neutral-3);
+  --popover-foreground-rgb: var(--neutral-12);
+
+  --muted-rgb: var(--neutral-2);             /* Step 2: De-emphasized areas */
+  --muted-foreground-rgb: var(--neutral-11); /* Step 11: Secondary text */
+
+  --border-rgb: var(--neutral-4);            /* Step 4: Subtle borders */
+  --input-rgb: var(--neutral-5);             /* Step 5: Input backgrounds */
+  --ring-rgb: var(--indigo-7);               /* Step 7: Focus rings */
+
+  /* Primary Brand */
+  --primary-rgb: var(--indigo-7);            /* Step 7: Solid interactive */
+  --primary-foreground-rgb: 255 255 255;
+  --primary-hover-rgb: var(--indigo-8);      /* Step 8: Hover state */
+
+  /* Secondary */
+  --secondary-rgb: var(--emerald-6);
+  --secondary-foreground-rgb: 255 255 255;
+
+  /* Accent */
+  --accent-rgb: var(--amber-6);
+  --accent-foreground-rgb: 255 255 255;
+
+  /* Semantic States */
+  --success-rgb: var(--emerald-6);
+  --success-foreground-rgb: 255 255 255;
+  --warning-rgb: var(--amber-6);
+  --warning-foreground-rgb: 255 255 255;
+  --error-rgb: var(--red-6);
+  --error-foreground-rgb: 255 255 255;
+  --info-rgb: var(--blue-6);
+  --info-foreground-rgb: 255 255 255;
+
+  /* Navigation/Sidebar - Dark contrast */
+  --sidebar-rgb: var(--neutral-10);          /* Step 10: Dark sidebar */
+  --sidebar-foreground-rgb: var(--neutral-1); /* Step 1: Light text */
+  --sidebar-accent-rgb: var(--indigo-7);
+  --sidebar-accent-foreground-rgb: 255 255 255;
+
+  /* Enterprise-specific additions */
+  --header-rgb: 255 255 255;                 /* Pure white header */
+  --header-border-rgb: var(--neutral-4);
+  --tooltip-rgb: var(--neutral-10);
+  --tooltip-foreground-rgb: var(--neutral-1);
+
+  /* Elevation shadows for depth */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(15 23 42 / 0.1), 0 4px 6px -4px rgb(15 23 42 / 0.08);
+  --shadow-xl: 0 20px 25px -5px rgb(15 23 42 / 0.1), 0 8px 10px -6px rgb(15 23 42 / 0.08);
+}
+
+/* Tailwind v4 @theme directive */
+@theme {
+  /* Typography */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Border radius - refined for enterprise */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+
+  /* Refined elevation system */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+
+  /* Color mappings */
+  --color-white: rgb(255 255 255);
+  --color-black: rgb(0 0 0);
+
+  --color-primary: rgb(var(--primary-rgb));
+  --color-primary-foreground: rgb(var(--primary-foreground-rgb));
+  --color-primary-hover: rgb(var(--primary-hover-rgb));
+  
+  --color-secondary: rgb(var(--secondary-rgb));
+  --color-secondary-foreground: rgb(var(--secondary-foreground-rgb));
+  
+  --color-accent: rgb(var(--accent-rgb));
+  --color-accent-foreground: rgb(var(--accent-foreground-rgb));
+
+  --color-background: rgb(var(--background-rgb));
+  --color-foreground: rgb(var(--foreground-rgb));
+  
+  --color-card: rgb(var(--card-rgb));
+  --color-card-foreground: rgb(var(--card-foreground-rgb));
+  
+  --color-popover: rgb(var(--popover-rgb));
+  --color-popover-foreground: rgb(var(--popover-foreground-rgb));
+
+  --color-muted: rgb(var(--muted-rgb));
+  --color-muted-foreground: rgb(var(--muted-foreground-rgb));
+  
+  --color-border: rgb(var(--border-rgb));
+  --color-input: rgb(var(--input-rgb));
+  --color-ring: rgb(var(--ring-rgb));
+
+  --color-success: rgb(var(--success-rgb));
+  --color-success-foreground: rgb(var(--success-foreground-rgb));
+  --color-warning: rgb(var(--warning-rgb));
+  --color-warning-foreground: rgb(var(--warning-foreground-rgb));
+  --color-error: rgb(var(--error-rgb));
+  --color-error-foreground: rgb(var(--error-foreground-rgb));
+  --color-info: rgb(var(--info-rgb));
+  --color-info-foreground: rgb(var(--info-foreground-rgb));
+
+  --color-sidebar: rgb(var(--sidebar-rgb));
+  --color-sidebar-foreground: rgb(var(--sidebar-foreground-rgb));
+  --color-sidebar-accent: rgb(var(--sidebar-accent-rgb));
+}
+
+/* Light Theme - Radix 12-Step Implementation */
+[data-theme='light'] {
+  /* Semantic Token Mappings using proper step hierarchy */
+  --background-rgb: var(--neutral-1);        /* Slate-50: Lightest page bg */
+  --foreground-rgb: var(--neutral-12);       /* Slate-900: Highest contrast text */
+
+  --card-rgb: var(--neutral-3);              /* Slate-200: Elevated surface */
+  --card-foreground-rgb: var(--neutral-12);  /* Slate-900: Text on cards */
+
+  --popover-rgb: var(--neutral-3);           /* Slate-200 */
+  --popover-foreground-rgb: var(--neutral-12);
+
+  --muted-rgb: var(--neutral-2);             /* Slate-100: De-emphasized areas */
+  --muted-foreground-rgb: var(--neutral-11); /* Slate-800: Secondary text (7:1 contrast) */
+
+  --border-rgb: var(--neutral-4);            /* Slate-300: Subtle borders */
+  --input-rgb: var(--neutral-5);             /* Slate-400: Input backgrounds */
+  --ring-rgb: var(--indigo-7);               /* Indigo-600: Focus rings */
+
+  /* Primary Brand */
+  --primary-rgb: var(--indigo-7);            /* Indigo-600 */
+  --primary-foreground-rgb: 255 255 255;
+  --primary-hover-rgb: var(--indigo-8);      /* Indigo-700: Hover state */
+
+  /* Secondary */
+  --secondary-rgb: var(--emerald-6);         /* Emerald-500 */
+  --secondary-foreground-rgb: 255 255 255;
+
+  /* Accent */
+  --accent-rgb: var(--amber-6);              /* Amber-500 */
+  --accent-foreground-rgb: 255 255 255;
+
+  /* Semantic States */
+  --success-rgb: var(--emerald-6);           /* Emerald-500 */
+  --success-foreground-rgb: 255 255 255;
+  --warning-rgb: var(--amber-6);             /* Amber-500 */
+  --warning-foreground-rgb: 255 255 255;
+  --error-rgb: var(--red-6);                 /* Red-500 */
+  --error-foreground-rgb: 255 255 255;
+  --info-rgb: var(--blue-6);                 /* Blue-500 */
+  --info-foreground-rgb: 255 255 255;
+
+  /* Navigation/Sidebar */
+  --sidebar-rgb: var(--neutral-10);          /* Slate-900: Dark sidebar */
+  --sidebar-foreground-rgb: var(--neutral-1); /* Slate-50: Light text */
+  --sidebar-accent-rgb: var(--indigo-7);     /* Indigo-600 */
+  --sidebar-accent-foreground-rgb: 255 255 255;
+}
+
+/* Dark Theme - Radix 12-Step Implementation (Inverted) */
+[data-theme='dark'],
+.dark {
+  /* Semantic Token Mappings with inverted neutral scale */
+  --background-rgb: var(--neutral-10);       /* Slate-900: Darkest page bg */
+  --foreground-rgb: var(--neutral-1);        /* Slate-50: Highest contrast text */
+
+  --card-rgb: var(--neutral-8);              /* Slate-700: Elevated surface */
+  --card-foreground-rgb: var(--neutral-1);   /* Slate-50: Text on cards */
+
+  --popover-rgb: var(--neutral-8);           /* Slate-700 */
+  --popover-foreground-rgb: var(--neutral-1);
+
+  --muted-rgb: var(--neutral-9);             /* Slate-800: De-emphasized areas */
+  --muted-foreground-rgb: var(--neutral-2);  /* Slate-100: Secondary text */
+
+  --border-rgb: var(--neutral-7);            /* Slate-600: Subtle borders */
+  --input-rgb: var(--neutral-8);             /* Slate-700: Input backgrounds */
+  --ring-rgb: var(--indigo-6);               /* Indigo-500: Focus rings (brighter) */
+
+  /* Primary Brand (brighter for dark bg) */
+  --primary-rgb: var(--indigo-6);            /* Indigo-500 */
+  --primary-foreground-rgb: 255 255 255;
+  --primary-hover-rgb: var(--indigo-5);      /* Indigo-400: Hover state */
+
+  /* Secondary */
+  --secondary-rgb: var(--emerald-5);         /* Emerald-400 (brighter) */
+  --secondary-foreground-rgb: 255 255 255;
+
+  /* Accent */
+  --accent-rgb: var(--amber-5);              /* Amber-400 (brighter) */
+  --accent-foreground-rgb: var(--neutral-10);
+
+  /* Semantic States */
+  --success-rgb: var(--emerald-5);           /* Emerald-400 */
+  --success-foreground-rgb: 255 255 255;
+  --warning-rgb: var(--amber-5);             /* Amber-400 */
+  --warning-foreground-rgb: var(--neutral-10);
+  --error-rgb: var(--red-5);                 /* Red-400 */
+  --error-foreground-rgb: 255 255 255;
+  --info-rgb: var(--blue-5);                 /* Blue-400 */
+  --info-foreground-rgb: 255 255 255;
+
+  /* Navigation/Sidebar */
+  --sidebar-rgb: var(--neutral-10);          /* Slate-900: Same as background */
+  --sidebar-foreground-rgb: var(--neutral-1); /* Slate-50: Light text */
+  --sidebar-accent-rgb: var(--indigo-6);     /* Indigo-500 */
+  --sidebar-accent-foreground-rgb: 255 255 255;
+
+  /* Dark mode shadows - subtler */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+}
+
+/* ============================================================================
+   ENTERPRISE UI ENHANCEMENTS
+   ============================================================================ */
+
+/* Smooth scrollbars */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(148 163 184);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(100 116 139);
+}
+
+/* Dark mode scrollbar */
+[data-theme='dark'] .custom-scrollbar {
+  scrollbar-color: rgb(71 85 105) transparent;
+}
+
+[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(71 85 105);
+}
+
+[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(100 116 139);
+}
+
+/* Refined animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-in-95 {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Enhanced focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid rgb(var(--ring-rgb));
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Remove default focus outline when not using keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Button enhancements */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Selection styling */
+::selection {
+  background-color: rgb(var(--primary-rgb) / 0.2);
+  color: rgb(var(--foreground-rgb));
+}
+
+/* Typography enhancements */
+body {
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Monospace number styling for better alignment */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide scrollbar for specific elements while maintaining scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Enterprise-grade transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Backdrop blur support */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+.backdrop-blur {
+  backdrop-filter: blur(8px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-rgb: 71 85 105;
+    --muted-foreground-rgb: 51 65 85;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,6115 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}": {
+      "get": {
+        "description": "Retrieve a paginated list of debtors accessible by the requesting organization with optional filtering.",
+        "operationId": "ProfilesController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "firstName",
+            "required": false,
+            "in": "query",
+            "description": "Filter by first name (partial match)",
+            "schema": {
+              "example": "John",
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastName",
+            "required": false,
+            "in": "query",
+            "description": "Filter by last name (partial match)",
+            "schema": {
+              "example": "Doe",
+              "type": "string"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by verification status",
+            "schema": {
+              "$ref": "#/components/schemas/DebtorVerificationStatus"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by user ID",
+            "schema": {
+              "format": "uuid",
+              "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by organization ID (requires organization access)",
+            "schema": {
+              "format": "uuid",
+              "example": "456fcdeb-51a2-43d7-b890-987654321xyz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search query (searches across first name, last name, email, phone)",
+            "schema": {
+              "example": "john",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "hasUserAccount",
+            "required": false,
+            "in": "query",
+            "description": "Filter by whether debtor has a user account",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "createdAfter",
+            "required": false,
+            "in": "query",
+            "description": "Filter by creation date (after this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdBefore",
+            "required": false,
+            "in": "query",
+            "description": "Filter by creation date (before this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "default": "lastName",
+              "example": "lastName",
+              "type": "string",
+              "enum": [
+                "firstName",
+                "lastName",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order (alias for sortDirection)",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtors retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDebtorsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all debtors",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "post": {
+        "description": "Create a new debtor profile. Automatically grants access to the creating organization.",
+        "operationId": "ProfilesController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDebtorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Debtor created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorProfileEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions"
+          },
+          "409": {
+            "description": "Conflict - Debtor already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific debtor including contact information.",
+        "operationId": "ProfilesController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtor retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorProfileEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get debtor by ID",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "put": {
+        "description": "Fully update a debtor profile. All fields in the request body will replace existing values.",
+        "operationId": "ProfilesController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDebtorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debtor updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorProfileEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update debtor profile (full replacement)",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "patch": {
+        "description": "Update specific fields of a debtor profile. Only provided fields will be updated.",
+        "operationId": "ProfilesController_partialUpdate",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartialUpdateDebtorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debtor updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorProfileEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Partially update debtor profile",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "delete": {
+        "description": "Soft delete a debtor profile by setting deletedAt timestamp. Maintains audit trail for compliance.",
+        "operationId": "ProfilesController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Debtor soft deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/invite": {
+      "post": {
+        "description": "Sends an invitation to a debtor to create a user account or links an existing user account to the debtor profile. Enforces global email uniqueness.",
+        "operationId": "ProfilesController_inviteDebtor",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteDebtorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invitation sent or user linked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteDebtorResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions"
+          },
+          "404": {
+            "description": "Debtor not found"
+          },
+          "409": {
+            "description": "Conflict - Email already associated with a different debtor"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a debtor to link to a user account",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/invite-portfolio": {
+      "post": {
+        "description": "Sends invitation events in batches to create debtor user accounts for all debtors in a portfolio. Processes 100 invitations per batch for optimal performance.",
+        "operationId": "ProfilesController_invitePortfolioDebtors",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitePortfolioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation batch sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invitationBatchId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for this invitation batch"
+                    },
+                    "totalInvitations": {
+                      "type": "number",
+                      "description": "Number of debtors invited"
+                    },
+                    "totalBatches": {
+                      "type": "number",
+                      "description": "Number of event batches published"
+                    },
+                    "skipped": {
+                      "type": "number",
+                      "description": "Number of debtors skipped (already invited or no email)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid portfolio ID"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions"
+          },
+          "404": {
+            "description": "Portfolio not found or no debtors to invite"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite all debtors from a portfolio",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/addresses": {
+      "get": {
+        "description": "Retrieve all addresses associated with a specific debtor.",
+        "operationId": "ProfilesController_findAllAddresses",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Addresses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DebtorAddress"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all addresses for a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "post": {
+        "description": "Create a new address record for a debtor.",
+        "operationId": "ProfilesController_createAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Address created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorAddress"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a new address to a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/addresses/{addressId}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific debtor address.",
+        "operationId": "ProfilesController_findOneAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "description": "Address UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorAddress"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Address not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific address",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "put": {
+        "description": "Update an existing address for a debtor.",
+        "operationId": "ProfilesController_updateAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "description": "Address UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorAddress"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Address not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a debtor address",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "delete": {
+        "description": "Delete a specific address for a debtor.",
+        "operationId": "ProfilesController_removeAddress",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "addressId",
+            "required": true,
+            "in": "path",
+            "description": "Address UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Address deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Address not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove an address from a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/emails": {
+      "get": {
+        "description": "Retrieve all email addresses associated with a specific debtor.",
+        "operationId": "ProfilesController_findAllEmails",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Emails retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DebtorEmail"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all emails for a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "post": {
+        "description": "Create a new email record for a debtor.",
+        "operationId": "ProfilesController_createEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Email created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorEmail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          },
+          "409": {
+            "description": "Conflict - Email already exists for this debtor"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a new email to a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/emails/{emailId}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific debtor email.",
+        "operationId": "ProfilesController_findOneEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailId",
+            "required": true,
+            "in": "path",
+            "description": "Email UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174002",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorEmail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Email not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific email",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "put": {
+        "description": "Update an existing email for a debtor.",
+        "operationId": "ProfilesController_updateEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailId",
+            "required": true,
+            "in": "path",
+            "description": "Email UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174002",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorEmail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Email not found"
+          },
+          "409": {
+            "description": "Conflict - Email already exists for this debtor"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a debtor email",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "delete": {
+        "description": "Delete a specific email for a debtor.",
+        "operationId": "ProfilesController_removeEmail",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailId",
+            "required": true,
+            "in": "path",
+            "description": "Email UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174002",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Email deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Email not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove an email from a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/phones": {
+      "get": {
+        "description": "Retrieve all phone numbers associated with a specific debtor.",
+        "operationId": "ProfilesController_findAllPhones",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phones retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DebtorPhone"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all phones for a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "post": {
+        "description": "Create a new phone record for a debtor.",
+        "operationId": "ProfilesController_createPhone",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePhoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Phone created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorPhone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Debtor not found"
+          },
+          "409": {
+            "description": "Conflict - Phone already exists for this debtor"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a new phone to a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/profiles/orgs/{organizationId}/{id}/phones/{phoneId}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific debtor phone.",
+        "operationId": "ProfilesController_findOnePhone",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneId",
+            "required": true,
+            "in": "path",
+            "description": "Phone UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174003",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phone retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorPhone"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Phone not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific phone",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "put": {
+        "description": "Update an existing phone for a debtor.",
+        "operationId": "ProfilesController_updatePhone",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneId",
+            "required": true,
+            "in": "path",
+            "description": "Phone UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174003",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePhoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorPhone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Phone not found"
+          },
+          "409": {
+            "description": "Conflict - Phone already exists for this debtor"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a debtor phone",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      },
+      "delete": {
+        "description": "Delete a specific phone for a debtor.",
+        "operationId": "ProfilesController_removePhone",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "phoneId",
+            "required": true,
+            "in": "path",
+            "description": "Phone UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174003",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Phone deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication token"
+          },
+          "403": {
+            "description": "Forbidden - Organization does not have access to this debtor"
+          },
+          "404": {
+            "description": "Phone not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a phone from a debtor",
+        "tags": [
+          "Debtor Profiles"
+        ]
+      }
+    },
+    "/v1/debtors/demographics/orgs/{organizationId}/debtors/{debtorId}": {
+      "get": {
+        "description": "Retrieve sensitive demographic information for a debtor. Access is logged for compliance audit trails. Organization must have access to the debtor.",
+        "operationId": "DemographicsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Demographics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorDemographics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sensitive-data": [
+              "This endpoint handles sensitive PII"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get demographics for a debtor",
+        "tags": [
+          "Debtor Demographics"
+        ]
+      },
+      "post": {
+        "description": "Create a new demographics record for a debtor.",
+        "operationId": "DemographicsController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDemographicsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Demographics created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorDemographics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sensitive-data": [
+              "This endpoint handles sensitive PII"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create demographics for a debtor",
+        "tags": [
+          "Debtor Demographics"
+        ]
+      },
+      "put": {
+        "description": "Fully update demographics for a debtor.",
+        "operationId": "DemographicsController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDemographicsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Demographics updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorDemographics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sensitive-data": [
+              "This endpoint handles sensitive PII"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update demographics (full replacement)",
+        "tags": [
+          "Debtor Demographics"
+        ]
+      },
+      "patch": {
+        "description": "Update specific fields of demographics record.",
+        "operationId": "DemographicsController_partialUpdate",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartialUpdateDemographicsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Demographics updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorDemographics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "sensitive-data": [
+              "This endpoint handles sensitive PII"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Partially update demographics",
+        "tags": [
+          "Debtor Demographics"
+        ]
+      },
+      "delete": {
+        "description": "Permanently delete demographics record for a debtor.",
+        "operationId": "DemographicsController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Demographics deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "sensitive-data": [
+              "This endpoint handles sensitive PII"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete demographics for a debtor",
+        "tags": [
+          "Debtor Demographics"
+        ]
+      }
+    },
+    "/v1/debtors/documents/orgs/{organizationId}/debtors/{debtorId}": {
+      "get": {
+        "description": "Retrieve a paginated list of documents for a debtor with optional filtering.",
+        "operationId": "DocumentsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by document type",
+            "schema": {
+              "$ref": "#/components/schemas/DebtorDocumentType"
+            }
+          },
+          {
+            "name": "isVerified",
+            "required": false,
+            "in": "query",
+            "description": "Filter by verification status",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isArchived",
+            "required": false,
+            "in": "query",
+            "description": "Filter by archived status",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "tag",
+            "required": false,
+            "in": "query",
+            "description": "Search by tag",
+            "schema": {
+              "example": "verified",
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": false,
+            "in": "query",
+            "description": "Include archived documents",
+            "schema": {
+              "default": false,
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "uploadedAfter",
+            "required": false,
+            "in": "query",
+            "description": "Filter by upload date (after this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "uploadedBefore",
+            "required": false,
+            "in": "query",
+            "description": "Filter by upload date (before this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "expiresAfter",
+            "required": false,
+            "in": "query",
+            "description": "Filter by expiration date (after this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "expiresBefore",
+            "required": false,
+            "in": "query",
+            "description": "Filter by expiration date (before this date)",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "default": "createdAt",
+              "example": "createdAt",
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "uploadedAt",
+                "originalFilename",
+                "fileSize"
+              ]
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documents retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDocumentsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all documents for a debtor",
+        "tags": [
+          "Debtor Documents"
+        ]
+      },
+      "post": {
+        "description": "Upload a document file and create metadata record. File is stored in Google Cloud Storage. Maximum file size: 10MB. Allowed types: PDF, images, Word documents, Excel spreadsheets, text files.",
+        "operationId": "DocumentsController_upload",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Document file and metadata",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Document uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a document",
+        "tags": [
+          "Debtor Documents"
+        ]
+      }
+    },
+    "/v1/debtors/documents/orgs/{organizationId}/debtors/{debtorId}/{id}": {
+      "get": {
+        "description": "Retrieve metadata for a specific document. To download the file, use the /download endpoint.",
+        "operationId": "DocumentsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174006",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document metadata retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get document metadata",
+        "tags": [
+          "Debtor Documents"
+        ]
+      },
+      "put": {
+        "description": "Update document metadata. This does NOT update the file itself. To replace a file, delete the old document and upload a new one.",
+        "operationId": "DocumentsController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174006",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document metadata updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update document metadata",
+        "tags": [
+          "Debtor Documents"
+        ]
+      },
+      "delete": {
+        "description": "Soft delete a document by marking it as archived.",
+        "operationId": "DocumentsController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174006",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete (archive) a document",
+        "tags": [
+          "Debtor Documents"
+        ]
+      }
+    },
+    "/v1/debtors/documents/orgs/{organizationId}/debtors/{debtorId}/{id}/download": {
+      "get": {
+        "description": "Generate a time-limited signed URL for downloading the document file.",
+        "operationId": "DocumentsController_generateDownloadUrl",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174006",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed URL generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadUrlDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get signed download URL",
+        "tags": [
+          "Debtor Documents"
+        ]
+      }
+    },
+    "/v1/debtors/documents/orgs/{organizationId}/debtors/{debtorId}/{id}/archive": {
+      "post": {
+        "description": "Soft delete a document by marking it as archived.",
+        "operationId": "DocumentsController_archive",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174006",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document archived successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive a document",
+        "tags": [
+          "Debtor Documents"
+        ]
+      }
+    },
+    "/v1/debtors/documents/orgs/{organizationId}/debtors/{debtorId}/storage-usage": {
+      "get": {
+        "description": "Calculate total storage used by all non-archived documents for a debtor.",
+        "operationId": "DocumentsController_getStorageUsage",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage usage calculated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageUsageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get total storage usage for debtor",
+        "tags": [
+          "Debtor Documents"
+        ]
+      }
+    },
+    "/v1/debtors/verifications/orgs/{organizationId}/debtors/{debtorId}": {
+      "get": {
+        "description": "Retrieve a paginated list of verification requests with optional filtering by type and status.",
+        "operationId": "VerificationController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "verificationType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by verification type",
+            "schema": {
+              "$ref": "#/components/schemas/VerificationType"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "$ref": "#/components/schemas/VerificationRequestStatus"
+            }
+          },
+          {
+            "name": "requestedAfter",
+            "required": false,
+            "in": "query",
+            "description": "Filter verifications requested after this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestedBefore",
+            "required": false,
+            "in": "query",
+            "description": "Filter verifications requested before this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by",
+            "schema": {
+              "default": "requestedAt",
+              "example": "requestedAt",
+              "type": "string",
+              "enum": [
+                "requestedAt",
+                "completedAt",
+                "status",
+                "verificationType"
+              ]
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification requests retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVerificationRequestsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List verification requests for a debtor",
+        "tags": [
+          "Debtor Verifications"
+        ]
+      },
+      "post": {
+        "description": "Create a new verification request. Processing happens asynchronously.",
+        "operationId": "VerificationController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVerificationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Verification request created and queued for processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request a new verification",
+        "tags": [
+          "Debtor Verifications"
+        ]
+      }
+    },
+    "/v1/debtors/verifications/orgs/{organizationId}/debtors/{debtorId}/statistics": {
+      "get": {
+        "description": "Retrieve aggregated statistics about verification requests (counts by status and type).",
+        "operationId": "VerificationController_getStatistics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationStatisticsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get verification statistics for a debtor",
+        "tags": [
+          "Debtor Verifications"
+        ]
+      }
+    },
+    "/v1/debtors/verifications/orgs/{organizationId}/debtors/{debtorId}/{id}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific verification request including results.",
+        "operationId": "VerificationController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Verification request UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174007",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification request retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get verification request details",
+        "tags": [
+          "Debtor Verifications"
+        ]
+      }
+    },
+    "/v1/debtors/verifications/orgs/{organizationId}/debtors/{debtorId}/{id}/retry": {
+      "post": {
+        "description": "Retry a verification that previously failed or encountered an error.",
+        "operationId": "VerificationController_retry",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Verification request UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174007",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification retry initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retry a failed verification",
+        "tags": [
+          "Debtor Verifications"
+        ]
+      }
+    },
+    "/internal/debtors/analytics/dashboard-summary/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates debtor metrics for the dashboard.\n      Called by the event orchestrator to build the dashboard summary.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDashboardSummary",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard summary retrieved successfully"
+          }
+        },
+        "summary": "Get dashboard summary for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debtors/analytics/flow/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates debtor data by dimension (e.g., STATE) for flow visualization.\n      Called by the event orchestrator to build flow analytics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getFlowAnalytics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": true,
+            "in": "query",
+            "description": "Flow dimension to visualize",
+            "schema": {
+              "$ref": "#/components/schemas/FlowDimension"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flow analytics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowAnalyticsDebtorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get flow analytics for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debtors/analytics/geographic/debtors/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates debtor data by state for geographic visualization.\n      Called by the event orchestrator to build geographic debtor analytics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getGeographicDebtors",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "states",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific states (state codes)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio ID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geographic debtor analytics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeographicDebtorsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get geographic debtor analytics for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debtors/analytics/debtor-focus/{organizationId}/{debtorProfileId}": {
+      "get": {
+        "description": "\n      Retrieves complete debtor profile with all contact information.\n      Called by the event orchestrator to build the debtor focus view for collectors.\n\n      Returns profile details, addresses, emails, and phone numbers\n      for this debtor within the organization.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDebtorProfile",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorProfileId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor Profile UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtor profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorFocusProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debtor profile with contact information (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Debtors API",
+    "description": "The Debtors Microservice API - Manages debtor profiles, contact information, demographics, verification, and documents",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Debtors",
+      "description": "Debtor profile and contact information management"
+    },
+    {
+      "name": "Demographics",
+      "description": "Sensitive demographic information management"
+    },
+    {
+      "name": "Verification",
+      "description": "Data verification and validation"
+    },
+    {
+      "name": "Documents",
+      "description": "Document metadata and storage management"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "DebtorVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "unverified",
+          "pending",
+          "verified",
+          "failed"
+        ]
+      },
+      "SortOrder": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "DebtorAddress": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique address identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174001",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this address belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "addressCategory": {
+            "type": "string",
+            "description": "Address category/type",
+            "example": "RESIDENCE_PRIMARY",
+            "enum": [
+              "RESIDENCE_PRIMARY",
+              "RESIDENCE_SECONDARY",
+              "PLACE_OF_EMPLOYMENT",
+              "RELATIVE",
+              "PO_BOX",
+              "LEGAL_CORRESPONDENCE",
+              "HEADQUARTERS",
+              "BRANCH"
+            ]
+          },
+          "street1": {
+            "type": "string",
+            "description": "Street address line 1",
+            "example": "123 Main Street",
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "Street address line 2 (apartment, suite, etc.)",
+            "example": "Apt 4B",
+            "maxLength": 255
+          },
+          "street3": {
+            "type": "string",
+            "description": "Street address line 3",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "Springfield",
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province",
+            "example": "IL",
+            "maxLength": 50
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "ZIP or postal code",
+            "example": "62701",
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "Country (defaults to US)",
+            "example": "US",
+            "maxLength": 100,
+            "default": "US"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "Latitude coordinate",
+            "example": 39.7817213
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Longitude coordinate",
+            "example": -89.6501481
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether this address has been verified",
+            "example": false,
+            "default": false
+          },
+          "verifiedAt": {
+            "format": "date",
+            "type": "string",
+            "description": "Date address was last verified",
+            "example": "2024-01-15"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "Whether this is the current/active address",
+            "example": true,
+            "default": true
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary address for the debtor",
+            "example": true,
+            "default": false
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when address was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when address was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "addressCategory",
+          "street1",
+          "city",
+          "state",
+          "postalCode",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DebtorEmail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique email record identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174002",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this email belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "john.doe@example.com",
+            "maxLength": 255
+          },
+          "emailCategory": {
+            "type": "string",
+            "description": "Email type/category",
+            "example": "GENERAL",
+            "enum": [
+              "GENERAL",
+              "BILLING",
+              "SUPPORT",
+              "LEGAL",
+              "TECHNICAL",
+              "WORK"
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary email",
+            "example": true,
+            "default": false
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether this email has been verified",
+            "example": false,
+            "default": false
+          },
+          "verifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date email was last verified",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "bounceStatus": {
+            "type": "string",
+            "description": "Email bounce status",
+            "example": "VALID",
+            "enum": [
+              "VALID",
+              "BOUNCED",
+              "SOFT_BOUNCE",
+              "HARD_BOUNCE",
+              "COMPLAINED",
+              "UNKNOWN"
+            ]
+          },
+          "lastBouncedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp of last bounce event",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when email was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when email was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "email",
+          "emailCategory",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DebtorPhone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique phone record identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174003",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this phone belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number (formatted)",
+            "example": "+1-555-123-4567",
+            "maxLength": 20
+          },
+          "category": {
+            "type": "string",
+            "description": "Phone type/category",
+            "example": "MOBILE",
+            "enum": [
+              "MOBILE",
+              "HOME",
+              "WORK",
+              "BUSINESS",
+              "FAX",
+              "OTHER"
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary phone number",
+            "example": true,
+            "default": false
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether this phone has been verified",
+            "example": false,
+            "default": false
+          },
+          "verifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date phone was last verified",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "canReceiveSms": {
+            "type": "boolean",
+            "description": "Whether this phone can receive SMS messages",
+            "example": true,
+            "default": false
+          },
+          "canReceiveCalls": {
+            "type": "boolean",
+            "description": "Whether this phone can receive calls",
+            "example": true,
+            "default": true
+          },
+          "isOptedOut": {
+            "type": "boolean",
+            "description": "Whether debtor opted out of communications on this number",
+            "example": false,
+            "default": false
+          },
+          "optedOutAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when debtor opted out",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when phone was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when phone was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "phoneNumber",
+          "category",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DebtorProfileEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique debtor profile identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "debtorIdentityId": {
+            "type": "string",
+            "description": "Debtor identity ID (global identifier for the person)",
+            "example": "789fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Debtor first name",
+            "example": "John",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Debtor last name",
+            "example": "Doe",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Debtor middle name",
+            "example": "Michael",
+            "maxLength": 100
+          },
+          "dateOfBirth": {
+            "format": "date",
+            "type": "string",
+            "description": "Debtor date of birth",
+            "example": "1985-06-15"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID that owns this debtor profile",
+            "example": "789fcdeb-51a2-43d7-b890-987654321xyz",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "description": "Lifecycle status of debtor profile",
+            "example": "ACTIVE",
+            "enum": [
+              "PENDING_INVITATION",
+              "INVITED",
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED"
+            ],
+            "default": "PENDING_INVITATION"
+          },
+          "invitedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when invitation was sent to debtor",
+            "example": "2024-01-10T09:00:00Z"
+          },
+          "acceptedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when debtor accepted invitation",
+            "example": "2024-01-12T14:30:00Z"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "description": "Verification status of debtor information",
+            "example": "verified",
+            "enum": [
+              "unverified",
+              "pending",
+              "verified",
+              "failed"
+            ],
+            "default": "unverified"
+          },
+          "lastVerifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp of last verification attempt",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the debtor (organization-specific)",
+            "example": "Prefers email communication"
+          },
+          "primaryCollectorId": {
+            "type": "string",
+            "description": "Assigned primary collector for this relationship (Sticky Assignment)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "description": "Debtor addresses (organization-specific)",
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DebtorAddress"
+              }
+            }
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "description": "Debtor email addresses (organization-specific)",
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DebtorEmail"
+              }
+            }
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "description": "Debtor phone numbers (organization-specific)",
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DebtorPhone"
+              }
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when debtor profile was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when debtor profile was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when debtor profile was soft deleted",
+            "example": "2024-01-20T15:45:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorIdentityId",
+          "firstName",
+          "lastName",
+          "organizationId",
+          "status",
+          "verificationStatus",
+          "addresses",
+          "emails",
+          "phones",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedDebtorsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of debtor profiles for the current page",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorProfileEntity"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of debtors available",
+            "example": 150
+          },
+          "page": {
+            "type": "number",
+            "description": "The current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "The number of items per page",
+            "example": 20
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "CreateDebtorDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Debtor first name",
+            "example": "John",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Debtor last name",
+            "example": "Doe",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Debtor middle name",
+            "example": "Michael",
+            "maxLength": 100
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Debtor date of birth in ISO 8601 format",
+            "example": "1985-06-15",
+            "format": "date"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID if debtor has registered as a platform user",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "verificationStatus": {
+            "description": "Verification status of debtor information",
+            "example": "unverified",
+            "default": "unverified",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtorVerificationStatus"
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the debtor",
+            "example": "Prefers email communication"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "UpdateDebtorDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Debtor first name",
+            "example": "John",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Debtor last name",
+            "example": "Doe",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Debtor middle name",
+            "example": "Michael",
+            "maxLength": 100
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Debtor date of birth in ISO 8601 format",
+            "example": "1985-06-15",
+            "format": "date"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID if debtor has registered as a platform user",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "verificationStatus": {
+            "description": "Verification status of debtor information",
+            "example": "verified",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtorVerificationStatus"
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the debtor",
+            "example": "Prefers email communication"
+          }
+        }
+      },
+      "PartialUpdateDebtorDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Debtor first name",
+            "example": "John",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Debtor last name",
+            "example": "Doe",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Debtor middle name",
+            "example": "Michael",
+            "maxLength": 100
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Debtor date of birth in ISO 8601 format",
+            "example": "1985-06-15",
+            "format": "date"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User ID if debtor has registered as a platform user",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "verificationStatus": {
+            "description": "Verification status of debtor information",
+            "example": "verified",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtorVerificationStatus"
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the debtor",
+            "example": "Prefers email communication"
+          }
+        }
+      },
+      "InviteDebtorDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address for the debtor user account",
+            "example": "john.doe@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name of the debtor",
+            "example": "John",
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name of the debtor",
+            "example": "Doe",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "email",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "InviteDebtorResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Invitation sent successfully"
+          },
+          "debtorId": {
+            "type": "string",
+            "description": "UUID of the debtor profile",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "userId": {
+            "type": "string",
+            "description": "UUID of the linked user account (if existing user was linked)",
+            "example": "789e4567-e89b-12d3-a456-426614174999"
+          },
+          "invitationSent": {
+            "type": "boolean",
+            "description": "Whether an invitation email was sent",
+            "example": true
+          }
+        },
+        "required": [
+          "message",
+          "debtorId",
+          "invitationSent"
+        ]
+      },
+      "InvitePortfolioDto": {
+        "type": "object",
+        "properties": {
+          "portfolioId": {
+            "type": "string",
+            "description": "Portfolio ID to invite debtors from",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "portfolioId"
+        ]
+      },
+      "AddressCategory": {
+        "type": "string",
+        "enum": [
+          "RESIDENCE_PRIMARY",
+          "RESIDENCE_SECONDARY",
+          "PLACE_OF_EMPLOYMENT",
+          "RELATIVE",
+          "PO_BOX",
+          "LEGAL_CORRESPONDENCE",
+          "HEADQUARTERS",
+          "BRANCH"
+        ],
+        "description": "Address type category"
+      },
+      "CreateAddressDto": {
+        "type": "object",
+        "properties": {
+          "addressCategory": {
+            "description": "Address type category",
+            "example": "RESIDENCE_PRIMARY",
+            "default": "RESIDENCE_PRIMARY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressCategory"
+              }
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary address",
+            "example": true,
+            "default": false
+          },
+          "street1": {
+            "type": "string",
+            "description": "Street address line 1",
+            "example": "123 Main Street",
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "Street address line 2 (apartment, suite, etc.)",
+            "example": "Apt 4B",
+            "maxLength": 255
+          },
+          "street3": {
+            "type": "string",
+            "description": "Street address line 3",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "San Francisco",
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province code",
+            "example": "CA",
+            "maxLength": 50
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal/ZIP code",
+            "example": "94102",
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "Country",
+            "example": "US",
+            "maxLength": 100,
+            "default": "US"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "Whether this is the current/active address",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "addressCategory",
+          "street1",
+          "city",
+          "state",
+          "postalCode"
+        ]
+      },
+      "UpdateAddressDto": {
+        "type": "object",
+        "properties": {
+          "addressCategory": {
+            "description": "Address type category",
+            "example": "RESIDENCE_PRIMARY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressCategory"
+              }
+            ]
+          },
+          "street1": {
+            "type": "string",
+            "description": "Street address line 1",
+            "example": "123 Main Street",
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "Street address line 2 (apartment, suite, etc.)",
+            "example": "Apt 4B",
+            "maxLength": 255
+          },
+          "street3": {
+            "type": "string",
+            "description": "Street address line 3",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "Springfield",
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province",
+            "example": "IL",
+            "maxLength": 50
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "ZIP or postal code",
+            "example": "62701",
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "Country",
+            "example": "US",
+            "maxLength": 100,
+            "default": "US"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "Whether this is the current/active address",
+            "example": true
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary address for the debtor",
+            "example": true
+          }
+        }
+      },
+      "EmailCategory": {
+        "type": "string",
+        "enum": [
+          "GENERAL",
+          "BILLING",
+          "SUPPORT",
+          "LEGAL",
+          "TECHNICAL",
+          "WORK"
+        ],
+        "description": "Email category"
+      },
+      "CreateEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "john.doe@example.com",
+            "maxLength": 255
+          },
+          "emailCategory": {
+            "description": "Email category",
+            "example": "GENERAL",
+            "default": "GENERAL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailCategory"
+              }
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary email",
+            "example": true,
+            "default": false
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "UpdateEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "john.doe@example.com",
+            "maxLength": 255
+          },
+          "emailCategory": {
+            "description": "Email category",
+            "example": "GENERAL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmailCategory"
+              }
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary email",
+            "example": true
+          }
+        }
+      },
+      "PhoneCategory": {
+        "type": "string",
+        "enum": [
+          "MOBILE",
+          "HOME",
+          "WORK",
+          "BUSINESS",
+          "FAX",
+          "OTHER"
+        ],
+        "description": "Phone category"
+      },
+      "CreatePhoneDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number (formatted)",
+            "example": "+1-555-123-4567",
+            "maxLength": 20
+          },
+          "category": {
+            "description": "Phone category",
+            "example": "MOBILE",
+            "default": "MOBILE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhoneCategory"
+              }
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary phone number",
+            "example": true,
+            "default": false
+          },
+          "canReceiveSms": {
+            "type": "boolean",
+            "description": "Whether this phone can receive SMS messages",
+            "example": true,
+            "default": false
+          },
+          "canReceiveCalls": {
+            "type": "boolean",
+            "description": "Whether this phone can receive calls",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "phoneNumber"
+        ]
+      },
+      "UpdatePhoneDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number (formatted)",
+            "example": "+1-555-123-4567",
+            "maxLength": 20
+          },
+          "category": {
+            "description": "Phone category",
+            "example": "MOBILE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhoneCategory"
+              }
+            ]
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary phone number",
+            "example": true
+          },
+          "canReceiveSms": {
+            "type": "boolean",
+            "description": "Whether this phone can receive SMS messages",
+            "example": true
+          },
+          "canReceiveCalls": {
+            "type": "boolean",
+            "description": "Whether this phone can receive calls",
+            "example": true
+          },
+          "isOptedOut": {
+            "type": "boolean",
+            "description": "Whether debtor opted out of communications on this number",
+            "example": false
+          }
+        }
+      },
+      "DebtorDemographics": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique demographics record identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174005",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this demographics record belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "ssnEncrypted": {
+            "type": "string",
+            "description": "Encrypted SSN (full 9 digits)",
+            "example": null
+          },
+          "ssnLastFour": {
+            "type": "string",
+            "description": "Last 4 digits of SSN (for display/verification)",
+            "example": "1234",
+            "maxLength": 4
+          },
+          "ssnHash": {
+            "type": "string",
+            "description": "Hash of full SSN for duplicate detection",
+            "example": null
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex/Gender",
+            "example": "MALE",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "NON_BINARY",
+              "PREFER_NOT_TO_SAY",
+              "OTHER"
+            ]
+          },
+          "race": {
+            "type": "string",
+            "description": "Race/Ethnicity",
+            "example": "WHITE",
+            "enum": [
+              "AMERICAN_INDIAN_ALASKA_NATIVE",
+              "ASIAN",
+              "BLACK_AFRICAN_AMERICAN",
+              "HISPANIC_LATINO",
+              "NATIVE_HAWAIIAN_PACIFIC_ISLANDER",
+              "WHITE",
+              "TWO_OR_MORE_RACES",
+              "PREFER_NOT_TO_SAY",
+              "OTHER"
+            ]
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "Marital status",
+            "example": "SINGLE",
+            "enum": [
+              "SINGLE",
+              "MARRIED",
+              "DIVORCED",
+              "WIDOWED",
+              "SEPARATED",
+              "OTHER"
+            ]
+          },
+          "numberOfDependents": {
+            "type": "number",
+            "description": "Number of dependents",
+            "example": 2,
+            "minimum": 0
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "description": "Preferred language",
+            "example": "ENGLISH",
+            "enum": [
+              "ENGLISH",
+              "SPANISH",
+              "FRENCH",
+              "OTHER"
+            ]
+          },
+          "annualIncome": {
+            "type": "number",
+            "description": "Annual income (in dollars)",
+            "example": 50000,
+            "minimum": 0
+          },
+          "employmentStatus": {
+            "type": "string",
+            "description": "Employment status",
+            "example": "EMPLOYED_FULL_TIME",
+            "enum": [
+              "EMPLOYED_FULL_TIME",
+              "EMPLOYED_PART_TIME",
+              "SELF_EMPLOYED",
+              "UNEMPLOYED",
+              "RETIRED",
+              "STUDENT",
+              "DISABLED",
+              "OTHER"
+            ]
+          },
+          "employerName": {
+            "type": "string",
+            "description": "Employer name",
+            "example": "Acme Corporation",
+            "maxLength": 255
+          },
+          "occupation": {
+            "type": "string",
+            "description": "Occupation/Job title",
+            "example": "Software Engineer",
+            "maxLength": 255
+          },
+          "educationLevel": {
+            "type": "string",
+            "description": "Education level",
+            "example": "BACHELORS",
+            "enum": [
+              "LESS_THAN_HIGH_SCHOOL",
+              "HIGH_SCHOOL",
+              "SOME_COLLEGE",
+              "ASSOCIATES",
+              "BACHELORS",
+              "MASTERS",
+              "DOCTORATE",
+              "OTHER"
+            ]
+          },
+          "bankruptcyHistory": {
+            "type": "boolean",
+            "description": "Whether debtor has bankruptcy history",
+            "example": false
+          },
+          "bankruptcyDate": {
+            "format": "date",
+            "type": "string",
+            "description": "Most recent bankruptcy filing date",
+            "example": "2020-01-15"
+          },
+          "bankruptcyType": {
+            "type": "string",
+            "description": "Type of bankruptcy filed",
+            "example": "CHAPTER_7",
+            "enum": [
+              "CHAPTER_7",
+              "CHAPTER_11",
+              "CHAPTER_13",
+              "OTHER"
+            ]
+          },
+          "bankruptcyDischargeDate": {
+            "format": "date",
+            "type": "string",
+            "description": "Bankruptcy discharge date",
+            "example": "2021-06-15"
+          },
+          "lastAccessedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when demographics were last accessed",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "lastAccessedBy": {
+            "type": "string",
+            "description": "User ID who last accessed demographics",
+            "example": "456fcdeb-51a2-43d7-b890-987654321xyz",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when demographics record was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when demographics record was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when demographics record was soft deleted",
+            "example": "2024-01-20T15:45:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Sex": {
+        "type": "string",
+        "enum": [
+          "MALE",
+          "FEMALE",
+          "NON_BINARY",
+          "PREFER_NOT_TO_SAY",
+          "OTHER"
+        ],
+        "description": "Sex/Gender"
+      },
+      "Race": {
+        "type": "string",
+        "enum": [
+          "AMERICAN_INDIAN_ALASKA_NATIVE",
+          "ASIAN",
+          "BLACK_AFRICAN_AMERICAN",
+          "HISPANIC_LATINO",
+          "NATIVE_HAWAIIAN_PACIFIC_ISLANDER",
+          "WHITE",
+          "TWO_OR_MORE_RACES",
+          "PREFER_NOT_TO_SAY",
+          "OTHER"
+        ],
+        "description": "Race/Ethnicity"
+      },
+      "MaritalStatus": {
+        "type": "string",
+        "enum": [
+          "SINGLE",
+          "MARRIED",
+          "DIVORCED",
+          "WIDOWED",
+          "SEPARATED",
+          "OTHER"
+        ],
+        "description": "Marital status"
+      },
+      "EmploymentStatus": {
+        "type": "string",
+        "enum": [
+          "EMPLOYED_FULL_TIME",
+          "EMPLOYED_PART_TIME",
+          "SELF_EMPLOYED",
+          "UNEMPLOYED",
+          "RETIRED",
+          "STUDENT",
+          "DISABLED",
+          "OTHER"
+        ],
+        "description": "Employment status"
+      },
+      "EducationLevel": {
+        "type": "string",
+        "enum": [
+          "HIGH_SCHOOL",
+          "SOME_COLLEGE",
+          "ASSOCIATES",
+          "BACHELORS",
+          "MASTERS",
+          "DOCTORATE",
+          "LESS_THAN_HIGH_SCHOOL",
+          "PREFER_NOT_TO_SAY",
+          "OTHER"
+        ],
+        "description": "Highest level of education completed"
+      },
+      "BankruptcyType": {
+        "type": "string",
+        "enum": [
+          "CHAPTER_7",
+          "CHAPTER_11",
+          "CHAPTER_13",
+          "OTHER"
+        ],
+        "description": "Type of bankruptcy filed"
+      },
+      "CreateDemographicsDto": {
+        "type": "object",
+        "properties": {
+          "ssnEncrypted": {
+            "type": "string",
+            "description": "Encrypted Social Security Number (will be encrypted by service)",
+            "example": "123-45-6789",
+            "maxLength": 255
+          },
+          "ssnLastFour": {
+            "type": "string",
+            "description": "Last 4 digits of SSN",
+            "example": "6789",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "sex": {
+            "description": "Sex/Gender",
+            "example": "MALE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Sex"
+              }
+            ]
+          },
+          "race": {
+            "description": "Race/Ethnicity",
+            "example": "WHITE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Race"
+              }
+            ]
+          },
+          "maritalStatus": {
+            "description": "Marital status",
+            "example": "MARRIED",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MaritalStatus"
+              }
+            ]
+          },
+          "dependents": {
+            "type": "number",
+            "description": "Number of dependents",
+            "example": 2,
+            "minimum": 0
+          },
+          "annualIncome": {
+            "type": "number",
+            "description": "Annual income in dollars",
+            "example": 75000
+          },
+          "employmentStatus": {
+            "description": "Employment status",
+            "example": "EMPLOYED_FULL_TIME",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmploymentStatus"
+              }
+            ]
+          },
+          "employerName": {
+            "type": "string",
+            "description": "Employer name",
+            "example": "Acme Corporation",
+            "maxLength": 255
+          },
+          "occupation": {
+            "type": "string",
+            "description": "Occupation or job title",
+            "example": "Software Engineer",
+            "maxLength": 255
+          },
+          "educationLevel": {
+            "description": "Highest level of education completed",
+            "example": "BACHELORS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EducationLevel"
+              }
+            ]
+          },
+          "bankruptcyHistory": {
+            "type": "boolean",
+            "description": "Whether debtor has bankruptcy history",
+            "example": false
+          },
+          "bankruptcyDate": {
+            "type": "string",
+            "description": "Date of most recent bankruptcy filing",
+            "example": "2020-03-15",
+            "format": "date"
+          },
+          "bankruptcyType": {
+            "description": "Type of bankruptcy filed",
+            "example": "CHAPTER_7",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BankruptcyType"
+              }
+            ]
+          },
+          "veteranStatus": {
+            "type": "boolean",
+            "description": "Veteran status",
+            "example": false
+          },
+          "primaryLanguage": {
+            "type": "string",
+            "description": "Primary language spoken",
+            "example": "English",
+            "maxLength": 100
+          },
+          "hasDisability": {
+            "type": "boolean",
+            "description": "Disability status",
+            "example": false
+          }
+        }
+      },
+      "UpdateDemographicsDto": {
+        "type": "object",
+        "properties": {
+          "ssnEncrypted": {
+            "type": "string",
+            "description": "Encrypted Social Security Number (will be encrypted by service)",
+            "example": "123-45-6789",
+            "maxLength": 255
+          },
+          "ssnLastFour": {
+            "type": "string",
+            "description": "Last 4 digits of SSN",
+            "example": "6789",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "sex": {
+            "description": "Sex/Gender",
+            "example": "MALE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Sex"
+              }
+            ]
+          },
+          "race": {
+            "description": "Race/Ethnicity",
+            "example": "WHITE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Race"
+              }
+            ]
+          },
+          "maritalStatus": {
+            "description": "Marital status",
+            "example": "SINGLE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MaritalStatus"
+              }
+            ]
+          },
+          "numberOfDependents": {
+            "type": "number",
+            "description": "Number of dependents",
+            "example": 2,
+            "minimum": 0
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "description": "Preferred language",
+            "example": "ENGLISH",
+            "enum": [
+              "ENGLISH",
+              "SPANISH",
+              "FRENCH",
+              "OTHER"
+            ]
+          },
+          "annualIncome": {
+            "type": "number",
+            "description": "Annual income in dollars",
+            "example": 50000,
+            "minimum": 0
+          },
+          "employmentStatus": {
+            "description": "Employment status",
+            "example": "EMPLOYED_FULL_TIME",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmploymentStatus"
+              }
+            ]
+          },
+          "employerName": {
+            "type": "string",
+            "description": "Employer name",
+            "example": "Acme Corporation",
+            "maxLength": 255
+          },
+          "occupation": {
+            "type": "string",
+            "description": "Occupation or job title",
+            "example": "Software Engineer",
+            "maxLength": 255
+          },
+          "educationLevel": {
+            "description": "Highest level of education completed",
+            "example": "BACHELORS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EducationLevel"
+              }
+            ]
+          },
+          "bankruptcyHistory": {
+            "type": "boolean",
+            "description": "Whether debtor has bankruptcy history",
+            "example": false
+          },
+          "bankruptcyDate": {
+            "type": "string",
+            "description": "Date of most recent bankruptcy filing",
+            "example": "2020-01-15",
+            "format": "date"
+          },
+          "bankruptcyType": {
+            "description": "Type of bankruptcy filed",
+            "example": "CHAPTER_7",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BankruptcyType"
+              }
+            ]
+          },
+          "bankruptcyDischargeDate": {
+            "type": "string",
+            "description": "Bankruptcy discharge date",
+            "example": "2021-06-15",
+            "format": "date"
+          }
+        }
+      },
+      "PartialUpdateDemographicsDto": {
+        "type": "object",
+        "properties": {
+          "ssnEncrypted": {
+            "type": "string",
+            "description": "Encrypted Social Security Number (will be encrypted by service)",
+            "example": "123-45-6789",
+            "maxLength": 255
+          },
+          "ssnLastFour": {
+            "type": "string",
+            "description": "Last 4 digits of SSN",
+            "example": "6789",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "sex": {
+            "description": "Sex/Gender",
+            "example": "MALE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Sex"
+              }
+            ]
+          },
+          "race": {
+            "description": "Race/Ethnicity",
+            "example": "WHITE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Race"
+              }
+            ]
+          },
+          "maritalStatus": {
+            "description": "Marital status",
+            "example": "SINGLE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MaritalStatus"
+              }
+            ]
+          },
+          "numberOfDependents": {
+            "type": "number",
+            "description": "Number of dependents",
+            "example": 2,
+            "minimum": 0
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "description": "Preferred language",
+            "example": "ENGLISH",
+            "enum": [
+              "ENGLISH",
+              "SPANISH",
+              "FRENCH",
+              "OTHER"
+            ]
+          },
+          "annualIncome": {
+            "type": "number",
+            "description": "Annual income in dollars",
+            "example": 50000,
+            "minimum": 0
+          },
+          "employmentStatus": {
+            "description": "Employment status",
+            "example": "EMPLOYED_FULL_TIME",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmploymentStatus"
+              }
+            ]
+          },
+          "employerName": {
+            "type": "string",
+            "description": "Employer name",
+            "example": "Acme Corporation",
+            "maxLength": 255
+          },
+          "occupation": {
+            "type": "string",
+            "description": "Occupation or job title",
+            "example": "Software Engineer",
+            "maxLength": 255
+          },
+          "educationLevel": {
+            "description": "Highest level of education completed",
+            "example": "BACHELORS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EducationLevel"
+              }
+            ]
+          },
+          "bankruptcyHistory": {
+            "type": "boolean",
+            "description": "Whether debtor has bankruptcy history",
+            "example": false
+          },
+          "bankruptcyDate": {
+            "type": "string",
+            "description": "Date of most recent bankruptcy filing",
+            "example": "2020-01-15",
+            "format": "date"
+          },
+          "bankruptcyType": {
+            "description": "Type of bankruptcy filed",
+            "example": "CHAPTER_7",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BankruptcyType"
+              }
+            ]
+          },
+          "bankruptcyDischargeDate": {
+            "type": "string",
+            "description": "Bankruptcy discharge date",
+            "example": "2021-06-15",
+            "format": "date"
+          }
+        }
+      },
+      "DebtorDocumentType": {
+        "type": "string",
+        "enum": [
+          "PROOF_OF_ADDRESS",
+          "VERIFICATION_RECORD",
+          "IDENTITY_DOCUMENT",
+          "BANKRUPTCY_DOCUMENT",
+          "CORRESPONDENCE",
+          "COURT_DOCUMENT",
+          "PAYMENT_AGREEMENT",
+          "OTHER"
+        ]
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique document identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174006",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this document belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID for tenant isolation",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "Document type/category",
+            "example": "PROOF_OF_ADDRESS",
+            "enum": [
+              "PROOF_OF_ADDRESS",
+              "VERIFICATION_RECORD",
+              "IDENTITY_DOCUMENT",
+              "BANKRUPTCY_DOCUMENT",
+              "CORRESPONDENCE",
+              "COURT_DOCUMENT",
+              "PAYMENT_AGREEMENT",
+              "OTHER"
+            ]
+          },
+          "originalFilename": {
+            "type": "string",
+            "description": "Original filename as uploaded",
+            "example": "proof-of-address-utility-bill.pdf",
+            "maxLength": 255
+          },
+          "storedFilename": {
+            "type": "string",
+            "description": "Stored filename in GCS (includes document ID prefix)",
+            "example": "123e4567-e89b-12d3-a456-426614174006-proof-of-address-utility-bill.pdf",
+            "maxLength": 300
+          },
+          "storagePath": {
+            "type": "string",
+            "description": "Full GCS storage path",
+            "example": "debtors-documents/org-123/debtor-456/doc-789-file.pdf",
+            "maxLength": 500
+          },
+          "bucketName": {
+            "type": "string",
+            "description": "GCS bucket name",
+            "example": "verichron-debtors-documents",
+            "maxLength": 100
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type of the document",
+            "example": "application/pdf",
+            "maxLength": 100
+          },
+          "fileSize": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 524288
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the document",
+            "example": "Utility bill from January 2024 showing current address"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata as JSON",
+            "example": {
+              "expirationDate": "2024-12-31",
+              "verifiedBy": "user-123"
+            },
+            "additionalProperties": true
+          },
+          "tags": {
+            "description": "Tags for categorization and search",
+            "example": [
+              "verified",
+              "primary-address",
+              "2024"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "uploadedBy": {
+            "type": "string",
+            "description": "User ID who uploaded the document",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether the document has been verified",
+            "example": false,
+            "default": false
+          },
+          "verifiedBy": {
+            "type": "string",
+            "description": "User ID who verified the document",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "verifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when document was verified",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "expiresAt": {
+            "format": "date",
+            "type": "string",
+            "description": "Document expiration date (for time-sensitive documents)",
+            "example": "2024-12-31"
+          },
+          "isArchived": {
+            "type": "boolean",
+            "description": "Whether the document is archived/soft-deleted",
+            "example": false,
+            "default": false
+          },
+          "archivedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when document was archived",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when document was uploaded",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when document metadata was last updated",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "organizationId",
+          "documentType",
+          "originalFilename",
+          "storedFilename",
+          "storagePath",
+          "bucketName",
+          "mimeType",
+          "fileSize",
+          "uploadedBy",
+          "isVerified",
+          "isArchived",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedDocumentsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of documents for the current page",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of documents available",
+            "example": 15
+          },
+          "page": {
+            "type": "number",
+            "description": "The current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "The number of items per page",
+            "example": 20
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "UploadDocumentDto": {
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "description": "Document type/category",
+            "example": "PROOF_OF_ADDRESS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtorDocumentType"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the document",
+            "example": "Utility bill from January 2024 showing current address"
+          },
+          "tags": {
+            "description": "Tags for categorization",
+            "example": [
+              "verified",
+              "primary-address",
+              "2024"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata as JSON object",
+            "example": {
+              "expirationDate": "2024-12-31",
+              "notes": "Verified by phone"
+            },
+            "additionalProperties": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Document expiration date (ISO 8601 format)",
+            "example": "2024-12-31",
+            "format": "date"
+          }
+        },
+        "required": [
+          "documentType"
+        ]
+      },
+      "UpdateDocumentDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Document description",
+            "example": "Updated utility bill showing current address"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata",
+            "example": {
+              "expirationDate": "2024-12-31",
+              "verifiedBy": "user-123"
+            }
+          },
+          "tags": {
+            "description": "Document tags",
+            "example": [
+              "verified",
+              "primary-address",
+              "2024"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Verification status",
+            "example": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Document expiration date",
+            "example": "2024-12-31",
+            "format": "date"
+          }
+        }
+      },
+      "DownloadUrlDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The pre-signed URL for downloading the document",
+            "example": "https://storage.googleapis.com/bucket/path?signature=..."
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Expiration time of the URL in seconds",
+            "example": 3600
+          }
+        },
+        "required": [
+          "url",
+          "expiresIn"
+        ]
+      },
+      "StorageUsageDto": {
+        "type": "object",
+        "properties": {
+          "bytes": {
+            "type": "number",
+            "description": "Total storage used in bytes",
+            "example": 5242880
+          },
+          "megabytes": {
+            "type": "number",
+            "description": "Total storage used in megabytes (rounded to 2 decimal places)",
+            "example": 5
+          }
+        },
+        "required": [
+          "bytes",
+          "megabytes"
+        ]
+      },
+      "VerificationType": {
+        "type": "string",
+        "enum": [
+          "ADDRESS_VERIFICATION",
+          "PHONE_VERIFICATION",
+          "EMAIL_VERIFICATION",
+          "SSN_VERIFICATION",
+          "IDENTITY_VERIFICATION",
+          "SKIP_TRACE",
+          "EMPLOYMENT_VERIFICATION"
+        ]
+      },
+      "VerificationRequestStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "IN_PROGRESS",
+          "VERIFIED",
+          "FAILED",
+          "SKIPPED",
+          "ERROR"
+        ]
+      },
+      "VerificationRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique verification request identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174007",
+            "format": "uuid"
+          },
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor Profile ID this verification request belongs to",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID for tenant isolation",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "verificationType": {
+            "type": "string",
+            "description": "Type of verification being performed",
+            "example": "ADDRESS_VERIFICATION",
+            "enum": [
+              "ADDRESS_VERIFICATION",
+              "PHONE_VERIFICATION",
+              "EMAIL_VERIFICATION",
+              "SSN_VERIFICATION",
+              "IDENTITY_VERIFICATION",
+              "SKIP_TRACE",
+              "EMPLOYMENT_VERIFICATION"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the verification request",
+            "example": "VERIFIED",
+            "enum": [
+              "PENDING",
+              "IN_PROGRESS",
+              "VERIFIED",
+              "FAILED",
+              "SKIPPED",
+              "ERROR"
+            ]
+          },
+          "inputData": {
+            "type": "object",
+            "description": "Input data sent to verification provider",
+            "example": {
+              "address": {
+                "streetLine1": "123 Main St",
+                "city": "San Francisco",
+                "state": "CA",
+                "postalCode": "94102"
+              }
+            },
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "description": "Verification result from provider",
+            "example": {
+              "verified": true,
+              "confidence": 95,
+              "standardizedAddress": {
+                "streetLine1": "123 MAIN ST",
+                "city": "SAN FRANCISCO",
+                "state": "CA",
+                "postalCode": "94102-1234"
+              }
+            },
+            "additionalProperties": true
+          },
+          "confidenceScore": {
+            "type": "number",
+            "description": "Verification confidence score (0-100)",
+            "example": 95,
+            "minimum": 0,
+            "maximum": 100
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether verification was successful",
+            "example": true
+          },
+          "provider": {
+            "type": "string",
+            "description": "Name of the verification provider used",
+            "example": "USPS",
+            "maxLength": 100
+          },
+          "costCents": {
+            "type": "integer",
+            "description": "Cost of verification in cents",
+            "example": 50
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message if verification failed",
+            "example": "Provider timeout - unable to connect to verification service"
+          },
+          "errorCode": {
+            "type": "string",
+            "description": "Error code from provider",
+            "example": "TIMEOUT_ERROR",
+            "maxLength": 100
+          },
+          "retryCount": {
+            "type": "number",
+            "description": "Number of retry attempts",
+            "example": 0,
+            "default": 0
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata",
+            "example": {
+              "ipAddress": "192.168.1.1",
+              "userAgent": "Mozilla/5.0..."
+            },
+            "additionalProperties": true
+          },
+          "requestedBy": {
+            "type": "string",
+            "description": "User ID who requested the verification",
+            "example": "987fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "requestedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when verification was requested",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when verification started processing",
+            "example": "2024-01-01T00:00:05Z"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when verification completed",
+            "example": "2024-01-01T00:00:10Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when record was created",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when record was last updated",
+            "example": "2024-01-01T00:00:10Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtorProfileId",
+          "organizationId",
+          "verificationType",
+          "status",
+          "inputData",
+          "verified",
+          "retryCount",
+          "requestedBy",
+          "requestedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedVerificationRequestsDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of verification requests for the current page",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationRequest"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of verification requests available",
+            "example": 25
+          },
+          "page": {
+            "type": "number",
+            "description": "The current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "The number of items per page",
+            "example": 20
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "VerificationStatisticsDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "Total number of verification requests",
+            "example": 25
+          },
+          "byStatus": {
+            "type": "object",
+            "description": "Counts of verification requests by status",
+            "example": {
+              "VERIFIED": 15,
+              "FAILED": 5,
+              "PENDING": 5
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "byType": {
+            "type": "object",
+            "description": "Counts of verification requests by type",
+            "example": {
+              "ADDRESS_VERIFICATION": 10,
+              "PHONE_VERIFICATION": 8,
+              "EMAIL_VERIFICATION": 7
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "byStatus",
+          "byType"
+        ]
+      },
+      "CreateVerificationRequestDto": {
+        "type": "object",
+        "properties": {
+          "verificationType": {
+            "description": "Type of verification to perform",
+            "example": "ADDRESS_VERIFICATION",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VerificationType"
+              }
+            ]
+          },
+          "inputData": {
+            "type": "object",
+            "description": "Input data for verification",
+            "example": {
+              "address": {
+                "streetLine1": "123 Main St",
+                "city": "San Francisco",
+                "state": "CA",
+                "postalCode": "94102"
+              }
+            },
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata",
+            "example": {
+              "source": "manual_request",
+              "priority": "high"
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "verificationType",
+          "inputData"
+        ]
+      },
+      "FlowDimension": {
+        "type": "string",
+        "enum": [
+          "PAYMENT_METHOD",
+          "STATE",
+          "DEBT_CATEGORY",
+          "PORTFOLIO",
+          "STATUS_TRANSITION"
+        ]
+      },
+      "FlowDimensionDataDto": {
+        "type": "object",
+        "properties": {
+          "dimensionValue": {
+            "type": "string",
+            "description": "Dimension value (e.g., state abbreviation)",
+            "example": "CA"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label for this dimension value",
+            "example": "California"
+          },
+          "totalDebtors": {
+            "type": "number",
+            "description": "Total number of debtors for this dimension",
+            "example": 150
+          }
+        },
+        "required": [
+          "dimensionValue",
+          "label",
+          "totalDebtors"
+        ]
+      },
+      "FlowAnalyticsDebtorResponseDto": {
+        "type": "object",
+        "properties": {
+          "debtorsByDimension": {
+            "description": "Debtors grouped by the requested dimension",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowDimensionDataDto"
+            }
+          }
+        },
+        "required": [
+          "debtorsByDimension"
+        ]
+      },
+      "StateAbbreviation": {
+        "type": "string",
+        "enum": [
+          "AL",
+          "AK",
+          "AZ",
+          "AR",
+          "CA",
+          "CO",
+          "CT",
+          "DE",
+          "FL",
+          "GA",
+          "HI",
+          "ID",
+          "IL",
+          "IN",
+          "IA",
+          "KS",
+          "KY",
+          "LA",
+          "ME",
+          "MD",
+          "MA",
+          "MI",
+          "MN",
+          "MS",
+          "MO",
+          "MT",
+          "NE",
+          "NV",
+          "NH",
+          "NJ",
+          "NM",
+          "NY",
+          "NC",
+          "ND",
+          "OH",
+          "OK",
+          "OR",
+          "PA",
+          "RI",
+          "SC",
+          "SD",
+          "TN",
+          "TX",
+          "UT",
+          "VT",
+          "VA",
+          "WA",
+          "WV",
+          "WI",
+          "WY",
+          "AS",
+          "DC",
+          "GU",
+          "MP",
+          "PR",
+          "VI"
+        ]
+      },
+      "GeographicAnalyticsView": {
+        "type": "string",
+        "enum": [
+          "debtors",
+          "creditors",
+          "combined",
+          "payment-plans",
+          "responsiveness",
+          "likelihood-to-pay",
+          "default-risk",
+          "debt-age"
+        ],
+        "description": "Analytics type"
+      },
+      "CoordinatesDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "description": "Latitude coordinate",
+            "example": 31.9686
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Longitude coordinate",
+            "example": -99.9018
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "DebtorGeographicStateDataDto": {
+        "type": "object",
+        "properties": {
+          "stateCode": {
+            "description": "Two-letter state code",
+            "example": "TX",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            ]
+          },
+          "stateName": {
+            "type": "string",
+            "description": "Full state name",
+            "example": "Texas"
+          },
+          "coordinates": {
+            "description": "Geographic coordinates of the state centroid",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoordinatesDto"
+              }
+            ]
+          },
+          "debtorCount": {
+            "type": "number",
+            "description": "Number of debtors in this state",
+            "example": 250
+          },
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value for this state",
+            "example": 1250000.75
+          },
+          "averageDebtValue": {
+            "type": "number",
+            "description": "Average debt value per debt in this state",
+            "example": 5000
+          },
+          "activeDebts": {
+            "type": "number",
+            "description": "Number of active debts in this state",
+            "example": 180
+          },
+          "paidDebts": {
+            "type": "number",
+            "description": "Number of paid debts in this state",
+            "example": 50
+          },
+          "defaultedDebts": {
+            "type": "number",
+            "description": "Number of defaulted/charged-off debts in this state",
+            "example": 20
+          },
+          "recoveryRate": {
+            "type": "number",
+            "description": "Recovery rate as a percentage (0-100)",
+            "example": 72.5
+          }
+        },
+        "required": [
+          "stateCode",
+          "stateName",
+          "coordinates",
+          "debtorCount",
+          "totalDebtValue",
+          "averageDebtValue",
+          "activeDebts",
+          "paidDebts",
+          "defaultedDebts",
+          "recoveryRate"
+        ]
+      },
+      "DebtorStateMapping": {
+        "type": "object",
+        "properties": {
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor profile UUID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "stateCode": {
+            "description": "Two-letter state code",
+            "example": "TX",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            ]
+          }
+        },
+        "required": [
+          "debtorProfileId",
+          "stateCode"
+        ]
+      },
+      "GeographicDebtorsResponseDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Analytics type",
+            "example": "debtors",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeographicAnalyticsView"
+              }
+            ]
+          },
+          "totalDebtors": {
+            "type": "number",
+            "description": "Total number of debtors across all states",
+            "example": 1500
+          },
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value across all states",
+            "example": 5000000
+          },
+          "states": {
+            "description": "State-level debtor statistics",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorGeographicStateDataDto"
+            }
+          },
+          "debtorStateMapping": {
+            "description": "Mapping of debtor profile IDs to their states (for orchestrator aggregation)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorStateMapping"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "totalDebtors",
+          "totalDebtValue",
+          "states",
+          "debtorStateMapping"
+        ]
+      },
+      "DebtorFocusAddressDto": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "string",
+            "description": "Address ID",
+            "example": "address-123"
+          },
+          "category": {
+            "type": "string",
+            "description": "Address category",
+            "enum": [
+              "RESIDENCE_PRIMARY",
+              "RESIDENCE_SECONDARY",
+              "PLACE_OF_EMPLOYMENT",
+              "RELATIVE",
+              "PO_BOX",
+              "LEGAL_CORRESPONDENCE",
+              "HEADQUARTERS",
+              "BRANCH"
+            ],
+            "example": "RESIDENCE_PRIMARY"
+          },
+          "street1": {
+            "type": "string",
+            "description": "Street address line 1",
+            "example": "123 Main Street"
+          },
+          "street2": {
+            "type": "object",
+            "description": "Street address line 2",
+            "example": "Apt 4B",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "Springfield"
+          },
+          "state": {
+            "type": "string",
+            "description": "State code",
+            "example": "IL"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code",
+            "example": "62701"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary address",
+            "example": true
+          }
+        },
+        "required": [
+          "addressId",
+          "category",
+          "street1",
+          "street2",
+          "city",
+          "state",
+          "postalCode",
+          "isPrimary"
+        ]
+      },
+      "DebtorFocusEmailDto": {
+        "type": "object",
+        "properties": {
+          "emailId": {
+            "type": "string",
+            "description": "Email record ID",
+            "example": "email-123"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "john.doe@example.com"
+          },
+          "category": {
+            "type": "string",
+            "description": "Email category",
+            "enum": [
+              "GENERAL",
+              "BILLING",
+              "SUPPORT",
+              "LEGAL",
+              "TECHNICAL",
+              "WORK"
+            ],
+            "example": "GENERAL"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary email",
+            "example": true
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether email is verified",
+            "example": true
+          }
+        },
+        "required": [
+          "emailId",
+          "email",
+          "category",
+          "isPrimary",
+          "isVerified"
+        ]
+      },
+      "DebtorFocusPhoneDto": {
+        "type": "object",
+        "properties": {
+          "phoneId": {
+            "type": "string",
+            "description": "Phone record ID",
+            "example": "phone-123"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number",
+            "example": "+1-555-123-4567"
+          },
+          "category": {
+            "type": "string",
+            "description": "Phone category",
+            "enum": [
+              "MOBILE",
+              "HOME",
+              "WORK",
+              "BUSINESS",
+              "FAX",
+              "OTHER"
+            ],
+            "example": "MOBILE"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary phone",
+            "example": true
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether phone is verified",
+            "example": true
+          }
+        },
+        "required": [
+          "phoneId",
+          "phoneNumber",
+          "category",
+          "isPrimary",
+          "isVerified"
+        ]
+      },
+      "DebtorFocusProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor profile ID",
+            "example": "profile-123"
+          },
+          "debtorIdentityId": {
+            "type": "string",
+            "description": "Debtor identity ID (global identifier)",
+            "example": "identity-456"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name",
+            "example": "Doe"
+          },
+          "middleName": {
+            "type": "object",
+            "description": "Middle name",
+            "example": "Michael",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "object",
+            "description": "Date of birth",
+            "example": "1985-06-15",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Profile status",
+            "enum": [
+              "PENDING_INVITATION",
+              "INVITED",
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED"
+            ],
+            "example": "ACTIVE"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date profile was created",
+            "example": "2024-01-15"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Date profile was last updated",
+            "example": "2024-11-20"
+          },
+          "addresses": {
+            "description": "All addresses for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusAddressDto"
+            }
+          },
+          "emails": {
+            "description": "All email addresses for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusEmailDto"
+            }
+          },
+          "phones": {
+            "description": "All phone numbers for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusPhoneDto"
+            }
+          }
+        },
+        "required": [
+          "debtorProfileId",
+          "debtorIdentityId",
+          "firstName",
+          "lastName",
+          "middleName",
+          "dateOfBirth",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "addresses",
+          "emails",
+          "phones"
+        ]
+      }
+    }
+  }
+}

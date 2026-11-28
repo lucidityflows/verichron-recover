@@ -1,0 +1,5270 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/debts/debts/orgs/{organizationId}": {
+      "post": {
+        "description": "\n      Creates a new debt record with associated debtors.\n    ",
+        "operationId": "DebtsController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDebtDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Debt created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new debt record",
+        "tags": [
+          "Debts"
+        ]
+      },
+      "get": {
+        "description": "\n      Retrieve a paginated list of debts with optional filters.\n    ",
+        "operationId": "DebtsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort results by",
+            "schema": {
+              "$ref": "#/components/schemas/DebtSortField"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order (ascending or descending)",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt status. Can specify multiple statuses separated by commas.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DebtStatus"
+              }
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio ID. Returns only debts in the specified portfolio.",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minBalance",
+            "required": false,
+            "in": "query",
+            "description": "Filter by minimum current balance (inclusive)",
+            "schema": {
+              "minimum": 0,
+              "format": "decimal",
+              "example": 1000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxBalance",
+            "required": false,
+            "in": "query",
+            "description": "Filter by maximum current balance (inclusive)",
+            "schema": {
+              "minimum": 0,
+              "format": "decimal",
+              "example": 10000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search term for account number or original creditor name (case-insensitive partial match)",
+            "schema": {
+              "maxLength": 100,
+              "example": "ACC-2024",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorProfileId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor profile ID. Returns debts associated with the specified debtor profile.",
+            "schema": {
+              "format": "uuid",
+              "example": "8f8c7e65-4b3a-4f1e-9c2d-5a7b9e3f1d4c",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List debts with filters and pagination",
+        "tags": [
+          "Debts"
+        ]
+      }
+    },
+    "/v1/debts/debts/orgs/{organizationId}/my-debts": {
+      "get": {
+        "description": "\n      Retrieve all debts for the authenticated DEBTOR user in the current organization.\n    ",
+        "operationId": "DebtsController_findMyDebts",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved debtor debts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get my debts (DEBTOR users only)",
+        "tags": [
+          "Debts"
+        ]
+      }
+    },
+    "/v1/debts/debts/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "\n      Retrieve detailed information about a specific debt.\n    ",
+        "operationId": "DebtsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debt UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single debt by ID",
+        "tags": [
+          "Debts"
+        ]
+      },
+      "patch": {
+        "description": "\n      Update mutable fields on a debt record.\n    ",
+        "operationId": "DebtsController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debt UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDebtDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debt updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a debt record",
+        "tags": [
+          "Debts"
+        ]
+      },
+      "delete": {
+        "description": "\n      Soft deletes a debt record by changing its status to `CHARGED_OFF`.\n    ",
+        "operationId": "DebtsController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Debt UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Debt deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete a debt",
+        "tags": [
+          "Debts"
+        ]
+      }
+    },
+    "/v1/debts/portfolios/orgs/{organizationId}": {
+      "post": {
+        "description": "\n      Creates a new portfolio record.\n    ",
+        "operationId": "PortfoliosController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePortfolioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Portfolio created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      },
+      "get": {
+        "description": "\n      Retrieve a paginated list of portfolios with optional filters and metrics.\n    ",
+        "operationId": "PortfoliosController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort results by",
+            "schema": {
+              "$ref": "#/components/schemas/PortfolioSortField"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order (ascending or descending)",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio status. Can specify multiple statuses.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/PortfolioStatus"
+              }
+            }
+          },
+          {
+            "name": "minPurchasePrice",
+            "required": false,
+            "in": "query",
+            "description": "Filter by minimum purchase price (inclusive)",
+            "schema": {
+              "minimum": 0,
+              "format": "decimal",
+              "example": 100000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPurchasePrice",
+            "required": false,
+            "in": "query",
+            "description": "Filter by maximum purchase price (inclusive)",
+            "schema": {
+              "minimum": 0,
+              "format": "decimal",
+              "example": 500000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search term for portfolio name or source (case-insensitive partial match)",
+            "schema": {
+              "maxLength": 100,
+              "example": "First National",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolios retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedPortfolioResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List portfolios with filters and pagination",
+        "tags": [
+          "Portfolios"
+        ]
+      }
+    },
+    "/v1/debts/portfolios/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "\n      Retrieve detailed information about a specific portfolio.\n    ",
+        "operationId": "PortfoliosController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolio retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single portfolio by ID",
+        "tags": [
+          "Portfolios"
+        ]
+      },
+      "patch": {
+        "description": "\n      Update mutable fields on a portfolio record.\n    ",
+        "operationId": "PortfoliosController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePortfolioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Portfolio updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      },
+      "delete": {
+        "description": "\n      Soft delete a portfolio record.\n    ",
+        "operationId": "PortfoliosController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Portfolio deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete a portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      }
+    },
+    "/v1/debts/portfolios/orgs/{organizationId}/{id}/users": {
+      "post": {
+        "description": "\n      Grant a user access to work on all debts within a portfolio.\n    ",
+        "operationId": "PortfoliosController_assignUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User assigned to portfolio successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Assign user access to a portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      },
+      "get": {
+        "description": "\n      Retrieve a list of all users who have been granted access to this portfolio.\n    ",
+        "operationId": "PortfoliosController_listUsers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortfolioUserAccessDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List users with access to a portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      }
+    },
+    "/v1/debts/portfolios/orgs/{organizationId}/{id}/users/{userId}": {
+      "delete": {
+        "description": "\n      Remove a user's access to a portfolio.\n    ",
+        "operationId": "PortfoliosController_revokeUser",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "description": "User UUID to revoke access from",
+            "schema": {
+              "format": "uuid",
+              "example": "3d2e5f4b-1c9a-4e7d-8b2f-6a5c9e1d3f8b",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User access revoked successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke user access from a portfolio",
+        "tags": [
+          "Portfolios"
+        ]
+      }
+    },
+    "/v1/debts/portfolios/orgs/{organizationId}/{id}/transfer": {
+      "post": {
+        "description": "\n      Transfer ownership of a portfolio to another organization (portfolio sale).\n    ",
+        "operationId": "PortfoliosController_transfer",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Portfolio UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferPortfolioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Portfolio transferred successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Transfer portfolio to another organization",
+        "tags": [
+          "Portfolios"
+        ]
+      }
+    },
+    "/v1/debts/history/orgs/{organizationId}/debts/{debtId}": {
+      "get": {
+        "description": "\n      Retrieve the complete chain of title for a debt showing all ownership transfers\n      from the original creditor to the current owner.\n    ",
+        "operationId": "HistoryController_getDebtHistory",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtId",
+            "required": true,
+            "in": "path",
+            "description": "Debt UUID to retrieve ownership history for",
+            "schema": {
+              "format": "uuid",
+              "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for history records (ASC = oldest first, DESC = newest first)",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ownership history retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtOwnershipChainResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get complete ownership history for a debt",
+        "tags": [
+          "Ownership History"
+        ]
+      }
+    },
+    "/v1/debts/imports/orgs/{organizationId}/inspect": {
+      "post": {
+        "description": "Uploads a file and returns discovered headers and preview rows for column mapping.",
+        "operationId": "ImportsController_inspect",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "CSV file to inspect"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File inspected successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileInspectionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Inspect a file for import",
+        "tags": [
+          "Portfolio Ingestion"
+        ]
+      }
+    },
+    "/v1/debts/imports/orgs/{organizationId}": {
+      "post": {
+        "description": "\n      Create a bulk import job. You can either upload a new file or reference a previously inspected file using tempFileId.\n    ",
+        "operationId": "ImportsController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "portfolioName",
+                  "purchaseDate",
+                  "purchasePrice",
+                  "source"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "CSV file containing debt records (optional if tempFileId provided)"
+                  },
+                  "tempFileId": {
+                    "type": "string",
+                    "description": "ID of a previously inspected file"
+                  },
+                  "columnMapping": {
+                    "type": "object",
+                    "description": "Map of source CSV headers to Verichron target fields",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "portfolioName": {
+                    "type": "string",
+                    "example": "Q1 2024 Credit Card Purchase - First National Bank",
+                    "description": "Name for the portfolio to be created"
+                  },
+                  "purchaseDate": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-01-15",
+                    "description": "Date the portfolio was acquired"
+                  },
+                  "purchasePrice": {
+                    "type": "number",
+                    "format": "decimal",
+                    "example": 250000,
+                    "description": "Amount paid to acquire the portfolio"
+                  },
+                  "source": {
+                    "type": "string",
+                    "example": "First National Bank - Charged-off Credit Cards",
+                    "description": "Origin/source of the portfolio"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Import job created successfully. Processing has begun.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportJobResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new bulk import job",
+        "tags": [
+          "Portfolio Ingestion"
+        ]
+      },
+      "get": {
+        "description": "\n      Retrieve a paginated list of import jobs for the organization.\n    ",
+        "operationId": "ImportsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by import job status",
+            "schema": {
+              "$ref": "#/components/schemas/ImportJobStatus"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order by creation date",
+            "schema": {
+              "default": "DESC",
+              "example": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import jobs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedImportJobResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List import jobs with filters and pagination",
+        "tags": [
+          "Portfolio Ingestion"
+        ]
+      }
+    },
+    "/v1/debts/imports/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "\n      Retrieve detailed status for a specific import job.\n    ",
+        "operationId": "ImportsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Import job UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import job retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportJobResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get import job status",
+        "tags": [
+          "Portfolio Ingestion"
+        ]
+      }
+    },
+    "/v1/debts/creditors/orgs/{organizationId}": {
+      "get": {
+        "operationId": "CreditorsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search creditors by name or EIN",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "onlyMasters",
+            "required": false,
+            "in": "query",
+            "description": "Only return master creditors (exclude duplicates)",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Results per page (max 100)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of creditors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCreditorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all creditors for organization",
+        "tags": [
+          "Creditors"
+        ]
+      },
+      "post": {
+        "operationId": "CreditorsController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCreditorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Creditor created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditorResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new creditor (manual entry)",
+        "tags": [
+          "Creditors"
+        ]
+      }
+    },
+    "/v1/debts/creditors/orgs/{organizationId}/{id}": {
+      "get": {
+        "operationId": "CreditorsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Creditor details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get creditor by ID",
+        "tags": [
+          "Creditors"
+        ]
+      },
+      "patch": {
+        "operationId": "CreditorsController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCreditorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Creditor updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update creditor details",
+        "tags": [
+          "Creditors"
+        ]
+      },
+      "delete": {
+        "operationId": "CreditorsController_delete",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Creditor deleted"
+          },
+          "400": {
+            "description": "Cannot delete creditor with active debts"
+          },
+          "404": {
+            "description": "Creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete a creditor",
+        "tags": [
+          "Creditors"
+        ]
+      }
+    },
+    "/v1/debts/creditors/orgs/{organizationId}/{id}/merge": {
+      "post": {
+        "operationId": "CreditorsController_merge",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID of duplicate creditor to merge (will be marked as duplicate)",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeCreditorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Creditor merged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditorResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid merge operation (cannot merge master into duplicate)"
+          },
+          "404": {
+            "description": "Creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Merge duplicate creditor into master (reassigns all debts)",
+        "tags": [
+          "Creditors"
+        ]
+      }
+    },
+    "/v1/debts/creditor-conflicts/orgs/{organizationId}": {
+      "get": {
+        "operationId": "CreditorConflictsController_findPending",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by conflict status (defaults to unresolved only)",
+            "schema": {
+              "enum": [
+                "HIGH_CONFIDENCE",
+                "MEDIUM_CONFIDENCE",
+                "LOW_CONFIDENCE",
+                "RESOLVED",
+                "DISMISSED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Results per page (max 100)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conflicts, sorted by impact (debt count descending)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConflictResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List conflicts in manual review queue",
+        "tags": [
+          "Creditor Conflicts"
+        ]
+      }
+    },
+    "/v1/debts/creditor-conflicts/orgs/{organizationId}/{id}": {
+      "get": {
+        "operationId": "CreditorConflictsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conflict details with populated creditor suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conflict not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get conflict details with suggested masters",
+        "tags": [
+          "Creditor Conflicts"
+        ]
+      }
+    },
+    "/v1/debts/creditor-conflicts/orgs/{organizationId}/{id}/resolve": {
+      "post": {
+        "operationId": "CreditorConflictsController_resolve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveConflictDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conflict resolved successfully"
+          },
+          "400": {
+            "description": "Invalid resolution action"
+          },
+          "404": {
+            "description": "Conflict not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resolve conflict (merge/create-new/dismiss)",
+        "tags": [
+          "Creditor Conflicts"
+        ]
+      }
+    },
+    "/internal/debts/creditors/analytics/geographic-flows/{organizationId}": {
+      "get": {
+        "description": "\n      Returns actual creditor→debtor state pairs with flow volumes and amounts.\n      Replaces proportional estimation algorithm with real data.\n\n      Used by: analytics-geographic-combined.orchestrator.ts\n\n      **This is an internal endpoint** - not exposed to external users.\n\n      REQUIRES:\n      - Creditor entity populated (creditorId on debts)\n      - Debtor state populated\n      - Creditor state populated\n\n      RETURNS:\n      - Array of flows with creditor state, debtor state, count, and total amount\n      - Only includes debts with both creditor and debtor state populated\n      - Aggregated by state pair (not individual debts)\n    ",
+        "operationId": "InternalCreditorsController_getGeographicFlows",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geographic flows retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "flows": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "creditorState": {
+                            "type": "string",
+                            "example": "CA",
+                            "description": "Creditor state (2-letter code)"
+                          },
+                          "debtorState": {
+                            "type": "string",
+                            "example": "TX",
+                            "description": "Debtor state (2-letter code)"
+                          },
+                          "flowCount": {
+                            "type": "number",
+                            "example": 150,
+                            "description": "Number of debts in this flow"
+                          },
+                          "totalAmount": {
+                            "type": "number",
+                            "example": 750000,
+                            "description": "Total principal amount of debts in this flow"
+                          }
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "totalFlows": {
+                          "type": "number",
+                          "example": 2400,
+                          "description": "Total number of unique creditor→debtor state pairs"
+                        },
+                        "totalDebts": {
+                          "type": "number",
+                          "example": 15000,
+                          "description": "Total number of debts included in flows"
+                        },
+                        "creditorStatesCount": {
+                          "type": "number",
+                          "example": 48,
+                          "description": "Number of unique creditor states"
+                        },
+                        "debtorStatesCount": {
+                          "type": "number",
+                          "example": 50,
+                          "description": "Number of unique debtor states"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get actual geographic flows (creditor→debtor state pairs)",
+        "tags": [
+          "Internal - Creditor Analytics"
+        ]
+      }
+    },
+    "/internal/debts/creditors/analytics/creditor-summary/{organizationId}": {
+      "get": {
+        "description": "\n      Returns aggregate statistics across all creditors for an organization.\n      Used for manager dashboards and portfolio analysis.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalCreditorsController_getCreditorSummary",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Creditor summary retrieved successfully"
+          }
+        },
+        "summary": "Get summary statistics for all creditors",
+        "tags": [
+          "Internal - Creditor Analytics"
+        ]
+      }
+    },
+    "/internal/debts/creditors/analytics/top-creditors/{organizationId}": {
+      "get": {
+        "description": "\n      Returns the top creditors ranked by number of debts or total principal.\n      Used for portfolio concentration analysis and creditor performance.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalCreditorsController_getTopCreditors",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top creditors retrieved successfully"
+          }
+        },
+        "summary": "Get top creditors by debt count or principal amount",
+        "tags": [
+          "Internal - Creditor Analytics"
+        ]
+      }
+    },
+    "/internal/debts/global-creditors": {
+      "get": {
+        "operationId": "InternalGlobalCreditorsController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by canonical name or EIN",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Results per page (max 100)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of global creditors"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all global creditors (Gold List)",
+        "tags": [
+          "Internal - Global Creditors"
+        ]
+      },
+      "post": {
+        "operationId": "InternalGlobalCreditorsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Global creditor created"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "409": {
+            "description": "EIN already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new global creditor (Gold List entry)",
+        "tags": [
+          "Internal - Global Creditors"
+        ]
+      }
+    },
+    "/internal/debts/global-creditors/{id}": {
+      "get": {
+        "operationId": "InternalGlobalCreditorsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Global creditor details with usage stats"
+          },
+          "404": {
+            "description": "Global creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get global creditor by ID",
+        "tags": [
+          "Internal - Global Creditors"
+        ]
+      },
+      "patch": {
+        "operationId": "InternalGlobalCreditorsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Global creditor updated"
+          },
+          "404": {
+            "description": "Global creditor not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update global creditor metadata",
+        "tags": [
+          "Internal - Global Creditors"
+        ]
+      }
+    },
+    "/internal/debts/global-creditors/bulk-upload": {
+      "post": {
+        "operationId": "InternalGlobalCreditorsController_bulkUpload",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Bulk upload completed"
+          },
+          "400": {
+            "description": "Invalid CSV format"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bulk upload Gold List from CSV (initial seed data)",
+        "tags": [
+          "Internal - Global Creditors"
+        ]
+      }
+    },
+    "/internal/debts/analytics/dashboard-summary/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates debt and portfolio metrics for the dashboard.\n      Called by the event orchestrator to build the dashboard summary.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDashboardSummary",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard summary retrieved successfully"
+          }
+        },
+        "summary": "Get dashboard summary for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/recovery-trends/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves debt data grouped by time period.\n      Called by the event orchestrator to build recovery trends.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getRecoveryTrends",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by single portfolio UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioTag",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio tags (comma-separated for multiple)",
+            "schema": {
+              "example": "Q2-2024,Broker-Triton",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtCategory",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt category",
+            "schema": {
+              "$ref": "#/components/schemas/DebtCategory"
+            }
+          },
+          {
+            "name": "granularity",
+            "required": false,
+            "in": "query",
+            "description": "Time period granularity",
+            "schema": {
+              "$ref": "#/components/schemas/TrendGranularity"
+            }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group by dimension",
+            "schema": {
+              "$ref": "#/components/schemas/AnalyticsGroupBy"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt trend data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryTrendsDebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debt data for recovery trends (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/portfolio-performance/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves debt statistics for each portfolio.\n      Called by the event orchestrator to build portfolio performance analytics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getPortfolioPerformance",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by single portfolio UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioTag",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio tags (comma-separated for multiple)",
+            "schema": {
+              "example": "Q2-2024,Broker-Triton",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtCategory",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt category",
+            "schema": {
+              "$ref": "#/components/schemas/DebtCategory"
+            }
+          },
+          {
+            "name": "debtStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt status",
+            "schema": {
+              "$ref": "#/components/schemas/DebtStatus"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort results by",
+            "schema": {
+              "$ref": "#/components/schemas/PortfolioSortField"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order (ascending or descending)",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolio debt metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioPerformanceDebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debt metrics for portfolio performance (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/debtor-portfolios/{organizationId}": {
+      "post": {
+        "description": "Returns which portfolios a batch of debtors belong to.",
+        "operationId": "InternalAnalyticsController_getDebtorPortfolios",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Get portfolio distribution for a set of debtors (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/flow/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves debt data grouped by dimension for flow visualizations.\n      Called by the event orchestrator to build Sankey flow diagrams.\n\n      Handles DEBT_CATEGORY and PORTFOLIO dimensions.\n      Returns empty array for other dimensions (handled by other services).\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getFlowAnalytics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": true,
+            "in": "query",
+            "description": "Flow dimension to visualize",
+            "schema": {
+              "$ref": "#/components/schemas/FlowDimension"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by single portfolio UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioTag",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio tags (comma-separated for multiple)",
+            "schema": {
+              "example": "Q2-2024,Broker-Triton",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtCategory",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt category",
+            "schema": {
+              "$ref": "#/components/schemas/DebtCategory"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flow analytics data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowAnalyticsDebtResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debt flow data for Sankey diagrams (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/debt-portfolio-map/{organizationId}": {
+      "get": {
+        "description": "\n      Returns a lightweight mapping of debt IDs to portfolio IDs.\n      Used by the orchestrator to connect payment data to portfolios.\n\n      This endpoint is optimized for performance:\n      - Only returns 2 columns (debt ID, portfolio ID)\n      - Can be filtered by specific portfolios via query param\n      - Response is cacheable with long TTL\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDebtPortfolioMap",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioIds",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt-to-portfolio mapping retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "example": {
+                    "debt-uuid-1": "portfolio-uuid-1",
+                    "debt-uuid-2": "portfolio-uuid-1",
+                    "debt-uuid-3": "portfolio-uuid-2"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debt-to-portfolio mapping (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/geographic/debts-by-state/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates debt financial data by debtor state for geographic visualization.\n      Called by the event orchestrator to build geographic debt analytics.\n\n      Returns debt values, counts, status metrics, and recovery rates grouped by state.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getGeographicDebts",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "states",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific states (state codes)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio ID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geographic debt metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeographicDebtsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debt financial metrics by state (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/geographic/creditors/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates creditor and debt data by original creditor location.\n      Called by the event orchestrator to build geographic creditor analytics.\n\n      Note: Requires original_creditor_id field and creditor entity-address relationships.\n      Current implementation uses placeholder data pending schema updates.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getGeographicCreditors",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "states",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific states (state codes)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio ID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geographic creditor metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeographicCreditorsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get creditor geographic metrics (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/debts/analytics/debtor-focus/{organizationId}/{debtorProfileId}": {
+      "get": {
+        "description": "\n      Retrieves all debt records associated with a specific debtor profile.\n      Called by the event orchestrator to build the debtor focus view for collectors.\n\n      Returns individual debt details plus aggregated totals across all debts\n      for this debtor within the organization.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDebtorDebts",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorProfileId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor Profile UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtor debts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorFocusDebtsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all debts for a specific debtor (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/ops/debts/creditors/global": {
+      "get": {
+        "operationId": "CreditorsOpsController_findAllGlobal",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalCreditorResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all platform master creditors (Gold List)",
+        "tags": [
+          "Ops: Creditors"
+        ]
+      },
+      "post": {
+        "operationId": "CreditorsOpsController_createGlobal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGlobalCreditorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalCreditorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new master creditor",
+        "tags": [
+          "Ops: Creditors"
+        ]
+      }
+    },
+    "/ops/debts/creditors/global/{id}": {
+      "patch": {
+        "operationId": "CreditorsOpsController_updateGlobal",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGlobalCreditorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalCreditorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a master creditor record",
+        "tags": [
+          "Ops: Creditors"
+        ]
+      },
+      "delete": {
+        "operationId": "CreditorsOpsController_removeGlobal",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Hard delete a master creditor record",
+        "tags": [
+          "Ops: Creditors"
+        ]
+      }
+    },
+    "/ops/debts/creditors/tenant": {
+      "get": {
+        "operationId": "CreditorsOpsController_findAllTenant",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCreditorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all organization creditors (Read-Only)",
+        "tags": [
+          "Ops: Creditors"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Debts API",
+    "description": "The Debts & Portfolios Microservice API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "DebtStatus": {
+        "type": "string",
+        "enum": [
+          "IMPORTED",
+          "ACTIVE",
+          "IN_COLLECTION",
+          "PAYMENT_PLAN",
+          "SETTLED",
+          "PAID_IN_FULL",
+          "SOLD",
+          "CHARGED_OFF"
+        ],
+        "description": "Initial status of the debt. Defaults to IMPORTED if not provided."
+      },
+      "DebtCategory": {
+        "type": "string",
+        "enum": [
+          "CREDIT_CARD",
+          "AUTO_LOAN",
+          "MEDICAL",
+          "STUDENT_LOAN",
+          "PERSONAL_LOAN",
+          "UTILITY",
+          "TELECOM",
+          "MORTGAGE",
+          "PAYDAY_LOAN",
+          "OTHER"
+        ],
+        "description": "Canonical debt type classification. Defaults to OTHER if not provided."
+      },
+      "CreateDebtDto": {
+        "type": "object",
+        "properties": {
+          "debtorIdentityId": {
+            "type": "string",
+            "description": "Debtor Identity ID (global identifier for the person). Required for debt creation, typically provided by the import process.",
+            "example": "789fcdeb-51a2-43d7-b890-123456789abc",
+            "format": "uuid"
+          },
+          "portfolioId": {
+            "type": "string",
+            "description": "Portfolio this debt belongs to. Must be a portfolio owned by the requesting organization.",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "format": "uuid"
+          },
+          "originalCreditorName": {
+            "type": "string",
+            "description": "Name of the original creditor who issued this debt",
+            "example": "First National Bank",
+            "maxLength": 255
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Original creditor account number. Must be unique within the organization.",
+            "example": "ACC-2024-00123456",
+            "maxLength": 100
+          },
+          "principalAmount": {
+            "type": "number",
+            "description": "Original principal amount of the debt in USD. This field is immutable after creation.",
+            "example": 5000,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "interestAmount": {
+            "type": "number",
+            "description": "Accrued interest on the debt in USD. Defaults to 0 if not provided.",
+            "example": 250,
+            "format": "decimal",
+            "minimum": 0,
+            "default": 0
+          },
+          "feesAmount": {
+            "type": "number",
+            "description": "Additional fees associated with the debt in USD. Defaults to 0 if not provided.",
+            "example": 100,
+            "format": "decimal",
+            "minimum": 0,
+            "default": 0
+          },
+          "status": {
+            "description": "Initial status of the debt. Defaults to IMPORTED if not provided.",
+            "example": "IMPORTED",
+            "default": "IMPORTED",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtStatus"
+              }
+            ]
+          },
+          "debtCategory": {
+            "description": "Canonical debt type classification. Defaults to OTHER if not provided.",
+            "example": "MEDICAL",
+            "default": "OTHER",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtCategory"
+              }
+            ]
+          },
+          "debtSubcategory": {
+            "type": "string",
+            "description": "Optional subcategory for more specific classification (e.g., \"Emergency Room Visit\", \"Subprime Auto\")",
+            "example": "Emergency Room Visit",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "originalDebtDate": {
+            "type": "string",
+            "description": "Date the original debt was incurred. This field is immutable after creation. Must be a date in the past or today.",
+            "example": "2023-06-15",
+            "format": "date"
+          },
+          "debtorProfileIds": {
+            "description": "Array of debtor profile UUIDs associated with this debt. Must include at least one debtor profile. Use this for co-debtors (spouses, co-signers).",
+            "example": [
+              "8f8c7e65-4b3a-4f1e-9c2d-5a7b9e3f1d4c",
+              "3d2e5f4b-1c9a-4e7d-8b2f-6a5c9e1d3f8b"
+            ],
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "description": "Initial notes about this debt. Can be added or updated later by collectors.",
+            "example": "Debt originated from credit card account. Debtor indicated willingness to negotiate.",
+            "nullable": true
+          }
+        },
+        "required": [
+          "portfolioId",
+          "originalCreditorName",
+          "accountNumber",
+          "principalAmount",
+          "originalDebtDate",
+          "debtorProfileIds"
+        ]
+      },
+      "DebtResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique debt identifier",
+            "example": "a1b2c3d4-e5f6-4789-a012-b3c4d5e6f7g8"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this debt",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+          },
+          "portfolioId": {
+            "type": "string",
+            "description": "Portfolio this debt belongs to",
+            "example": "9f8e7d6c-5b4a-3219-8f7e-6d5c4b3a2918"
+          },
+          "originalCreditorName": {
+            "type": "string",
+            "description": "Original creditor name",
+            "example": "First National Bank"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Account number from original creditor",
+            "example": "ACC-2024-00123456"
+          },
+          "principalAmount": {
+            "type": "string",
+            "description": "Principal amount (original debt amount)",
+            "example": "5000.00"
+          },
+          "interestAmount": {
+            "type": "string",
+            "description": "Accrued interest amount",
+            "example": "250.00"
+          },
+          "feesAmount": {
+            "type": "string",
+            "description": "Fees and charges",
+            "example": "100.00"
+          },
+          "currentBalance": {
+            "type": "string",
+            "description": "Current outstanding balance (calculated)",
+            "example": "5350.00"
+          },
+          "status": {
+            "description": "Current debt status",
+            "example": "IN_COLLECTION",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtStatus"
+              }
+            ]
+          },
+          "debtCategory": {
+            "description": "Canonical debt type classification",
+            "example": "MEDICAL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtCategory"
+              }
+            ]
+          },
+          "debtSubcategory": {
+            "type": "object",
+            "description": "Optional subcategory for more specific classification",
+            "example": "Emergency Room Visit",
+            "nullable": true
+          },
+          "originalDebtDate": {
+            "type": "string",
+            "description": "Date when original debt was incurred",
+            "example": "2023-06-15",
+            "format": "date"
+          },
+          "lastPaymentDate": {
+            "type": "object",
+            "description": "Date of last payment received (null if no payments)",
+            "example": "2024-01-15",
+            "format": "date",
+            "nullable": true
+          },
+          "debtorProfileIds": {
+            "description": "IDs of associated debtor profiles",
+            "example": [
+              "8f8c7e65-4b3a-4f1e-9c2d-5a7b9e3f1d4c"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": "object",
+            "description": "Optional notes",
+            "example": "Debtor indicated willingness to negotiate.",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Record creation timestamp",
+            "example": "2024-01-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Record last update timestamp",
+            "example": "2024-01-15T10:15:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "portfolioId",
+          "originalCreditorName",
+          "accountNumber",
+          "principalAmount",
+          "interestAmount",
+          "feesAmount",
+          "currentBalance",
+          "status",
+          "debtCategory",
+          "debtSubcategory",
+          "originalDebtDate",
+          "lastPaymentDate",
+          "debtorProfileIds",
+          "notes",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DebtSortField": {
+        "type": "string",
+        "enum": [
+          "created_at",
+          "updated_at",
+          "current_balance",
+          "principal_amount",
+          "original_debt_date",
+          "account_number",
+          "status"
+        ]
+      },
+      "SortOrder": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "PaginatedDebtResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of debt records",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of items across all pages",
+            "example": 150
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 20
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 8
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateDebtDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Update debt status. Must follow valid status transitions.",
+            "example": "IN_COLLECTION",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtStatus"
+              }
+            ]
+          },
+          "interestAmount": {
+            "type": "number",
+            "description": "Update interest amount in USD. Requires debt:update permission.",
+            "example": 300,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "feesAmount": {
+            "type": "number",
+            "description": "Update fees amount in USD. Requires debt:update permission.",
+            "example": 150,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "notes": {
+            "type": "string",
+            "description": "Update notes. Requires debt:update:notes or debt:update permission.",
+            "example": "Debtor agreed to payment plan starting next month."
+          }
+        }
+      },
+      "PortfolioStatus": {
+        "type": "string",
+        "enum": [
+          "SOLD",
+          "PROVISIONING",
+          "ACTIVE",
+          "CLOSED"
+        ],
+        "description": "Initial status of the portfolio. Defaults to PROVISIONING if not provided."
+      },
+      "CreatePortfolioDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the portfolio",
+            "example": "Q1 2024 Credit Card Purchase - First National Bank",
+            "maxLength": 255
+          },
+          "purchaseDate": {
+            "type": "string",
+            "description": "Date the portfolio was acquired by the organization",
+            "example": "2024-01-15",
+            "format": "date"
+          },
+          "purchasePrice": {
+            "type": "number",
+            "description": "Amount paid to acquire this portfolio in USD",
+            "example": 250000,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "totalPrincipal": {
+            "type": "number",
+            "description": "Sum of all debt principal amounts in this portfolio. Typically calculated during import.",
+            "example": 1500000,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "source": {
+            "type": "string",
+            "description": "Origin/source of the portfolio (e.g., creditor name, acquisition details)",
+            "example": "First National Bank - Charged-off Credit Cards",
+            "maxLength": 500
+          },
+          "status": {
+            "description": "Initial status of the portfolio. Defaults to PROVISIONING if not provided.",
+            "example": "PROVISIONING",
+            "default": "PROVISIONING",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PortfolioStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "purchaseDate",
+          "purchasePrice",
+          "totalPrincipal",
+          "source"
+        ]
+      },
+      "PortfolioResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique portfolio identifier",
+            "example": "9f8e7d6c-5b4a-3219-8f7e-6d5c4b3a2918"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this portfolio",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+          },
+          "name": {
+            "type": "string",
+            "description": "Portfolio name",
+            "example": "Q1 2024 Credit Card Purchase"
+          },
+          "status": {
+            "description": "Portfolio status",
+            "example": "ACTIVE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PortfolioStatus"
+              }
+            ]
+          },
+          "purchaseDate": {
+            "type": "string",
+            "description": "Date when portfolio was acquired",
+            "example": "2024-01-15",
+            "format": "date"
+          },
+          "purchasePrice": {
+            "type": "string",
+            "description": "Amount paid to acquire the portfolio",
+            "example": "250000.00"
+          },
+          "totalPrincipal": {
+            "type": "string",
+            "description": "Total principal of all debts in portfolio",
+            "example": "1500000.00"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source/origin of the portfolio",
+            "example": "First National Bank"
+          },
+          "primaryDebtCategory": {
+            "description": "Primary debt category hint (nullable)",
+            "example": "MEDICAL",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtCategory"
+              }
+            ]
+          },
+          "portfolioTags": {
+            "description": "User-defined tags for organization and filtering",
+            "example": [
+              "Q2-2024",
+              "Broker-Triton",
+              "Consumer-Mix"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "businessDescription": {
+            "type": "object",
+            "description": "Business context and notes about this portfolio",
+            "example": "Mixed consumer portfolio from Triton Financial",
+            "nullable": true
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Number of debts in this portfolio",
+            "example": 250
+          },
+          "totalCurrentBalance": {
+            "type": "string",
+            "description": "Total current balance of all debts",
+            "example": "1575000.00"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Record creation timestamp",
+            "example": "2024-01-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Record last update timestamp",
+            "example": "2024-01-15T10:15:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "status",
+          "purchaseDate",
+          "purchasePrice",
+          "totalPrincipal",
+          "source",
+          "primaryDebtCategory",
+          "portfolioTags",
+          "businessDescription",
+          "debtCount",
+          "totalCurrentBalance",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PortfolioSortField": {
+        "type": "string",
+        "enum": [
+          "created_at",
+          "purchase_date",
+          "purchase_price",
+          "name"
+        ]
+      },
+      "PaginatedPortfolioResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of portfolio records",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortfolioResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of items across all pages",
+            "example": 45
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 20
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 3
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdatePortfolioDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Update portfolio name",
+            "example": "Q1 2024 Credit Card Purchase - Updated",
+            "maxLength": 255
+          },
+          "purchaseDate": {
+            "type": "string",
+            "description": "Update purchase date",
+            "example": "2024-01-15",
+            "format": "date"
+          },
+          "purchasePrice": {
+            "type": "number",
+            "description": "Update purchase price in USD",
+            "example": 275000,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "totalPrincipal": {
+            "type": "number",
+            "description": "Update total principal. Typically recalculated automatically.",
+            "example": 1600000,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "source": {
+            "type": "string",
+            "description": "Update source/origin information",
+            "example": "First National Bank - Updated",
+            "maxLength": 500
+          },
+          "status": {
+            "description": "Update portfolio status. Must follow valid status transitions.",
+            "example": "ACTIVE",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PortfolioStatus"
+              }
+            ]
+          }
+        }
+      },
+      "AssignUserDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User ID to grant access to. User must belong to the same organization.",
+            "example": "8f8c7e65-4b3a-4f1e-9c2d-5a7b9e3f1d4c",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "PortfolioUserAccessDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User ID who has access",
+            "example": "8f8c7e65-4b3a-4f1e-9c2d-5a7b9e3f1d4c"
+          },
+          "grantedAt": {
+            "type": "string",
+            "description": "Timestamp when access was granted",
+            "example": "2024-01-15T10:30:00.000Z"
+          }
+        },
+        "required": [
+          "userId",
+          "grantedAt"
+        ]
+      },
+      "TransferPortfolioDto": {
+        "type": "object",
+        "properties": {
+          "newOrganizationId": {
+            "type": "string",
+            "description": "Organization ID to transfer portfolio to",
+            "example": "3d2e5f4b-1c9a-4e7d-8b2f-6a5c9e1d3f8b",
+            "format": "uuid"
+          },
+          "transferDate": {
+            "type": "string",
+            "description": "Date of the transfer. Defaults to today if not provided.",
+            "example": "2024-01-20",
+            "format": "date"
+          },
+          "transferPrice": {
+            "type": "number",
+            "description": "Sale price of the portfolio in USD",
+            "example": 180000,
+            "format": "decimal",
+            "minimum": 0
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes about the transfer",
+            "example": "Portfolio sold to XYZ Collections per contract ABC-123"
+          }
+        },
+        "required": [
+          "newOrganizationId"
+        ]
+      },
+      "OwnershipHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique history record identifier",
+            "example": "a1b2c3d4-e5f6-4789-a012-b3c4d5e6f7g8"
+          },
+          "debtId": {
+            "type": "string",
+            "description": "Debt ID this record belongs to",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owned the debt",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+          },
+          "acquiredDate": {
+            "type": "string",
+            "description": "Date when organization acquired the debt",
+            "example": "2024-01-15",
+            "format": "date"
+          },
+          "soldDate": {
+            "type": "object",
+            "description": "Date when organization sold the debt (null if current owner)",
+            "example": "2024-06-15",
+            "format": "date",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "description": "Source of acquisition",
+            "example": "Initial Import from First National Bank"
+          },
+          "daysOwned": {
+            "type": "object",
+            "description": "Number of days owned (null if still owned)",
+            "example": 152,
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Record creation timestamp",
+            "example": "2024-01-15T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "debtId",
+          "organizationId",
+          "acquiredDate",
+          "soldDate",
+          "source",
+          "daysOwned",
+          "createdAt"
+        ]
+      },
+      "DebtOwnershipChainResponseDto": {
+        "type": "object",
+        "properties": {
+          "debtId": {
+            "type": "string",
+            "description": "Debt ID",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "history": {
+            "description": "Complete ownership history in chronological order",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OwnershipHistoryResponseDto"
+            }
+          },
+          "totalTransfers": {
+            "type": "number",
+            "description": "Total number of ownership transfers",
+            "example": 2
+          },
+          "currentOwnerId": {
+            "type": "object",
+            "description": "Current owner organization ID (null if no records)",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "nullable": true
+          }
+        },
+        "required": [
+          "debtId",
+          "history",
+          "totalTransfers",
+          "currentOwnerId"
+        ]
+      },
+      "FileInspectionResponseDto": {
+        "type": "object",
+        "properties": {
+          "tempFileId": {
+            "type": "string",
+            "description": "Temporary file ID for use in the follow-up import execution",
+            "example": "temp_123456789"
+          },
+          "headers": {
+            "description": "Raw headers discovered in the uploaded file",
+            "example": [
+              "Account Number",
+              "Principal",
+              "Creditor Name",
+              "Debt Date"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "previewRows": {
+            "description": "Preview of the first few rows of data",
+            "example": [
+              {
+                "Account Number": "8821-0029-11",
+                "Principal": "1240.50"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "tempFileId",
+          "headers",
+          "previewRows"
+        ]
+      },
+      "ImportJobStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "VALIDATING",
+          "PROCESSING",
+          "COMPLETED",
+          "FAILED"
+        ],
+        "description": "Current processing status"
+      },
+      "ImportJobResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique import job identifier",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this import job",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "format": "uuid"
+          },
+          "portfolioName": {
+            "type": "string",
+            "description": "Name of the portfolio being created",
+            "example": "Q1 2024 Credit Card Purchase - First National Bank"
+          },
+          "status": {
+            "description": "Current processing status",
+            "example": "PROCESSING",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImportJobStatus"
+              }
+            ]
+          },
+          "totalRows": {
+            "type": "object",
+            "description": "Total number of rows in CSV (null if not yet parsed)",
+            "example": 1250,
+            "nullable": true
+          },
+          "processedRows": {
+            "type": "number",
+            "description": "Number of rows processed so far",
+            "example": 850
+          },
+          "progressPercentage": {
+            "type": "object",
+            "description": "Progress percentage (0-100, null if totalRows is null)",
+            "example": 68,
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true
+          },
+          "errorMessage": {
+            "type": "object",
+            "description": "Error message if import failed",
+            "example": "Validation failed at row 42: principalAmount must be greater than 0",
+            "nullable": true
+          },
+          "portfolioId": {
+            "type": "object",
+            "description": "Portfolio ID if successfully created",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when import job was created",
+            "example": "2024-01-15T10:30:00.000Z",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when import job was last updated",
+            "example": "2024-01-15T10:35:00.000Z",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "portfolioName",
+          "status",
+          "processedRows",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 20
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of items across all pages",
+            "example": 150
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 8
+          }
+        },
+        "required": [
+          "page",
+          "pageSize",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PaginatedImportJobResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Array of import jobs for current page",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportJobResponseDto"
+            }
+          },
+          "meta": {
+            "description": "Pagination metadata",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMeta"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CreditorResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique creditor identifier",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this creditor",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "format": "uuid"
+          },
+          "legalName": {
+            "type": "string",
+            "description": "Legal name of the creditor",
+            "example": "JPMorgan Chase N.A."
+          },
+          "normalizedName": {
+            "type": "string",
+            "description": "Normalized name for fuzzy matching",
+            "example": "JPMORGAN CHASE"
+          },
+          "ein": {
+            "type": "object",
+            "description": "Employer Identification Number (EIN)",
+            "example": "13-2890427",
+            "nullable": true
+          },
+          "dbaName": {
+            "type": "object",
+            "description": "Doing Business As (DBA) name",
+            "example": "Chase Bank",
+            "nullable": true
+          },
+          "street1": {
+            "type": "object",
+            "description": "Primary street address",
+            "example": "270 Park Avenue",
+            "nullable": true
+          },
+          "street2": {
+            "type": "object",
+            "description": "Street address line 2",
+            "nullable": true
+          },
+          "street3": {
+            "type": "object",
+            "description": "Street address line 3",
+            "nullable": true
+          },
+          "city": {
+            "type": "object",
+            "description": "City",
+            "example": "New York",
+            "nullable": true
+          },
+          "state": {
+            "type": "object",
+            "description": "State (2-letter code)",
+            "example": "NY",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "object",
+            "description": "Postal code",
+            "example": "10017",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "description": "Country (ISO 3166-1 alpha-2 code)",
+            "example": "US"
+          },
+          "latitude": {
+            "type": "object",
+            "description": "Latitude for geocoding",
+            "example": 40.7549,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "object",
+            "description": "Longitude for geocoding",
+            "example": -73.984,
+            "nullable": true
+          },
+          "isMasterRecord": {
+            "type": "boolean",
+            "description": "Whether this is the master record",
+            "example": true
+          },
+          "masterCreditorId": {
+            "type": "object",
+            "description": "Reference to master creditor if this is a duplicate",
+            "example": "a47ac10b-58cc-4372-a567-0e02b2c3d480",
+            "nullable": true
+          },
+          "matchConfidenceScore": {
+            "type": "object",
+            "description": "Match confidence score from entity resolution",
+            "example": 97.5,
+            "nullable": true
+          },
+          "einVerified": {
+            "type": "boolean",
+            "description": "Whether EIN was verified via lookup API",
+            "example": true
+          },
+          "globalCreditorId": {
+            "type": "object",
+            "description": "Reference to platform-owned global creditor",
+            "example": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+            "nullable": true
+          },
+          "isPlatformVerified": {
+            "type": "boolean",
+            "description": "Whether linked to platform-verified global creditor (Gold List)",
+            "example": true
+          },
+          "globalLinkConfidence": {
+            "type": "object",
+            "description": "Confidence score of global creditor match (0-100)",
+            "example": 98,
+            "nullable": true
+          },
+          "hasUnresolvedConflict": {
+            "type": "boolean",
+            "description": "Whether this creditor has unresolved conflicts in the queue",
+            "example": false
+          },
+          "hygieneScore": {
+            "type": "object",
+            "description": "Data quality score (0-100)",
+            "example": 85,
+            "nullable": true
+          },
+          "industry": {
+            "type": "object",
+            "description": "Industry classification",
+            "example": "Banking",
+            "nullable": true
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Total number of debts from this creditor",
+            "example": 1523
+          },
+          "totalPrincipal": {
+            "type": "string",
+            "description": "Total principal amount of debts",
+            "example": "2500000.00"
+          },
+          "notes": {
+            "type": "object",
+            "description": "Notes about this creditor",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when creditor was created",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when creditor was last updated",
+            "example": "2024-01-20T14:45:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "legalName",
+          "normalizedName",
+          "country",
+          "isMasterRecord",
+          "einVerified",
+          "isPlatformVerified",
+          "hasUnresolvedConflict",
+          "debtCount",
+          "totalPrincipal",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedCreditorResponseDto": {
+        "type": "object",
+        "properties": {
+          "creditors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditorResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of records"
+          }
+        },
+        "required": [
+          "creditors",
+          "total"
+        ]
+      },
+      "CreateCreditorDto": {
+        "type": "object",
+        "properties": {
+          "legalName": {
+            "type": "string",
+            "description": "Legal name of the creditor",
+            "example": "JPMorgan Chase N.A.",
+            "maxLength": 255
+          },
+          "ein": {
+            "type": "string",
+            "description": "Employer Identification Number (EIN) - format: XX-XXXXXXX",
+            "example": "13-2890427",
+            "maxLength": 10
+          },
+          "dbaName": {
+            "type": "string",
+            "description": "Doing Business As (DBA) name if different from legal name",
+            "example": "Chase Bank",
+            "maxLength": 255
+          },
+          "street1": {
+            "type": "string",
+            "description": "Primary street address line 1",
+            "example": "270 Park Avenue",
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "Street address line 2 (suite, floor, etc.)",
+            "example": "Floor 12",
+            "maxLength": 255
+          },
+          "street3": {
+            "type": "string",
+            "description": "Street address line 3",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "New York",
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "State (2-letter code)",
+            "example": "NY",
+            "maxLength": 2
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code (5 or 9 digit ZIP code)",
+            "example": "10017",
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "Country (ISO 3166-1 alpha-2 code)",
+            "example": "US",
+            "maxLength": 2,
+            "default": "US"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry classification",
+            "example": "Banking",
+            "maxLength": 100
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about this creditor"
+          }
+        },
+        "required": [
+          "legalName"
+        ]
+      },
+      "UpdateCreditorDto": {
+        "type": "object",
+        "properties": {
+          "legalName": {
+            "type": "string",
+            "description": "Legal name of the creditor",
+            "example": "JPMorgan Chase N.A.",
+            "maxLength": 255
+          },
+          "ein": {
+            "type": "string",
+            "description": "Employer Identification Number (EIN) - format: XX-XXXXXXX",
+            "example": "13-2890427",
+            "maxLength": 10
+          },
+          "dbaName": {
+            "type": "string",
+            "description": "Doing Business As (DBA) name if different from legal name",
+            "example": "Chase Bank",
+            "maxLength": 255
+          },
+          "street1": {
+            "type": "string",
+            "description": "Primary street address line 1",
+            "example": "270 Park Avenue",
+            "maxLength": 255
+          },
+          "street2": {
+            "type": "string",
+            "description": "Street address line 2 (suite, floor, etc.)",
+            "example": "Floor 12",
+            "maxLength": 255
+          },
+          "street3": {
+            "type": "string",
+            "description": "Street address line 3",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "description": "City",
+            "example": "New York",
+            "maxLength": 100
+          },
+          "state": {
+            "type": "string",
+            "description": "State (2-letter code)",
+            "example": "NY",
+            "maxLength": 2
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code (5 or 9 digit ZIP code)",
+            "example": "10017",
+            "maxLength": 10
+          },
+          "country": {
+            "type": "string",
+            "description": "Country (ISO 3166-1 alpha-2 code)",
+            "example": "US",
+            "maxLength": 2,
+            "default": "US"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry classification",
+            "example": "Banking",
+            "maxLength": 100
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about this creditor"
+          }
+        }
+      },
+      "MergeCreditorDto": {
+        "type": "object",
+        "properties": {
+          "masterCreditorId": {
+            "type": "string",
+            "description": "ID of the master creditor to merge into (target)",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "format": "uuid"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes explaining the merge decision",
+            "example": "Approved via Green Strip - EIN exact match + legal entity variation"
+          }
+        },
+        "required": [
+          "masterCreditorId"
+        ]
+      },
+      "ConflictResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique conflict identifier",
+            "example": "d1e2f3g4-h5i6-j7k8-l9m0-n1o2p3q4r5s6",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this conflict",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "format": "uuid"
+          },
+          "rawCreditorName": {
+            "type": "string",
+            "description": "Raw creditor name from import file",
+            "example": "JPM Chase, Inc."
+          },
+          "normalizedName": {
+            "type": "string",
+            "description": "Normalized version of raw name",
+            "example": "JPM CHASE"
+          },
+          "sourceImportId": {
+            "type": "object",
+            "description": "Import job that created this conflict",
+            "example": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+            "nullable": true
+          },
+          "suggestedMasterIds": {
+            "description": "Array of candidate creditor IDs",
+            "example": [
+              "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidenceScores": {
+            "description": "Confidence scores for suggested masters (0-100)",
+            "example": [
+              97.5,
+              82.3
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "aiMatchReason": {
+            "type": "object",
+            "description": "Explanation from Vertex AI",
+            "example": "EIN exact match + legal entity variation (Inc vs N.A.)",
+            "nullable": true
+          },
+          "isPlatformMatch": {
+            "type": "boolean",
+            "description": "Whether top suggestion is from Gold List",
+            "example": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Conflict status based on confidence tier",
+            "enum": [
+              "HIGH_CONFIDENCE",
+              "MEDIUM_CONFIDENCE",
+              "LOW_CONFIDENCE",
+              "RESOLVED",
+              "DISMISSED"
+            ],
+            "example": "HIGH_CONFIDENCE"
+          },
+          "resolvedByUserId": {
+            "type": "object",
+            "description": "User who resolved this conflict",
+            "example": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+            "nullable": true
+          },
+          "resolvedAt": {
+            "type": "object",
+            "description": "Timestamp when resolved",
+            "example": "2025-01-15T14:30:00Z",
+            "nullable": true
+          },
+          "resolution": {
+            "type": "object",
+            "description": "Resolution action details",
+            "example": {
+              "action": "MERGE",
+              "targetMasterId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "notes": "Approved via Green Strip"
+            },
+            "nullable": true
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Number of debts waiting on resolution",
+            "example": 142
+          },
+          "totalPrincipalAffected": {
+            "type": "string",
+            "description": "Total principal amount affected",
+            "example": "250000.00"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when conflict was created",
+            "example": "2025-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when conflict was last updated",
+            "example": "2025-01-15T14:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "rawCreditorName",
+          "normalizedName",
+          "suggestedMasterIds",
+          "confidenceScores",
+          "isPlatformMatch",
+          "status",
+          "debtCount",
+          "totalPrincipalAffected",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ResolveConflictDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Resolution action type",
+            "enum": [
+              "MERGE",
+              "CREATE_NEW",
+              "DISMISS"
+            ],
+            "example": "MERGE"
+          },
+          "targetMasterId": {
+            "type": "string",
+            "description": "ID of the master creditor to merge into (required for MERGE action)",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "format": "uuid"
+          },
+          "targetGlobalId": {
+            "type": "string",
+            "description": "ID of the global creditor to link (optional, for platform-verified matches)",
+            "example": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+            "format": "uuid"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes explaining the resolution decision",
+            "example": "Approved - Platform verified Gold List match"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "TrendGranularity": {
+        "type": "string",
+        "enum": [
+          "DAILY",
+          "WEEKLY",
+          "MONTHLY",
+          "QUARTERLY",
+          "YEARLY"
+        ]
+      },
+      "AnalyticsGroupBy": {
+        "type": "string",
+        "enum": [
+          "DEBT_CATEGORY",
+          "PORTFOLIO",
+          "NONE"
+        ]
+      },
+      "DebtPeriodDataDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "description": "Period identifier (ISO date or quarter string)",
+            "example": "2024-01"
+          },
+          "totalPrincipal": {
+            "type": "string",
+            "description": "Total principal owed in this period (decimal as string)",
+            "example": "125000.50"
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Number of debts in this period",
+            "example": 45
+          },
+          "groupKey": {
+            "type": "string",
+            "description": "Group key (debt category or portfolio ID)",
+            "example": "MEDICAL"
+          }
+        },
+        "required": [
+          "period",
+          "totalPrincipal",
+          "debtCount"
+        ]
+      },
+      "RecoveryTrendsDebtResponseDto": {
+        "type": "object",
+        "properties": {
+          "debtsOverTime": {
+            "description": "Debt data points grouped by period",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtPeriodDataDto"
+            }
+          }
+        },
+        "required": [
+          "debtsOverTime"
+        ]
+      },
+      "PortfolioDebtMetricsDto": {
+        "type": "object",
+        "properties": {
+          "portfolioId": {
+            "type": "string",
+            "description": "Portfolio unique identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "portfolioName": {
+            "type": "string",
+            "description": "Portfolio name",
+            "example": "Medical Debt Portfolio 2024"
+          },
+          "purchasePrice": {
+            "type": "string",
+            "description": "Purchase price (amount invested) as decimal string",
+            "example": "125000.00"
+          },
+          "totalPrincipal": {
+            "type": "string",
+            "description": "Total principal amount of all debts as decimal string",
+            "example": "450000.00"
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Total number of debts in portfolio",
+            "example": 150
+          },
+          "activeDebts": {
+            "type": "number",
+            "description": "Number of active debts",
+            "example": 120
+          },
+          "paidDebts": {
+            "type": "number",
+            "description": "Number of paid debts",
+            "example": 30
+          },
+          "primaryDebtCategory": {
+            "description": "Primary debt category in portfolio",
+            "example": "MEDICAL",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebtCategory"
+              }
+            ]
+          },
+          "portfolioTags": {
+            "description": "Portfolio tags for filtering and categorization",
+            "example": [
+              "high-value",
+              "medical"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "portfolioId",
+          "portfolioName",
+          "purchasePrice",
+          "totalPrincipal",
+          "debtCount",
+          "activeDebts",
+          "paidDebts",
+          "portfolioTags"
+        ]
+      },
+      "PortfolioPerformanceDebtResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalPortfolios": {
+            "type": "number",
+            "description": "Total number of portfolios (before pagination)",
+            "example": 15
+          },
+          "portfolios": {
+            "description": "Debt metrics for each portfolio",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortfolioDebtMetricsDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 20
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 1
+          }
+        },
+        "required": [
+          "totalPortfolios",
+          "portfolios",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "FlowDimension": {
+        "type": "string",
+        "enum": [
+          "PAYMENT_METHOD",
+          "STATE",
+          "DEBT_CATEGORY",
+          "PORTFOLIO",
+          "STATUS_TRANSITION"
+        ]
+      },
+      "FlowDimensionDataDto": {
+        "type": "object",
+        "properties": {
+          "dimensionValue": {
+            "type": "string",
+            "description": "Dimension value (e.g., debt category, portfolio ID)",
+            "example": "MEDICAL"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label for this dimension value",
+            "example": "Medical Debt"
+          },
+          "totalPrincipal": {
+            "type": "string",
+            "description": "Total principal amount for this dimension",
+            "example": "125000.50"
+          },
+          "debtCount": {
+            "type": "number",
+            "description": "Number of debts in this dimension",
+            "example": 150
+          }
+        },
+        "required": [
+          "dimensionValue",
+          "label",
+          "totalPrincipal",
+          "debtCount"
+        ]
+      },
+      "FlowAnalyticsDebtResponseDto": {
+        "type": "object",
+        "properties": {
+          "debtsByDimension": {
+            "description": "Debts grouped by the requested dimension",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowDimensionDataDto"
+            }
+          }
+        },
+        "required": [
+          "debtsByDimension"
+        ]
+      },
+      "StateAbbreviation": {
+        "type": "string",
+        "enum": [
+          "AL",
+          "AK",
+          "AZ",
+          "AR",
+          "CA",
+          "CO",
+          "CT",
+          "DE",
+          "FL",
+          "GA",
+          "HI",
+          "ID",
+          "IL",
+          "IN",
+          "IA",
+          "KS",
+          "KY",
+          "LA",
+          "ME",
+          "MD",
+          "MA",
+          "MI",
+          "MN",
+          "MS",
+          "MO",
+          "MT",
+          "NE",
+          "NV",
+          "NH",
+          "NJ",
+          "NM",
+          "NY",
+          "NC",
+          "ND",
+          "OH",
+          "OK",
+          "OR",
+          "PA",
+          "RI",
+          "SC",
+          "SD",
+          "TN",
+          "TX",
+          "UT",
+          "VT",
+          "VA",
+          "WA",
+          "WV",
+          "WI",
+          "WY",
+          "AS",
+          "DC",
+          "GU",
+          "MP",
+          "PR",
+          "VI"
+        ]
+      },
+      "DebtorDebtMetricsDto": {
+        "type": "object",
+        "properties": {
+          "debtorProfileId": {
+            "type": "string",
+            "description": "Debtor profile UUID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value for this debtor",
+            "example": 25000.5
+          },
+          "averageDebtValue": {
+            "type": "number",
+            "description": "Average debt value per debt for this debtor",
+            "example": 5000.25
+          },
+          "totalDebts": {
+            "type": "number",
+            "description": "Number of debts for this debtor",
+            "example": 5
+          },
+          "activeDebts": {
+            "type": "number",
+            "description": "Number of active debts for this debtor",
+            "example": 3
+          },
+          "paidDebts": {
+            "type": "number",
+            "description": "Number of paid debts for this debtor",
+            "example": 1
+          },
+          "defaultedDebts": {
+            "type": "number",
+            "description": "Number of defaulted/charged-off debts for this debtor",
+            "example": 1
+          },
+          "recoveryRate": {
+            "type": "number",
+            "description": "Recovery rate as a percentage (0-100)",
+            "example": 65.5
+          }
+        },
+        "required": [
+          "debtorProfileId",
+          "totalDebtValue",
+          "averageDebtValue",
+          "totalDebts",
+          "activeDebts",
+          "paidDebts",
+          "defaultedDebts",
+          "recoveryRate"
+        ]
+      },
+      "GeographicDebtsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value across all debtors",
+            "example": 1000000
+          },
+          "debtorMetrics": {
+            "description": "Debtor-level debt financial metrics",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorDebtMetricsDto"
+            }
+          }
+        },
+        "required": [
+          "totalDebtValue",
+          "debtorMetrics"
+        ]
+      },
+      "TopCreditorDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Creditor identifier",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Creditor name",
+            "example": "First National Bank"
+          },
+          "debtValue": {
+            "type": "number",
+            "description": "Total debt value from this creditor in this state",
+            "example": 150000
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "debtValue"
+        ]
+      },
+      "StateCreditorMetricsDto": {
+        "type": "object",
+        "properties": {
+          "stateCode": {
+            "description": "State abbreviation code",
+            "example": "TX",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StateAbbreviation"
+              }
+            ]
+          },
+          "creditorCount": {
+            "type": "number",
+            "description": "Number of unique creditors in this state",
+            "example": 12
+          },
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value originated from this state",
+            "example": 500000
+          },
+          "averageDebtValue": {
+            "type": "number",
+            "description": "Average debt value per creditor in this state",
+            "example": 41666.67
+          },
+          "topCreditors": {
+            "description": "Top creditors in this state by debt value",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopCreditorDto"
+            }
+          }
+        },
+        "required": [
+          "stateCode",
+          "creditorCount",
+          "totalDebtValue",
+          "averageDebtValue",
+          "topCreditors"
+        ]
+      },
+      "GeographicCreditorsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalCreditors": {
+            "type": "number",
+            "description": "Total number of unique creditors across all states",
+            "example": 150
+          },
+          "totalDebtValue": {
+            "type": "number",
+            "description": "Total debt value across all states",
+            "example": 5000000
+          },
+          "states": {
+            "description": "State-level creditor metrics",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateCreditorMetricsDto"
+            }
+          }
+        },
+        "required": [
+          "totalCreditors",
+          "totalDebtValue",
+          "states"
+        ]
+      },
+      "DebtorFocusDebtDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Debt ID",
+            "example": "debt-123"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Account number",
+            "example": "ACC-001-2024"
+          },
+          "originalCreditorName": {
+            "type": "string",
+            "description": "Original creditor name",
+            "example": "Acme Medical Center"
+          },
+          "debtType": {
+            "type": "string",
+            "description": "Debt type/category",
+            "example": "MEDICAL"
+          },
+          "status": {
+            "type": "string",
+            "description": "Debt status",
+            "example": "IN_COLLECTION"
+          },
+          "principalAmount": {
+            "type": "number",
+            "description": "Principal amount",
+            "example": 5000
+          },
+          "interestAmount": {
+            "type": "number",
+            "description": "Interest amount",
+            "example": 250
+          },
+          "feesAmount": {
+            "type": "number",
+            "description": "Fees amount",
+            "example": 0
+          },
+          "currentBalance": {
+            "type": "number",
+            "description": "Current balance",
+            "example": 5250
+          },
+          "daysOverdue": {
+            "type": "number",
+            "description": "Days overdue since first delinquency",
+            "example": 120
+          },
+          "lastPaymentDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last payment date",
+            "example": "2024-11-01T00:00:00.000Z",
+            "nullable": true
+          },
+          "lastPaymentAmount": {
+            "type": "object",
+            "description": "Last payment amount",
+            "example": 100,
+            "nullable": true
+          },
+          "nextPaymentDue": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Next payment due date",
+            "example": "2024-12-01T00:00:00.000Z",
+            "nullable": true
+          },
+          "hasPaymentPlan": {
+            "type": "boolean",
+            "description": "Whether the debt has an active payment plan",
+            "example": false
+          },
+          "hasDispute": {
+            "type": "boolean",
+            "description": "Whether the debt is currently disputed",
+            "example": false
+          },
+          "ltpScore": {
+            "type": "number",
+            "description": "Likelihood to pay score (0-100)",
+            "example": 75
+          }
+        },
+        "required": [
+          "id",
+          "accountNumber",
+          "originalCreditorName",
+          "debtType",
+          "status",
+          "principalAmount",
+          "interestAmount",
+          "feesAmount",
+          "currentBalance",
+          "daysOverdue",
+          "hasPaymentPlan",
+          "hasDispute"
+        ]
+      },
+      "DebtorFocusDebtsResponseDto": {
+        "type": "object",
+        "properties": {
+          "debts": {
+            "description": "List of debts for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusDebtDto"
+            }
+          },
+          "totalPrincipal": {
+            "type": "number",
+            "description": "Total principal across all debts",
+            "example": 15000
+          },
+          "totalBalance": {
+            "type": "number",
+            "description": "Total current balance across all debts",
+            "example": 15750
+          },
+          "totalInterest": {
+            "type": "number",
+            "description": "Total interest across all debts",
+            "example": 750
+          },
+          "totalFees": {
+            "type": "number",
+            "description": "Total fees across all debts",
+            "example": 0
+          },
+          "activeDebtCount": {
+            "type": "number",
+            "description": "Number of active debts",
+            "example": 3
+          },
+          "oldestDelinquentDate": {
+            "type": "object",
+            "description": "Oldest delinquent date across all debts",
+            "example": "2024-01-15",
+            "nullable": true
+          }
+        },
+        "required": [
+          "debts",
+          "totalPrincipal",
+          "totalBalance",
+          "totalInterest",
+          "totalFees",
+          "activeDebtCount",
+          "oldestDelinquentDate"
+        ]
+      },
+      "GlobalCreditorResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "canonicalName": {
+            "type": "string",
+            "example": "JPMorgan Chase N.A."
+          },
+          "verifiedEIN": {
+            "type": "string",
+            "example": "13-2890427"
+          },
+          "knownAliases": {
+            "example": [
+              "Chase Bank",
+              "JPM"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "industry": {
+            "type": "string",
+            "example": "Banking"
+          },
+          "isReferenceOnly": {
+            "type": "boolean",
+            "example": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "canonicalName",
+          "isReferenceOnly",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateGlobalCreditorDto": {
+        "type": "object",
+        "properties": {
+          "canonicalName": {
+            "type": "string",
+            "description": "Canonical, verified legal name of the creditor",
+            "example": "JPMorgan Chase N.A.",
+            "maxLength": 255
+          },
+          "verifiedEIN": {
+            "type": "string",
+            "description": "Verified Employer Identification Number (EIN)",
+            "example": "13-2890427",
+            "maxLength": 10
+          },
+          "knownAliases": {
+            "description": "Known aliases for fuzzy matching",
+            "example": [
+              "Chase Bank",
+              "JPM"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry classification",
+            "example": "Banking",
+            "maxLength": 100
+          },
+          "isReferenceOnly": {
+            "type": "boolean",
+            "description": "If true, this is a reference-only Gold List entry",
+            "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible metadata",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "canonicalName"
+        ]
+      },
+      "UpdateGlobalCreditorDto": {
+        "type": "object",
+        "properties": {
+          "canonicalName": {
+            "type": "string",
+            "description": "Canonical, verified legal name of the creditor",
+            "example": "JPMorgan Chase N.A.",
+            "maxLength": 255
+          },
+          "verifiedEIN": {
+            "type": "string",
+            "description": "Verified Employer Identification Number (EIN)",
+            "example": "13-2890427",
+            "maxLength": 10
+          },
+          "knownAliases": {
+            "description": "Known aliases for fuzzy matching",
+            "example": [
+              "Chase Bank",
+              "JPM"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry classification",
+            "example": "Banking",
+            "maxLength": 100
+          },
+          "isReferenceOnly": {
+            "type": "boolean",
+            "description": "If true, this is a reference-only Gold List entry",
+            "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Extensible metadata",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  }
+}

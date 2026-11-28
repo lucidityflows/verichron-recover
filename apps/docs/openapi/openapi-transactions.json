@@ -1,0 +1,4073 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/transactions/payment-plans/orgs/{organizationId}": {
+      "post": {
+        "description": "Creates a new payment plan to consolidate one or more debts. The initial status will be DRAFT, PENDING_APPROVAL, or ACTIVE depending on the total amount and organization approval threshold. Supports multi-debt consolidation via debtIds array.",
+        "operationId": "PlansController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment plan created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or business rule violation"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:create permission"
+          },
+          "409": {
+            "description": "One or more debts are already part of an active payment plan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      },
+      "get": {
+        "description": "Retrieve a paginated list of payment plans with optional filters. Results are automatically scoped to the requesting user's organization.",
+        "operationId": "PlansController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by",
+            "schema": {
+              "default": "createdAt",
+              "example": "createdAt",
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "updatedAt",
+                "startDate",
+                "totalAmount",
+                "status"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "321e6543-e89b-12d3-a456-426614174777",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payment plan status",
+            "schema": {
+              "example": "ACTIVE",
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PENDING_APPROVAL",
+                "ACTIVE",
+                "COMPLETED",
+                "CANCELED",
+                "DEFAULTED"
+              ]
+            }
+          },
+          {
+            "name": "dateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter by plans created on or after this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter by plans created on or before this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment plan list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PaymentPlan"
+                      }
+                    },
+                    "total": {
+                      "type": "number",
+                      "example": 75
+                    },
+                    "page": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "pageSize": {
+                      "type": "number",
+                      "example": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:read permission"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List payment plans",
+        "tags": [
+          "Payment Plans"
+        ]
+      }
+    },
+    "/v1/transactions/payment-plans/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific payment plan by ID. Includes associated debt information. Access is automatically scoped to the requesting user's organization.",
+        "operationId": "PlansController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment plan found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:read permission"
+          },
+          "404": {
+            "description": "Payment plan not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get payment plan details",
+        "tags": [
+          "Payment Plans"
+        ]
+      },
+      "put": {
+        "description": "Update an existing payment plan. Only plans with DRAFT status can be updated. All provided fields will replace existing values.",
+        "operationId": "PlansController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment plan updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or plan status prevents updates"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:update permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      },
+      "patch": {
+        "description": "Partially update an existing payment plan. Only plans with DRAFT status can be updated. Only provided fields will be updated.",
+        "operationId": "PlansController_partialUpdate",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment plan updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or plan status prevents updates"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:update permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Partially update payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      },
+      "delete": {
+        "description": "Soft delete (cancel) a payment plan. This is an alias for the cancel operation. No future scheduled payments will be processed.",
+        "operationId": "PlansController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment plan canceled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Plan status prevents cancellation"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:cancel permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete (cancel) payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      }
+    },
+    "/v1/transactions/payment-plans/orgs/{organizationId}/{id}/approve": {
+      "post": {
+        "description": "Approve a pending payment plan, changing its status from PENDING_APPROVAL to ACTIVE. Only users with payment_plan:approve permission can approve plans. Once approved, scheduled payments will begin processing.",
+        "operationId": "PlansController_approve",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment plan approved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Plan status prevents approval (must be PENDING_APPROVAL)"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:approve permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      }
+    },
+    "/v1/transactions/payment-plans/orgs/{organizationId}/{id}/cancel": {
+      "post": {
+        "description": "Cancel an active or pending payment plan. No future scheduled payments will be processed. This action cannot be undone.",
+        "operationId": "PlansController_cancel",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment plan canceled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Plan status prevents cancellation"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:cancel permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel payment plan",
+        "tags": [
+          "Payment Plans"
+        ]
+      }
+    },
+    "/internal/transactions/payment-plans/process-scheduled-payments": {
+      "post": {
+        "description": "Internal endpoint for processing scheduled payments. Called by Cloud Scheduler daily to process all payment plans with due payments.",
+        "operationId": "PlansInternalController_processScheduledPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Scheduled payments processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "processed": {
+                      "type": "number",
+                      "example": 25
+                    },
+                    "completed": {
+                      "type": "number",
+                      "example": 3
+                    },
+                    "failed": {
+                      "type": "number",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Process scheduled payments (internal)",
+        "tags": [
+          "Payment Plans (Internal)"
+        ]
+      }
+    },
+    "/v1/transactions/transactions/orgs/{organizationId}": {
+      "post": {
+        "description": "Initiates a one-time payment transaction. Payment methods must be tokenized client-side using Stripe.js or similar. Returns immediately with PENDING status; processing happens asynchronously. Subscribe to TransactionSucceeded or TransactionFailed events for final status.",
+        "operationId": "TransactionsController_createOneTimePayment",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment transaction created and queued for processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionHistory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or business rule violation"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment:create permission"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create one-time payment",
+        "tags": [
+          "Transactions"
+        ]
+      },
+      "get": {
+        "description": "Retrieve a paginated list of transactions with optional filters. Results are automatically scoped to the requesting user's organization.",
+        "operationId": "TransactionsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by",
+            "schema": {
+              "default": "createdAt",
+              "example": "createdAt",
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "updatedAt",
+                "amount",
+                "status"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "debtId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "789e0123-e89b-12d3-a456-426614174999",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "321e6543-e89b-12d3-a456-426614174777",
+              "type": "string"
+            }
+          },
+          {
+            "name": "paymentPlanId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payment plan UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "example": "SUCCEEDED",
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "PROCESSING",
+                "SUCCEEDED",
+                "FAILED",
+                "REFUNDED"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "example": "PAYMENT",
+              "type": "string",
+              "enum": [
+                "PAYMENT",
+                "PAYMENT_REVERSAL",
+                "INTEREST_APPLIED",
+                "FEE_APPLIED",
+                "PRINCIPAL_ADJUSTMENT_INCREASE",
+                "PRINCIPAL_ADJUSTMENT_DECREASE",
+                "WAIVER",
+                "REFUND"
+              ]
+            }
+          },
+          {
+            "name": "dateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transactions created on or after this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transactions created on or before this date",
+            "schema": {
+              "format": "date",
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TransactionHistory"
+                      }
+                    },
+                    "total": {
+                      "type": "number",
+                      "example": 150
+                    },
+                    "page": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "pageSize": {
+                      "type": "number",
+                      "example": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment:read permission"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List transactions",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/v1/transactions/transactions/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "Retrieve detailed information about a specific transaction by ID. Access is automatically scoped to the requesting user's organization.",
+        "operationId": "TransactionsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Transaction UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment:read permission"
+          },
+          "404": {
+            "description": "Transaction not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get transaction details",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/v1/transactions/transactions/orgs/{organizationId}/{id}/refund": {
+      "post": {
+        "description": "Issue a refund for a successfully completed payment transaction. Supports full refunds (no amount specified) or partial refunds. The original transaction must have status SUCCEEDED. A new REFUND transaction is created, and the original is marked REFUNDED.",
+        "operationId": "TransactionsController_processRefund",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Original payment transaction UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessRefundDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund transaction created and queued for processing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionHistory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid refund request (e.g., refund amount exceeds original, transaction already refunded)"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment:create permission"
+          },
+          "404": {
+            "description": "Original transaction not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Process refund",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/internal/transactions/recent/{organizationId}": {
+      "get": {
+        "description": "Internal endpoint for event-orchestrator to fetch latest payments for the activity feed.",
+        "operationId": "TransactionsInternalController_findRecent",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionHistory"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recent transactions (internal)",
+        "tags": [
+          "Transactions (Internal)"
+        ]
+      }
+    },
+    "/internal/transactions/scheduled-payment": {
+      "post": {
+        "description": "Internal endpoint for creating scheduled payment transactions. Called by the plans module when processing payment plan installments.",
+        "operationId": "TransactionsInternalController_createScheduledPayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScheduledPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Scheduled payment transaction created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionHistory"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create scheduled payment (internal)",
+        "tags": [
+          "Transactions (Internal)"
+        ]
+      }
+    },
+    "/public/transactions/gateways/stripe/webhooks": {
+      "post": {
+        "description": "Receives webhook events from Stripe. Signature verification is required. This endpoint handles asynchronous event notifications from Stripe.",
+        "operationId": "GatewaysController_handleStripeWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "description": "Stripe webhook signature for verification",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "received": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid webhook payload"
+          },
+          "401": {
+            "description": "Webhook signature verification failed"
+          }
+        },
+        "summary": "Stripe webhook endpoint",
+        "tags": [
+          "Payment Gateways"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}/generate-agreement": {
+      "post": {
+        "description": "Generate a payment agreement PDF for a payment plan. The document contains plan terms, debtor information, and signature fields. The PDF is automatically uploaded to Google Cloud Storage.",
+        "operationId": "DocumentsController_generateAgreement",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateAgreementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment agreement generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment_plan:create permission"
+          },
+          "404": {
+            "description": "Payment plan not found"
+          },
+          "500": {
+            "description": "Document generation or storage failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate payment agreement",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}/generate-receipt": {
+      "post": {
+        "description": "Generate a payment receipt PDF for a transaction. The document contains transaction details, amount, date, and payment method. Automatically called after successful payment processing.",
+        "operationId": "DocumentsController_generateReceipt",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateReceiptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment receipt generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks payment:create permission"
+          },
+          "404": {
+            "description": "Transaction not found"
+          },
+          "500": {
+            "description": "Document generation or storage failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate payment receipt",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}/generate-invoice": {
+      "post": {
+        "description": "Generate an invoice PDF for a debt. The document contains debt details, amounts owed, and payment instructions.",
+        "operationId": "DocumentsController_generateInvoice",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invoice generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks debt:read permission"
+          },
+          "404": {
+            "description": "Debt not found"
+          },
+          "500": {
+            "description": "Document generation or storage failed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate invoice",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}": {
+      "get": {
+        "description": "Retrieve a paginated list of documents with optional filters. Results are automatically scoped to the requesting user's organization.",
+        "operationId": "DocumentsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "debtorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debtor ID",
+            "schema": {
+              "format": "uuid",
+              "example": "321e6543-e89b-12d3-a456-426614174777",
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by document type",
+            "schema": {
+              "$ref": "#/components/schemas/DocumentType"
+            }
+          },
+          {
+            "name": "associatedPlanId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by associated payment plan ID",
+            "schema": {
+              "format": "uuid",
+              "example": "456e7890-e89b-12d3-a456-426614174888",
+              "type": "string"
+            }
+          },
+          {
+            "name": "associatedTransactionId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by associated transaction ID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "associatedDebtId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by associated debt ID",
+            "schema": {
+              "format": "uuid",
+              "example": "789e0123-e89b-12d3-a456-426614174999",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter by documents created on or after this date",
+            "schema": {
+              "format": "date-time",
+              "example": "2024-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter by documents created on or before this date",
+            "schema": {
+              "format": "date-time",
+              "example": "2024-12-31T23:59:59.999Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by",
+            "schema": {
+              "default": "createdAt",
+              "example": "createdAt",
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "documentType",
+                "title"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Document"
+                      }
+                    },
+                    "total": {
+                      "type": "number",
+                      "example": 50
+                    },
+                    "page": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "pageSize": {
+                      "type": "number",
+                      "example": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks document:read permission"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List documents",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}/{id}": {
+      "get": {
+        "description": "Retrieve detailed metadata about a specific document by ID. Returns document metadata only, not the file itself. Access is automatically scoped to the requesting user's organization.",
+        "operationId": "DocumentsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks document:read permission"
+          },
+          "404": {
+            "description": "Document not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get document details",
+        "tags": [
+          "Documents"
+        ]
+      },
+      "delete": {
+        "description": "Soft delete a document. The document metadata is retained for audit purposes with a deletedAt timestamp. The file remains in Google Cloud Storage.",
+        "operationId": "DocumentsController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document deleted successfully"
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks document:delete permission"
+          },
+          "404": {
+            "description": "Document not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete document",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/v1/transactions/documents/orgs/{organizationId}/{id}/download": {
+      "get": {
+        "description": "Generate a signed URL for secure document download from Google Cloud Storage. The signed URL provides temporary access to the document file without exposing GCS credentials. The URL expires in 1 hour.",
+        "operationId": "DocumentsController_getDownloadUrl",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Document UUID",
+            "schema": {
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed download URL generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "downloadUrl": {
+                      "type": "string",
+                      "example": "https://storage.googleapis.com/..."
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-15T11:30:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated"
+          },
+          "403": {
+            "description": "User lacks document:read permission"
+          },
+          "404": {
+            "description": "Document not found"
+          },
+          "500": {
+            "description": "Failed to generate signed URL"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download document",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/dashboard-summary/{organizationId}": {
+      "get": {
+        "description": "\n      Aggregates transaction and payment plan metrics for the dashboard.\n      Called by the event orchestrator to build the dashboard summary.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDashboardSummary",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Specific date to fetch stats for (ISO 8601)",
+            "schema": {
+              "example": "2025-12-20",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction analytics retrieved successfully"
+          }
+        },
+        "summary": "Get transaction analytics for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/recent/{organizationId}": {
+      "get": {
+        "description": "Retrieves the most recent payment transactions for the activity feed.",
+        "operationId": "InternalAnalyticsController_getRecentTransactions",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get recent transactions for organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/recovery-trends/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves payment transaction data grouped by time period.\n      Called by the event orchestrator to build recovery trends.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getRecoveryTrends",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by single portfolio UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioTag",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio tags (comma-separated for multiple)",
+            "schema": {
+              "example": "Q2-2024,Broker-Triton",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtCategory",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt category",
+            "schema": {
+              "$ref": "#/components/schemas/DebtCategory"
+            }
+          },
+          {
+            "name": "granularity",
+            "required": false,
+            "in": "query",
+            "description": "Time period granularity",
+            "schema": {
+              "$ref": "#/components/schemas/TrendGranularity"
+            }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group by dimension",
+            "schema": {
+              "$ref": "#/components/schemas/AnalyticsGroupBy"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment trend data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryTrendsPaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment data for recovery trends (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/portfolio-performance/{organizationId}": {
+      "post": {
+        "description": "\n      Retrieves payment statistics grouped by portfolio.\n      Called by the event orchestrator to build portfolio performance analytics.\n\n      Uses POST because it needs to send debt-to-portfolio mapping in the body.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getPortfolioPerformance",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "object",
+                    "properties": {
+                      "startDate": {
+                        "type": "string",
+                        "example": "2024-01-01"
+                      },
+                      "endDate": {
+                        "type": "string",
+                        "example": "2024-12-31"
+                      },
+                      "portfolioId": {
+                        "type": "string",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                      },
+                      "portfolioIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "debtToPortfolioMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "debt-id-1": "portfolio-id-1",
+                      "debt-id-2": "portfolio-id-1",
+                      "debt-id-3": "portfolio-id-2"
+                    }
+                  }
+                },
+                "required": [
+                  "debtToPortfolioMap"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Portfolio payment metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioPerformancePaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment metrics for portfolio performance (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/flow/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves payment data grouped by dimension for flow visualizations.\n      Called by the event orchestrator to build Sankey flow diagrams.\n\n      Note: PAYMENT_METHOD view is not yet supported (requires storing payment method types).\n      Currently returns empty results.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getFlowAnalytics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": true,
+            "in": "query",
+            "description": "Flow dimension to visualize",
+            "schema": {
+              "$ref": "#/components/schemas/FlowDimension"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by single portfolio UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "portfolioTag",
+            "required": false,
+            "in": "query",
+            "description": "Filter by portfolio tags (comma-separated for multiple)",
+            "schema": {
+              "example": "Q2-2024,Broker-Triton",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtCategory",
+            "required": false,
+            "in": "query",
+            "description": "Filter by debt category",
+            "schema": {
+              "$ref": "#/components/schemas/DebtCategory"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flow analytics data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowAnalyticsPaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment flow data for Sankey diagrams (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/debtor-focus/{organizationId}/{debtorProfileId}": {
+      "get": {
+        "description": "\n      Retrieves all transactions and active payment plans for a specific debtor.\n      Called by the event orchestrator to build the debtor focus view for collectors.\n\n      Returns transaction history with payment details and active payment plan status.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getDebtorTransactions",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "debtorProfileId",
+            "required": true,
+            "in": "path",
+            "description": "Debtor Profile UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debtor transactions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorFocusTransactionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get transaction history and payment plans for a debtor (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/collector-stats/{organizationId}/{collectorUserId}": {
+      "get": {
+        "description": "\n      Retrieves aggregated payment metrics for a specific collector within a time period.\n      Called by api-collectors to calculate performance dashboards.\n\n      Returns total collected, payment counts, unique paying accounts, and payment plan metrics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getCollectorStats",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "collectorUserId",
+            "required": true,
+            "in": "path",
+            "description": "Collector User UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collector payment statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorPaymentStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment statistics for a collector (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/organization-stats/{organizationId}": {
+      "get": {
+        "description": "\n      Retrieves aggregated payment metrics for all collectors in an organization within a time period.\n      Called by api-collectors to calculate leaderboards.\n\n      Returns per-collector metrics including total collected, payment counts, and payment plan metrics.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getOrganizationStats",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization payment statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationPaymentStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment statistics for all collectors in an organization (internal only)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/internal/transactions/analytics/collectors/{collectorUserId}/dashboard-metrics": {
+      "get": {
+        "description": "\n      Retrieves comprehensive dashboard metrics for a specific collector.\n      Returns both the requested period stats AND today's stats in a single response\n      to optimize performance for dashboard rendering.\n\n      **This is an internal endpoint** - not exposed to external users.\n    ",
+        "operationId": "InternalAnalyticsController_getCollectorDashboardMetrics",
+        "parameters": [
+          {
+            "name": "collectorUserId",
+            "required": true,
+            "in": "path",
+            "description": "Collector User UUID",
+            "schema": {
+              "example": "456e7890-e89b-12d3-a456-426614174001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "query",
+            "description": "Organization UUID",
+            "schema": {
+              "example": "123e4567-e89b-12d3-a456-426614174000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "query",
+            "description": "Start of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-01T00:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodEnd",
+            "required": true,
+            "in": "query",
+            "description": "End of reporting period (ISO 8601)",
+            "schema": {
+              "example": "2025-01-31T23:59:59.999Z",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collector dashboard metrics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorDashboardMetricsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get collector dashboard metrics (period + today in single call)",
+        "tags": [
+          "Internal - Analytics"
+        ]
+      }
+    },
+    "/v1/transactions/settlement-offers/orgs/{organizationId}/pending": {
+      "get": {
+        "operationId": "SettlementOffersController_getPendingOffers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SettlementOffer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all pending settlement offers",
+        "tags": [
+          "Settlement Offers"
+        ]
+      }
+    },
+    "/v1/transactions/settlement-offers/orgs/{organizationId}/{offerId}/approve": {
+      "post": {
+        "operationId": "SettlementOffersController_approveOffer",
+        "parameters": [
+          {
+            "name": "offerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementOffer"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve a settlement offer",
+        "tags": [
+          "Settlement Offers"
+        ]
+      }
+    },
+    "/v1/transactions/settlement-offers/orgs/{organizationId}/{offerId}/reject": {
+      "post": {
+        "operationId": "SettlementOffersController_rejectOffer",
+        "parameters": [
+          {
+            "name": "offerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementOffer"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reject a settlement offer",
+        "tags": [
+          "Settlement Offers"
+        ]
+      }
+    },
+    "/ops/transactions/gateways/status": {
+      "get": {
+        "operationId": "TransactionsOpsController_getGatewayStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Consolidated gateway health report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentGatewayStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current health and configuration status of payment gateways",
+        "tags": [
+          "Ops: Transactions"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Transactions API",
+    "description": "The Transactions & Payment Plans Microservice API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreatePlanDto": {
+        "type": "object",
+        "properties": {
+          "debtIds": {
+            "description": "Array of debt UUIDs to consolidate into this payment plan",
+            "example": [
+              "789e0123-e89b-12d3-a456-426614174999",
+              "789e0123-e89b-12d3-a456-426614174998"
+            ],
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "numberOfInstallments": {
+            "type": "integer",
+            "description": "Number of installment payments",
+            "example": 12,
+            "minimum": 1
+          },
+          "frequency": {
+            "type": "string",
+            "description": "Payment frequency for scheduled installments",
+            "enum": [
+              "WEEKLY",
+              "BI_WEEKLY",
+              "MONTHLY"
+            ],
+            "example": "MONTHLY"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date of the first scheduled payment (must be a future date)",
+            "example": "2024-02-01",
+            "format": "date"
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method for scheduled payments (from Stripe.js or similar)",
+            "example": "tok_1234567890abcdef"
+          },
+          "downPayment": {
+            "type": "number",
+            "description": "Optional down payment amount to be charged immediately upon plan activation",
+            "example": 100,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional metadata to attach to the payment plan",
+            "example": {
+              "notes": "Hardship case",
+              "source": "debtor_portal"
+            }
+          }
+        },
+        "required": [
+          "debtIds",
+          "numberOfInstallments",
+          "frequency",
+          "startDate",
+          "paymentMethodToken"
+        ]
+      },
+      "PaymentPlan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique payment plan identifier",
+            "example": "456e7890-e89b-12d3-a456-426614174888",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this payment plan (denormalized for tenant isolation)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "debtorId": {
+            "type": "string",
+            "description": "Debtor who agreed to this payment plan",
+            "example": "321e6543-e89b-12d3-a456-426614174777",
+            "format": "uuid"
+          },
+          "collectorUserId": {
+            "type": "object",
+            "description": "Collector who created this payment plan (null for self-service plans)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the payment plan",
+            "enum": [
+              "DRAFT",
+              "PENDING_APPROVAL",
+              "ACTIVE",
+              "COMPLETED",
+              "CANCELED",
+              "DEFAULTED"
+            ],
+            "example": "ACTIVE"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Total amount to be paid under this plan (sum of all consolidated debts)",
+            "example": 1500,
+            "format": "decimal"
+          },
+          "numberOfInstallments": {
+            "type": "integer",
+            "description": "Number of scheduled payment installments",
+            "example": 12,
+            "minimum": 1
+          },
+          "installmentAmount": {
+            "type": "number",
+            "description": "Amount per installment payment",
+            "example": 125,
+            "format": "decimal"
+          },
+          "frequency": {
+            "type": "string",
+            "description": "Payment frequency for scheduled installments",
+            "enum": [
+              "WEEKLY",
+              "BI_WEEKLY",
+              "MONTHLY"
+            ],
+            "example": "MONTHLY"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date of the first scheduled payment",
+            "example": "2024-02-01",
+            "format": "date"
+          },
+          "nextPaymentDate": {
+            "type": "string",
+            "description": "Date of the next scheduled payment (updated after each successful payment)",
+            "example": "2024-03-01",
+            "format": "date"
+          },
+          "lastPaymentDate": {
+            "type": "string",
+            "description": "Date of the most recent payment (null if no payments yet)",
+            "example": "2024-02-01",
+            "format": "date",
+            "nullable": true
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method for scheduled payments",
+            "example": "tok_1234567890abcdef"
+          },
+          "paymentsCompleted": {
+            "type": "integer",
+            "description": "Number of completed payments",
+            "example": 3,
+            "minimum": 0
+          },
+          "paymentsFailed": {
+            "type": "integer",
+            "description": "Number of failed payment attempts",
+            "example": 0,
+            "minimum": 0
+          },
+          "createdByUserId": {
+            "type": "string",
+            "description": "User who created this payment plan",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "format": "uuid"
+          },
+          "approvedByUserId": {
+            "type": "object",
+            "description": "User who approved this payment plan (if approval was required)",
+            "example": "550e8400-e29b-41d4-a716-446655440001",
+            "format": "uuid",
+            "nullable": true
+          },
+          "approvedAt": {
+            "type": "object",
+            "description": "Timestamp when the plan was approved",
+            "example": "2024-01-15T10:30:00.000Z",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for the payment plan",
+            "example": {
+              "notes": "Hardship case - reduced payments",
+              "source": "debtor_portal"
+            },
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the payment plan was created",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the payment plan was last updated",
+            "example": "2024-01-15T10:30:05.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "debtorId",
+          "collectorUserId",
+          "status",
+          "totalAmount",
+          "numberOfInstallments",
+          "installmentAmount",
+          "frequency",
+          "startDate",
+          "nextPaymentDate",
+          "lastPaymentDate",
+          "paymentMethodToken",
+          "paymentsCompleted",
+          "paymentsFailed",
+          "createdByUserId",
+          "approvedByUserId",
+          "approvedAt",
+          "metadata",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SortOrder": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "UpdatePlanDto": {
+        "type": "object",
+        "properties": {
+          "debtIds": {
+            "description": "Array of debt UUIDs to consolidate into this payment plan",
+            "example": [
+              "789e0123-e89b-12d3-a456-426614174999",
+              "789e0123-e89b-12d3-a456-426614174998"
+            ],
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "numberOfInstallments": {
+            "type": "integer",
+            "description": "Number of installment payments",
+            "example": 12,
+            "minimum": 1
+          },
+          "frequency": {
+            "type": "string",
+            "description": "Payment frequency for scheduled installments",
+            "enum": [
+              "WEEKLY",
+              "BI_WEEKLY",
+              "MONTHLY"
+            ],
+            "example": "MONTHLY"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date of the first scheduled payment (must be a future date)",
+            "example": "2024-02-01",
+            "format": "date"
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method for scheduled payments",
+            "example": "tok_1234567890abcdef"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional metadata to attach to the payment plan",
+            "example": {
+              "notes": "Updated hardship case",
+              "source": "admin_portal"
+            }
+          }
+        }
+      },
+      "CreateTransactionDto": {
+        "type": "object",
+        "properties": {
+          "debtId": {
+            "type": "string",
+            "description": "UUID of the debt account this payment applies to",
+            "example": "789e0123-e89b-12d3-a456-426614174999",
+            "format": "uuid"
+          },
+          "debtorId": {
+            "type": "string",
+            "description": "UUID of the debtor making the payment (optional)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Payment amount in USD (must be positive with up to 2 decimal places)",
+            "example": 150.5,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method reference (e.g., from Stripe.js tokenization). NEVER send raw card data.",
+            "example": "tok_1234567890abcdef"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional metadata to attach to the transaction (e.g., IP address, user agent)",
+            "example": {
+              "ip_address": "192.168.1.1",
+              "user_agent": "Mozilla/5.0..."
+            },
+            "nullable": true
+          }
+        },
+        "required": [
+          "debtId",
+          "amount",
+          "paymentMethodToken"
+        ]
+      },
+      "PaymentMethod": {
+        "type": "string",
+        "enum": [
+          "VISA",
+          "MASTERCARD",
+          "AMEX",
+          "DISCOVER",
+          "ACH",
+          "MONEY_ORDER",
+          "CASH",
+          "CHECK",
+          "OTHER"
+        ],
+        "description": "Type of payment method used"
+      },
+      "TransactionHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique transaction identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this transaction (denormalized for tenant isolation)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "debtId": {
+            "type": "object",
+            "description": "Debt account this transaction applies to (nullable for standalone transactions)",
+            "example": "789e0123-e89b-12d3-a456-426614174999",
+            "format": "uuid",
+            "nullable": true
+          },
+          "paymentPlanId": {
+            "type": "object",
+            "description": "Payment plan this transaction is associated with (for scheduled payments)",
+            "example": "456e7890-e89b-12d3-a456-426614174888",
+            "format": "uuid",
+            "nullable": true
+          },
+          "debtorId": {
+            "type": "object",
+            "description": "Debtor who made or received this transaction",
+            "example": "321e6543-e89b-12d3-a456-426614174777",
+            "format": "uuid",
+            "nullable": true
+          },
+          "collectorUserId": {
+            "type": "object",
+            "description": "Collector who facilitated this transaction (null for self-service payments)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "description": "Transaction amount in USD",
+            "example": 150.5,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of transaction",
+            "enum": [
+              "PAYMENT",
+              "PAYMENT_REVERSAL",
+              "INTEREST_APPLIED",
+              "FEE_APPLIED",
+              "PRINCIPAL_ADJUSTMENT_INCREASE",
+              "PRINCIPAL_ADJUSTMENT_DECREASE",
+              "WAIVER",
+              "REFUND"
+            ],
+            "example": "PAYMENT"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the transaction",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "REFUNDED"
+            ],
+            "example": "SUCCEEDED"
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method reference (NOT raw card data)",
+            "example": "tok_1234567890abcdef"
+          },
+          "paymentMethodType": {
+            "description": "Type of payment method used",
+            "example": "VISA",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentMethod"
+              }
+            ]
+          },
+          "gatewayTransactionId": {
+            "type": "object",
+            "description": "External payment gateway transaction ID (e.g., Stripe charge ID)",
+            "example": "ch_3MmlLrLkdIwHu7ix0SNM0WaR",
+            "nullable": true
+          },
+          "failureReason": {
+            "type": "object",
+            "description": "Reason for failure if status is FAILED",
+            "example": "Card declined - insufficient funds",
+            "nullable": true
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Unique idempotency key for preventing duplicate charges",
+            "example": "550e8400-e29b-41d4-a716-446655440001",
+            "format": "uuid"
+          },
+          "originalTransactionId": {
+            "type": "object",
+            "description": "ID of the original payment transaction (for REFUND types)",
+            "example": "550e8400-e29b-41d4-a716-446655440002",
+            "format": "uuid",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for the transaction",
+            "example": {
+              "ip_address": "192.168.1.1",
+              "user_agent": "Mozilla/5.0..."
+            },
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the transaction was created",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the transaction was last updated",
+            "example": "2024-01-15T10:30:05.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "debtId",
+          "paymentPlanId",
+          "debtorId",
+          "collectorUserId",
+          "amount",
+          "type",
+          "status",
+          "paymentMethodToken",
+          "paymentMethodType",
+          "gatewayTransactionId",
+          "failureReason",
+          "idempotencyKey",
+          "originalTransactionId",
+          "metadata",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ProcessRefundDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Amount to refund (defaults to full transaction amount if not specified)",
+            "example": 50,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for issuing the refund",
+            "example": "Customer requested refund due to duplicate charge"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "CreateScheduledPaymentDto": {
+        "type": "object",
+        "properties": {
+          "paymentPlanId": {
+            "type": "string",
+            "description": "Payment plan UUID",
+            "example": "456e7890-e89b-12d3-a456-426614174888",
+            "format": "uuid"
+          },
+          "debtId": {
+            "type": "string",
+            "description": "Debt UUID (optional - can be retrieved from plan)",
+            "example": "789e0123-e89b-12d3-a456-426614174999",
+            "format": "uuid"
+          },
+          "debtorId": {
+            "type": "string",
+            "description": "Debtor UUID (optional - can be retrieved from plan)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Payment amount (typically the installment amount)",
+            "example": 125,
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "paymentMethodToken": {
+            "type": "string",
+            "description": "Tokenized payment method from the payment plan",
+            "example": "tok_1234567890abcdef"
+          }
+        },
+        "required": [
+          "paymentPlanId",
+          "amount",
+          "paymentMethodToken"
+        ]
+      },
+      "GenerateAgreementDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "Payment plan ID for which to generate the agreement",
+            "example": "456e7890-e89b-12d3-a456-426614174888",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "planId"
+        ]
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique document identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this document (denormalized for tenant isolation)",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid"
+          },
+          "debtorId": {
+            "type": "object",
+            "description": "Debtor associated with this document",
+            "example": "321e6543-e89b-12d3-a456-426614174777",
+            "format": "uuid"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "Type of document",
+            "enum": [
+              "PAYMENT_AGREEMENT",
+              "PAYMENT_RECEIPT",
+              "INVOICE",
+              "PAYMENT_OFFER_LETTER",
+              "SETTLEMENT_AGREEMENT",
+              "SETTLEMENT_ACCEPTANCE_LETTER",
+              "SETTLEMENT_COMPLETION_LETTER",
+              "BANKRUPTCY_FILING",
+              "BANKRUPTCY_DISCHARGE",
+              "BANKRUPTCY_SCHEDULES",
+              "CEASE_AND_DESIST_LETTER",
+              "VALIDATION_NOTICE",
+              "VALIDATION_REQUEST",
+              "ATTORNEY_REPRESENTATION_LETTER",
+              "DEATH_CERTIFICATE",
+              "PROOF_OF_DEBT",
+              "ACCOUNT_STATEMENT",
+              "CHAIN_OF_TITLE",
+              "ORIGINAL_AGREEMENT",
+              "CALL_RECORDING",
+              "EMAIL_CORRESPONDENCE",
+              "COLLECTOR_NOTES",
+              "COMPLIANCE_AUDIT",
+              "OTHER"
+            ],
+            "example": "PAYMENT_RECEIPT"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable document title",
+            "example": "Payment Receipt - Transaction #12345"
+          },
+          "storagePath": {
+            "type": "string",
+            "description": "Google Cloud Storage URI for the document file",
+            "example": "gs://payments-docs/org-123/doc-456.pdf"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "Document MIME type",
+            "example": "application/pdf"
+          },
+          "fileSizeBytes": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 245678
+          },
+          "associatedPlanId": {
+            "type": "object",
+            "description": "Associated payment plan ID (for PAYMENT_AGREEMENT documents)",
+            "example": "456e7890-e89b-12d3-a456-426614174888",
+            "format": "uuid",
+            "nullable": true
+          },
+          "associatedTransactionId": {
+            "type": "object",
+            "description": "Associated transaction ID (for PAYMENT_RECEIPT documents)",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "format": "uuid",
+            "nullable": true
+          },
+          "associatedDebtId": {
+            "type": "object",
+            "description": "Associated debt ID (for INVOICE or PAYMENT_OFFER_LETTER documents)",
+            "example": "789e0123-e89b-12d3-a456-426614174999",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdByUserId": {
+            "type": "string",
+            "description": "User who generated this document",
+            "example": "550e8400-e29b-41d4-a716-446655440001",
+            "format": "uuid"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for the document",
+            "example": {
+              "generationTimeMs": 1234,
+              "templateVersion": "v2.1",
+              "includesSignature": false
+            },
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the document was created",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the document metadata was last updated",
+            "example": "2024-01-15T10:30:05.000Z"
+          },
+          "deletedAt": {
+            "type": "object",
+            "description": "Timestamp when the document was soft-deleted (null if active)",
+            "example": null,
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "documentType",
+          "title",
+          "storagePath",
+          "mimeType",
+          "fileSizeBytes",
+          "associatedPlanId",
+          "associatedTransactionId",
+          "associatedDebtId",
+          "createdByUserId",
+          "metadata",
+          "createdAt",
+          "updatedAt",
+          "deletedAt"
+        ]
+      },
+      "GenerateReceiptDto": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "description": "Transaction ID for which to generate the receipt",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "transactionId"
+        ]
+      },
+      "GenerateInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "debtId": {
+            "type": "string",
+            "description": "Debt ID for which to generate the invoice",
+            "example": "789e0123-e89b-12d3-a456-426614174999",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "debtId"
+        ]
+      },
+      "DocumentType": {
+        "type": "string",
+        "enum": [
+          "PAYMENT_AGREEMENT",
+          "PAYMENT_RECEIPT",
+          "INVOICE",
+          "PAYMENT_OFFER_LETTER",
+          "SETTLEMENT_AGREEMENT",
+          "SETTLEMENT_ACCEPTANCE_LETTER",
+          "SETTLEMENT_COMPLETION_LETTER",
+          "BANKRUPTCY_FILING",
+          "BANKRUPTCY_DISCHARGE",
+          "BANKRUPTCY_SCHEDULES",
+          "CEASE_AND_DESIST_LETTER",
+          "VALIDATION_NOTICE",
+          "VALIDATION_REQUEST",
+          "ATTORNEY_REPRESENTATION_LETTER",
+          "DEATH_CERTIFICATE",
+          "PROOF_OF_DEBT",
+          "ACCOUNT_STATEMENT",
+          "CHAIN_OF_TITLE",
+          "ORIGINAL_AGREEMENT",
+          "CALL_RECORDING",
+          "EMAIL_CORRESPONDENCE",
+          "COLLECTOR_NOTES",
+          "COMPLIANCE_AUDIT",
+          "OTHER"
+        ]
+      },
+      "DebtCategory": {
+        "type": "string",
+        "enum": [
+          "CREDIT_CARD",
+          "AUTO_LOAN",
+          "MEDICAL",
+          "STUDENT_LOAN",
+          "PERSONAL_LOAN",
+          "UTILITY",
+          "TELECOM",
+          "MORTGAGE",
+          "PAYDAY_LOAN",
+          "OTHER"
+        ]
+      },
+      "TrendGranularity": {
+        "type": "string",
+        "enum": [
+          "DAILY",
+          "WEEKLY",
+          "MONTHLY",
+          "QUARTERLY",
+          "YEARLY"
+        ]
+      },
+      "AnalyticsGroupBy": {
+        "type": "string",
+        "enum": [
+          "DEBT_CATEGORY",
+          "PORTFOLIO",
+          "NONE"
+        ]
+      },
+      "PaymentPeriodDataDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "description": "Period identifier (ISO date or quarter string)",
+            "example": "2024-01"
+          },
+          "totalCollected": {
+            "type": "string",
+            "description": "Total amount collected in this period (decimal as string)",
+            "example": "24500.75"
+          },
+          "transactionCount": {
+            "type": "number",
+            "description": "Number of successful payment transactions",
+            "example": 42
+          },
+          "groupKey": {
+            "type": "string",
+            "description": "Group key (debt category or portfolio ID)",
+            "example": "MEDICAL"
+          }
+        },
+        "required": [
+          "period",
+          "totalCollected",
+          "transactionCount"
+        ]
+      },
+      "RecoveryTrendsPaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "payments": {
+            "description": "Payment data points grouped by period",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentPeriodDataDto"
+            }
+          }
+        },
+        "required": [
+          "payments"
+        ]
+      },
+      "PortfolioPaymentMetricsDto": {
+        "type": "object",
+        "properties": {
+          "portfolioId": {
+            "type": "string",
+            "description": "Portfolio unique identifier (from debt_id mapping)",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "totalCollected": {
+            "type": "string",
+            "description": "Total amount collected as decimal string",
+            "example": "180000.00"
+          },
+          "paymentPlanCount": {
+            "type": "number",
+            "description": "Number of payment plans for debts in this portfolio",
+            "example": 25
+          },
+          "avgDaysToFirstPayment": {
+            "type": "object",
+            "description": "Average days from debt creation to first payment (null if no payments)",
+            "example": 45,
+            "nullable": true
+          }
+        },
+        "required": [
+          "portfolioId",
+          "totalCollected",
+          "paymentPlanCount",
+          "avgDaysToFirstPayment"
+        ]
+      },
+      "PortfolioPerformancePaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "portfolios": {
+            "description": "Payment metrics for each portfolio",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortfolioPaymentMetricsDto"
+            }
+          }
+        },
+        "required": [
+          "portfolios"
+        ]
+      },
+      "FlowDimension": {
+        "type": "string",
+        "enum": [
+          "PAYMENT_METHOD",
+          "STATE",
+          "DEBT_CATEGORY",
+          "PORTFOLIO",
+          "STATUS_TRANSITION"
+        ]
+      },
+      "FlowDimensionDataDto": {
+        "type": "object",
+        "properties": {
+          "dimensionValue": {
+            "type": "string",
+            "description": "Dimension value (e.g., payment method)",
+            "example": "VISA"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label for this dimension value",
+            "example": "Visa"
+          },
+          "totalAmount": {
+            "type": "string",
+            "description": "Total payment amount for this dimension",
+            "example": "125000.50"
+          },
+          "paymentCount": {
+            "type": "number",
+            "description": "Number of payments in this dimension",
+            "example": 150
+          }
+        },
+        "required": [
+          "dimensionValue",
+          "label",
+          "totalAmount",
+          "paymentCount"
+        ]
+      },
+      "FlowAnalyticsPaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "paymentsByDimension": {
+            "description": "Payments grouped by the requested dimension",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowDimensionDataDto"
+            }
+          }
+        },
+        "required": [
+          "paymentsByDimension"
+        ]
+      },
+      "DebtorFocusTransactionDto": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "description": "Transaction ID",
+            "example": "transaction-123"
+          },
+          "debtId": {
+            "type": "object",
+            "description": "Debt ID this transaction applies to",
+            "example": "debt-456",
+            "nullable": true
+          },
+          "paymentPlanId": {
+            "type": "object",
+            "description": "Payment plan ID if part of a plan",
+            "example": "plan-789",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "description": "Transaction amount",
+            "example": 150.5
+          },
+          "type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "PAYMENT",
+              "PAYMENT_REVERSAL",
+              "INTEREST_APPLIED",
+              "FEE_APPLIED",
+              "PRINCIPAL_ADJUSTMENT_INCREASE",
+              "PRINCIPAL_ADJUSTMENT_DECREASE",
+              "WAIVER",
+              "REFUND"
+            ],
+            "example": "PAYMENT"
+          },
+          "status": {
+            "type": "string",
+            "description": "Transaction status",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "REFUNDED"
+            ],
+            "example": "SUCCEEDED"
+          },
+          "paymentMethodType": {
+            "type": "string",
+            "description": "Payment method type",
+            "enum": [
+              "VISA",
+              "MASTERCARD",
+              "AMEX",
+              "DISCOVER",
+              "ACH",
+              "MONEY_ORDER",
+              "CASH",
+              "CHECK",
+              "OTHER"
+            ],
+            "example": "VISA"
+          },
+          "gatewayTransactionId": {
+            "type": "object",
+            "description": "External gateway transaction ID",
+            "example": "ch_3MmlLrLkdIwHu7ix0SNM0WaR",
+            "nullable": true
+          },
+          "failureReason": {
+            "type": "object",
+            "description": "Failure reason if status is FAILED",
+            "example": "Card declined - insufficient funds",
+            "nullable": true
+          },
+          "transactionDate": {
+            "type": "string",
+            "description": "Transaction date",
+            "example": "2024-11-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "transactionId",
+          "debtId",
+          "paymentPlanId",
+          "amount",
+          "type",
+          "status",
+          "paymentMethodType",
+          "gatewayTransactionId",
+          "failureReason",
+          "transactionDate"
+        ]
+      },
+      "DebtorFocusPaymentPlanDto": {
+        "type": "object",
+        "properties": {
+          "paymentPlanId": {
+            "type": "string",
+            "description": "Payment plan ID",
+            "example": "plan-123"
+          },
+          "debtId": {
+            "type": "string",
+            "description": "Debt ID",
+            "example": "debt-456"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Total plan amount",
+            "example": 1500
+          },
+          "amountPaid": {
+            "type": "number",
+            "description": "Amount paid so far",
+            "example": 600
+          },
+          "amountRemaining": {
+            "type": "number",
+            "description": "Remaining balance",
+            "example": 900
+          },
+          "installmentAmount": {
+            "type": "number",
+            "description": "Installment amount",
+            "example": 150
+          },
+          "totalInstallments": {
+            "type": "number",
+            "description": "Number of total installments",
+            "example": 10
+          },
+          "completedInstallments": {
+            "type": "number",
+            "description": "Number of completed installments",
+            "example": 4
+          },
+          "status": {
+            "type": "string",
+            "description": "Payment plan status",
+            "example": "ACTIVE"
+          },
+          "nextPaymentDue": {
+            "type": "object",
+            "description": "Next payment due date",
+            "example": "2024-12-01",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Payment plan start date",
+            "example": "2024-08-01"
+          }
+        },
+        "required": [
+          "paymentPlanId",
+          "debtId",
+          "totalAmount",
+          "amountPaid",
+          "amountRemaining",
+          "installmentAmount",
+          "totalInstallments",
+          "completedInstallments",
+          "status",
+          "nextPaymentDue",
+          "startDate"
+        ]
+      },
+      "DebtorFocusTransactionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "description": "List of transactions for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusTransactionDto"
+            }
+          },
+          "paymentPlans": {
+            "description": "Active payment plans for this debtor",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DebtorFocusPaymentPlanDto"
+            }
+          },
+          "totalAmountPaid": {
+            "type": "number",
+            "description": "Total amount paid (successful payments)",
+            "example": 2500
+          },
+          "successfulPaymentCount": {
+            "type": "number",
+            "description": "Total number of successful payments",
+            "example": 15
+          },
+          "failedPaymentCount": {
+            "type": "number",
+            "description": "Total number of failed payments",
+            "example": 2
+          },
+          "lastPaymentDate": {
+            "type": "object",
+            "description": "Date of last successful payment",
+            "example": "2024-11-15",
+            "nullable": true
+          },
+          "lastPaymentAmount": {
+            "type": "object",
+            "description": "Amount of last successful payment",
+            "example": 150,
+            "nullable": true
+          }
+        },
+        "required": [
+          "transactions",
+          "paymentPlans",
+          "totalAmountPaid",
+          "successfulPaymentCount",
+          "failedPaymentCount",
+          "lastPaymentDate",
+          "lastPaymentAmount"
+        ]
+      },
+      "CollectorPaymentStatsDto": {
+        "type": "object",
+        "properties": {
+          "collectorUserId": {
+            "type": "string",
+            "description": "Collector user ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "totalCollected": {
+            "type": "number",
+            "description": "Total amount collected (in cents)",
+            "example": 1250000
+          },
+          "successfulPaymentCount": {
+            "type": "number",
+            "description": "Number of successful payment transactions",
+            "example": 45
+          },
+          "uniquePayingAccounts": {
+            "type": "number",
+            "description": "Number of unique debtor accounts that made payments",
+            "example": 38
+          },
+          "paymentPlansCreated": {
+            "type": "number",
+            "description": "Number of payment plans created",
+            "example": 12
+          },
+          "avgPaymentAmount": {
+            "type": "number",
+            "description": "Average payment amount (in cents)",
+            "example": 27777
+          },
+          "largestPayment": {
+            "type": "number",
+            "description": "Largest single payment (in cents)",
+            "example": 150000
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          }
+        },
+        "required": [
+          "collectorUserId",
+          "totalCollected",
+          "successfulPaymentCount",
+          "uniquePayingAccounts",
+          "paymentPlansCreated",
+          "avgPaymentAmount",
+          "largestPayment",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "OrganizationPaymentStatsDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "collectorStats": {
+            "description": "Payment statistics per collector",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectorPaymentStatsDto"
+            }
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          }
+        },
+        "required": [
+          "organizationId",
+          "collectorStats",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "CollectorDashboardMetricsDto": {
+        "type": "object",
+        "properties": {
+          "collectorUserId": {
+            "type": "string",
+            "description": "Collector user ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "periodStart": {
+            "type": "string",
+            "description": "Start of the requested reporting period",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "periodEnd": {
+            "type": "string",
+            "description": "End of the requested reporting period",
+            "example": "2025-01-31T23:59:59.999Z"
+          },
+          "totalCollected": {
+            "type": "number",
+            "description": "Total amount collected in the period (in cents)",
+            "example": 5820000
+          },
+          "successfulPaymentCount": {
+            "type": "number",
+            "description": "Number of successful payment transactions in the period",
+            "example": 45
+          },
+          "uniquePayingAccounts": {
+            "type": "number",
+            "description": "Number of unique debtor accounts that made payments in the period",
+            "example": 38
+          },
+          "paymentPlansCreated": {
+            "type": "number",
+            "description": "Number of payment plans created in the period",
+            "example": 12
+          },
+          "avgPaymentAmount": {
+            "type": "number",
+            "description": "Average payment amount in the period (in cents)",
+            "example": 27777
+          },
+          "largestPayment": {
+            "type": "number",
+            "description": "Largest single payment in the period (in cents)",
+            "example": 150000
+          },
+          "totalCollectedToday": {
+            "type": "number",
+            "description": "Total amount collected today (in cents)",
+            "example": 125000
+          },
+          "successfulPaymentCountToday": {
+            "type": "number",
+            "description": "Number of successful payment transactions today",
+            "example": 8
+          },
+          "uniquePayingAccountsToday": {
+            "type": "number",
+            "description": "Number of unique debtor accounts that made payments today",
+            "example": 7
+          },
+          "paymentPlansCreatedToday": {
+            "type": "number",
+            "description": "Number of payment plans created today",
+            "example": 2
+          }
+        },
+        "required": [
+          "collectorUserId",
+          "periodStart",
+          "periodEnd",
+          "totalCollected",
+          "successfulPaymentCount",
+          "uniquePayingAccounts",
+          "paymentPlansCreated",
+          "avgPaymentAmount",
+          "largestPayment",
+          "totalCollectedToday",
+          "successfulPaymentCountToday",
+          "uniquePayingAccountsToday",
+          "paymentPlansCreatedToday"
+        ]
+      },
+      "SettlementOffer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique settlement offer identifier",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization that owns this settlement offer",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "format": "uuid"
+          },
+          "debtId": {
+            "type": "string",
+            "description": "Debt this settlement offer applies to",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "format": "uuid"
+          },
+          "offeredBy": {
+            "type": "string",
+            "description": "Who initiated this settlement offer",
+            "enum": [
+              "CREDITOR",
+              "DEBTOR"
+            ],
+            "example": "CREDITOR"
+          },
+          "originalBalance": {
+            "type": "number",
+            "description": "Original debt balance at time of offer",
+            "example": 5000,
+            "format": "decimal"
+          },
+          "settlementAmount": {
+            "type": "number",
+            "description": "Settlement offer amount (total to be paid to settle debt)",
+            "example": 3000,
+            "format": "decimal"
+          },
+          "settlementPercentage": {
+            "type": "number",
+            "description": "Percentage of original balance (calculated: settlementAmount / originalBalance)",
+            "example": 60,
+            "format": "decimal"
+          },
+          "paymentStructure": {
+            "type": "string",
+            "description": "Payment structure for settlement",
+            "enum": [
+              "LUMP_SUM",
+              "INSTALLMENT"
+            ],
+            "example": "LUMP_SUM"
+          },
+          "installmentCount": {
+            "type": "object",
+            "description": "If INSTALLMENT: Number of payments allowed",
+            "example": 3,
+            "nullable": true
+          },
+          "installmentAmount": {
+            "type": "number",
+            "description": "If INSTALLMENT: Amount per installment payment",
+            "example": 1000,
+            "format": "decimal",
+            "nullable": true
+          },
+          "installmentFrequency": {
+            "type": "string",
+            "description": "If INSTALLMENT: Frequency of payments (WEEKLY, BIWEEKLY, MONTHLY)",
+            "enum": [
+              "WEEKLY",
+              "BIWEEKLY",
+              "MONTHLY"
+            ],
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the settlement offer",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "REJECTED",
+              "EXPIRED",
+              "WITHDRAWN",
+              "COMPLETED",
+              "DEFAULTED"
+            ],
+            "example": "PENDING"
+          },
+          "offerDate": {
+            "type": "string",
+            "description": "Date the settlement offer was made",
+            "example": "2024-04-01",
+            "format": "date"
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "Date the settlement offer expires if not accepted",
+            "example": "2024-04-30",
+            "format": "date",
+            "nullable": true
+          },
+          "resolutionDate": {
+            "type": "string",
+            "description": "Date the settlement offer was accepted, rejected, or expired",
+            "example": "2024-04-15",
+            "format": "date",
+            "nullable": true
+          },
+          "completionDate": {
+            "type": "string",
+            "description": "Date the settlement was fully paid (status = COMPLETED)",
+            "example": "2024-05-01",
+            "format": "date",
+            "nullable": true
+          },
+          "createdBy": {
+            "type": "object",
+            "description": "User ID of collector or system that created the offer",
+            "example": "456e7890-e89b-12d3-a456-426614174001",
+            "format": "uuid",
+            "nullable": true
+          },
+          "resolvedBy": {
+            "type": "object",
+            "description": "User ID who approved/rejected the offer (for debtor-initiated offers)",
+            "example": "456e7890-e89b-12d3-a456-426614174002",
+            "format": "uuid",
+            "nullable": true
+          },
+          "notes": {
+            "type": "object",
+            "description": "Notes or terms associated with the settlement offer",
+            "example": "Debtor must pay lump sum within 30 days. Credit reporting will show \"Settled\" status. Waives all interest and fees.",
+            "nullable": true
+          },
+          "settlementAgreementDocumentId": {
+            "type": "object",
+            "description": "Reference to signed settlement agreement document",
+            "example": "doc-123e4567-e89b-12d3-a456-426614174000",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the offer was created",
+            "example": "2024-04-01T10:00:00Z",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when the offer was last updated",
+            "example": "2024-04-15T14:30:00Z",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "debtId",
+          "offeredBy",
+          "originalBalance",
+          "settlementAmount",
+          "settlementPercentage",
+          "paymentStructure",
+          "installmentCount",
+          "installmentAmount",
+          "installmentFrequency",
+          "status",
+          "offerDate",
+          "expirationDate",
+          "resolutionDate",
+          "completionDate",
+          "createdBy",
+          "resolvedBy",
+          "notes",
+          "settlementAgreementDocumentId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaymentGatewayHealthDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Health status",
+            "example": "active"
+          },
+          "mode": {
+            "type": "string",
+            "description": "Integration mode",
+            "example": "live"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if status is failed"
+          }
+        },
+        "required": [
+          "status",
+          "mode"
+        ]
+      },
+      "PaymentGatewayStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "stripe": {
+            "$ref": "#/components/schemas/PaymentGatewayHealthDto"
+          }
+        },
+        "required": [
+          "stripe"
+        ]
+      }
+    }
+  }
+}

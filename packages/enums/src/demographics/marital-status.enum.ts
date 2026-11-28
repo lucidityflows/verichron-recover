@@ -1,0 +1,11 @@
+/**
+ * Marital status enumeration
+ */
+export enum MaritalStatus {
+  SINGLE = 'SINGLE',
+  MARRIED = 'MARRIED',
+  DIVORCED = 'DIVORCED',
+  WIDOWED = 'WIDOWED',
+  SEPARATED = 'SEPARATED',
+  OTHER = 'OTHER',
+}

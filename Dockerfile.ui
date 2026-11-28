@@ -1,0 +1,67 @@
+# Stage 1: Build the SPA
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy workspace configuration
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy package.json for all apps to ensure workspace resolution works
+COPY apps/ui-auth/package.json ./apps/ui-auth/
+COPY apps/ui-managers/package.json ./apps/ui-managers/
+COPY apps/ui-collectors/package.json ./apps/ui-collectors/
+COPY apps/ui-ops/package.json ./apps/ui-ops/
+COPY apps/ui-marketing/package.json ./apps/ui-marketing/
+
+# Copy shared packages
+COPY packages/ ./packages/
+
+# Install dependencies (frozen-lockfile for consistency)
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build Arguments (Environment Variables injected at build time)
+ARG APP_NAME
+ARG VITE_API_USERS_URL
+ARG VITE_API_ORGANIZATIONS_URL
+ARG VITE_API_DEBTS_URL
+ARG VITE_API_DEBTORS_URL
+ARG VITE_API_TRANSACTIONS_URL
+ARG VITE_API_COMMUNICATIONS_URL
+ARG VITE_API_COLLECTORS_URL
+ARG VITE_API_VOICE_URL
+ARG VITE_API_WORKFLOWS_URL
+ARG VITE_API_AUDITS_URL
+ARG VITE_DASHBOARD_MANAGERS_URL
+ARG VITE_DASHBOARD_COLLECTORS_URL
+ARG VITE_DASHBOARD_PLATFORM_URL
+ARG VITE_AUTH_URL
+
+# Build shared dependencies first (specifically api-client which causes the axios error)
+RUN pnpm --filter @verichron/api-client build
+
+# Build the specific app
+# We use --filter to build only the target app
+RUN pnpm --filter ${APP_NAME} build
+
+# Stage 2: Serve with Nginx
+FROM nginx:alpine
+
+# Redeclare ARG for this stage
+ARG APP_NAME
+
+# Copy built assets from builder stage
+COPY --from=build /app/apps/${APP_NAME}/dist /usr/share/nginx/html
+
+# Custom Nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80 (Cloud Run maps this to PORT env var automatically or we configure it)
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

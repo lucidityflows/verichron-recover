@@ -1,0 +1,10 @@
+export type { DebtorAddressUpdatedPayload } from './debtor-address-updated.payload';
+export type { DebtorEmailUpdatedPayload } from './debtor-email-updated.payload';
+export type { DebtorPhoneUpdatedPayload } from './debtor-phone-updated.payload';
+export type { DebtorCreatedPayload } from './debtor-created.payload';
+export type { DebtorIdentityCreatedPayload } from './debtor-identity-created.payload';
+export type { DebtorProfileCreatedPayload } from './debtor-profile-created.payload';
+export type { DebtorInformationReceivedPayload } from './debtor-information-received.payload';
+export type { DebtorUpdatedPayload } from './debtor-updated.payload';
+export type { DebtorUserLinkedPayload } from './debtor-user-linked.payload';
+export type { DebtorVerificationStatusChangedPayload } from './debtor-verification-status-changed.payload';

@@ -1,0 +1,11 @@
+export { CommunicationDispatchedDto } from './communication-dispatched.dto';
+export { CommunicationDeliveredDto } from './communication-delivered.dto';
+export { CommunicationFailedDto } from './communication-failed.dto';
+export { CommunicationBlockedDto } from './communication-blocked.dto';
+export { EmailOpenedDto } from './email-opened.dto';
+export { CommunicationClickedDto } from './communication-clicked.dto';
+export { CommunicationSpamReportedDto } from './communication-spam-reported.dto';
+export { EmailReplyReceivedDto } from './email-reply-received.dto';
+export { SmsReplyReceivedDto } from './sms-reply-received.dto';
+export { CallbackRequestedDto } from './callback-requested.dto';
+export { DebtorInvitationDispatchedDto } from './debtor-invitation-dispatched.dto';

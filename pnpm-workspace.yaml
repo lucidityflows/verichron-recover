@@ -1,0 +1,30 @@
+packages:
+  - apps/*
+  - libs/*
+  - packages/*
+  - e2e
+
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - '@tailwindcss/oxide'
+  - esbuild
+
+onlyBuiltDependencies:
+  - bcrypt
+  - better-sqlite3
+
+# Allow workspace injection (so deploy can copy linked workspaces cleanly)
+injectWorkspacePackages: true
+
+allowBuilds:
+  '@google/genai': false
+  '@parcel/watcher': false
+  '@scarf/scarf': true
+  '@swc/core': true
+  bcrypt: true
+  better-sqlite3: true
+  esbuild: true
+  msgpackr-extract: false
+  protobufjs: true

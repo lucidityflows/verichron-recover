@@ -1,0 +1,10 @@
+export enum CallStatus {
+  QUEUED = 'QUEUED',
+  RINGING = 'RINGING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELED = 'CANCELED',
+  NO_ANSWER = 'NO_ANSWER',
+  BUSY = 'BUSY',
+}

@@ -1,0 +1,45 @@
+{
+  "name": "@verichron/event-orchestrator",
+  "version": "0.0.1",
+  "description": "Provides request-response pattern for event-driven microservice communication via GCP Pub/Sub.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint . --ext .ts --fix"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@verichron/event-publisher": "workspace:*",
+    "@verichron/event-subscriber": "workspace:*",
+    "@verichron/contracts": "workspace:*",
+    "@verichron/enums": "workspace:*",
+    "@verichron/events": "workspace:*",
+    "@verichron/security": "workspace:*",
+    "@google-cloud/pubsub": "^4.11.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "rxjs": "^7.8.1",
+    "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/axios": "^4.0.1",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6"
+  },
+  "devDependencies": {
+    "@verichron/eslint-config": "workspace:*",
+    "@types/uuid": "^11.0.0",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,64 @@
+# Dockerfile for E2E testing of the api-users service.
+# This uses a multi-stage build to create a production-like artifact
+# that is self-contained and free of symlink issues from pnpm workspaces.
+
+# --- Builder Stage ---
+# This stage installs all dependencies, builds the service, and creates a
+# clean deployment package using `pnpm deploy`.
+FROM node:20-alpine AS builder
+
+# Install pnpm
+RUN npm install -g pnpm
+
+WORKDIR /usr/src/app
+
+# Copy the entire monorepo context.
+# This is necessary for `pnpm install` to resolve workspace dependencies correctly.
+# For better caching, this could be optimized to copy only package manifests first.
+COPY . .
+
+# Install all monorepo dependencies.
+RUN pnpm install --frozen-lockfile
+
+# Build all shared workspace packages first
+RUN pnpm --filter "{packages/*}" build
+
+# Build the specific service. The `pnpm deploy` command requires the build
+# artifacts (e.g., in the `dist` folder) to be present.
+RUN pnpm --filter @verichron/api-users build
+
+# Use `pnpm deploy` to create a self-contained, production-ready package
+# in the /deploy directory. This copies only the necessary files and hoists
+# the required node_modules, removing the need for symlinks.
+RUN pnpm --filter @verichron/api-users --prod deploy /deploy
+
+# DEBUG: List contents of auth package to verify dist exists
+RUN ls -laR /deploy/node_modules/@verichron/auth
+
+# --- Runner Stage ---
+# This stage creates the final, small image by copying the deployed
+# application from the builder stage.
+FROM node:20-alpine AS runner
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Copy workspace packages to /packages to satisfy relative path resolution (../../../../../packages)
+COPY --from=builder /usr/src/app/packages /packages
+
+# Copy the clean, deployed application from the builder stage.
+COPY --from=builder /deploy .
+
+# Create a symlink from the root node_modules to the app's node_modules.
+# This allows shared packages in /packages to resolve their dependencies.
+RUN ln -s /app/node_modules /node_modules
+
+# Expose the port the application runs on.
+# The default for api-users is 3001.
+EXPOSE 3001
+
+CMD ["node", "dist/src/main.js"]
+
+

@@ -1,0 +1,39 @@
+{
+  "name": "@verichron/event-subscriber",
+  "version": "0.0.1",
+  "description": "Provides a standardized mechanism for subscribing to GCP Pub/Sub events and handling request-response patterns.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint . --ext .ts --fix"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@verichron/contracts": "workspace:*",
+    "@verichron/enums": "workspace:*",
+    "@verichron/events": "workspace:*",
+    "@google-cloud/pubsub": "^4.11.0",
+    "rxjs": "^7.8.1",
+    "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6"
+  },
+  "devDependencies": {
+    "@verichron/eslint-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "@types/uuid": "^11.0.0"
+  }
+}

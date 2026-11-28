@@ -1,0 +1,63 @@
+{
+  "name": "@verichron/ui-managers",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "generate:types": "orval",
+    "dev": "vite --mode test",
+    "build": "vite build --mode test",
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "preview": "vite preview --mode test"
+  },
+  "dependencies": {
+    "@verichron/api-client": "workspace:*",
+    "@verichron/auth-utils": "workspace:*",
+    "@tanstack/react-query": "^5.89.0",
+    "@tanstack/react-router": "^1.111.7",
+    "@tanstack/react-virtual": "^3.13.13",
+    "@testing-library/jest-dom": "^6.8.0",
+    "clsx": "^2.1.1",
+    "d3": "^7.9.0",
+    "d3-sankey": "^0.12.3",
+    "date-fns": "^4.1.0",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.544.0",
+    "socket.io-client": "^4.8.3",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.3.1",
+    "topojson-client": "^3.1.0",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.28.0",
+    "@verichron/eslint-config": "workspace:*",
+    "@orval/axios": "8.0.0-rc.2",
+    "@orval/core": "8.0.0-rc.2",
+    "@tailwindcss/vite": "^4.0.8",
+    "@tanstack/react-router-devtools": "1.134.15",
+    "@tanstack/router-vite-plugin": "^1.111.11",
+    "@types/d3": "^7.4.3",
+    "@types/d3-sankey": "^0.12.5",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.13.11",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/topojson-client": "^3.1.5",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@vitest/ui": "^2.0.4",
+    "eslint": "^9.33.0",
+    "jsdom": "^24.1.1",
+    "orval": "8.0.0-rc.2",
+    "tailwindcss": "^4.0.8",
+    "vite": "^7.1.2",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^2.0.4"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@verichron/eslint-config",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/eslint-plugin-jsx-a11y": "^6.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.8.0",
+    "typescript-eslint": "^8.20.0",
+    "@types/eslint-config-prettier": "^6.0.0"
+  },
+  "peerDependencies": {
+    "@types/node": "^22.13.11",
+    "eslint": "^9.33.0"
+  }
+}

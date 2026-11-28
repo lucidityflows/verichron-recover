@@ -1,0 +1,6 @@
+export enum GoalUnit {
+  COUNT = 'COUNT',
+  DOLLARS = 'DOLLARS',
+  PERCENTAGE = 'PERCENTAGE',
+  MINUTES = 'MINUTES',
+}

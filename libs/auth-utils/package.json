@@ -1,0 +1,35 @@
+{
+  "name": "@verichron/auth-utils",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared authentication utilities for Verichron microfrontends",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "build": "tsc --build",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "@verichron/eslint-config": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^22.13.11",
+    "eslint": "^9.33.0"
+  }
+}

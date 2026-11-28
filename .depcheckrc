@@ -1,0 +1,82 @@
+ignores:
+  # Verichron Workspace
+  - '@verichron/*'
+
+  # TypeScript and tooling
+  - typescript
+  - ts-node
+  - tsx
+  - rimraf
+  - prettier
+  - concurrently
+  - dotenv-cli
+  
+  # Type definitions
+  - '@types/*'
+
+  # ESLint
+  - eslint
+  - '@verichron/eslint-config'
+  - '@typescript-eslint/eslint-plugin'
+  - '@typescript-eslint/parser'
+
+  # Vite Plugins
+  - '@babel/plugin-proposal-decorators'
+  - '@tanstack/router-vite-plugin'
+  - '@vitejs/plugin-react'
+  - 'vite-tsconfig-paths'
+  - '@tailwindcss/vite'
+  - tailwindcss
+
+  # NestJS API
+  - '@nestjs/passport'
+  - csurf
+  - 'express-rate-limit'
+  - helmet
+  - jsonwebtoken
+  - passport
+  - 'passport-jwt'
+  - 'passport-local'
+  - 'swagger-ui-express'
+  - '@nestjs/schematics'
+  - '@swc/jest'
+  - 'jest-pnp-resolver'
+  - 'source-map-support'
+  - supertest
+  - 'ts-loader'
+  - 'tsconfig-paths'
+  - 'tsconfig-paths-webpack-plugin'
+
+  # NestJS peer dependencies & drivers that are not directly imported
+  - reflect-metadata
+  - pg
+  - bcrypt
+
+  # Nivo peer dependencies
+  - '@nivo/core'
+
+  # API Generation
+  - openapi-typescript
+
+ignore-patterns:
+  # Ignore build output
+  - 'dist'
+  - '*.tsbuildinfo'
+
+  # Ignore config files
+  - '*.config.js'
+  - '*.config.ts'
+  - '*.config.cjs'
+  - 'eslint.config.js'
+  - '.eslintrc.js'
+
+  # Ignore dot files
+  - '.github'
+  - '.husky'
+  - '.vscode'
+  - '.pnpm-store'
+
+  # Ignore tests and mocks
+  - '*.test.ts'
+  - '*.spec.ts'
+  - 'mock-data'

@@ -1,0 +1,5 @@
+export enum EscalationEscalateTo {
+  MANAGER = 'MANAGER',
+  SENIOR_COLLECTOR = 'SENIOR_COLLECTOR',
+  CUSTOM_ROLE = 'CUSTOM_ROLE',
+}

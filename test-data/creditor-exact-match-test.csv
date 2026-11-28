@@ -1,0 +1,31 @@
+Account Number,Creditor Name,Principal Amount,Debt Date,First Name,Last Name,Email,Phone,Address,City,State,Zip,Interest Amount,Fees,Notes
+ACC-001,JPMorgan Chase Bank N.A.,5420.50,2023-06-15,John,Smith,john.smith@email.com,555-0101,123 Main St,New York,NY,10001,245.00,50.00,Original credit card debt
+ACC-002,Bank of America N.A.,12350.00,2023-03-22,Sarah,Johnson,sarah.j@email.com,555-0102,456 Oak Ave,Los Angeles,CA,90001,1100.00,75.00,Auto loan default
+ACC-003,Wells Fargo Bank National Association,8750.25,2023-01-10,Michael,Williams,m.williams@email.com,555-0103,789 Elm St,Chicago,IL,60601,425.50,100.00,Personal loan
+ACC-004,Citibank N.A.,3200.00,2023-08-05,Emily,Brown,emily.brown@email.com,555-0104,321 Pine St,Houston,TX,77001,150.00,25.00,Credit card balance
+ACC-005,U.S. Bank National Association,15500.00,2023-02-18,David,Jones,d.jones@email.com,555-0105,654 Maple Dr,Phoenix,AZ,85001,775.00,125.00,Business line of credit
+ACC-006,Capital One Financial Corporation,4850.00,2023-07-12,Jessica,Davis,jessica.d@email.com,555-0106,987 Cedar Ln,Philadelphia,PA,19019,225.00,50.00,Retail credit card
+ACC-007,Discover Bank,2100.50,2023-05-20,Christopher,Miller,c.miller@email.com,555-0107,147 Birch Rd,San Antonio,TX,78201,95.00,15.00,Discover card debt
+ACC-008,American Express Company,6800.00,2023-04-08,Amanda,Wilson,amanda.w@email.com,555-0108,258 Walnut St,San Diego,CA,92101,340.00,75.00,Amex platinum card
+ACC-009,Synchrony Bank,1850.00,2023-09-15,Matthew,Moore,m.moore@email.com,555-0109,369 Spruce Ave,Dallas,TX,75201,90.00,20.00,Amazon store card
+ACC-010,Ally Financial Inc.,22500.00,2023-01-25,Jennifer,Taylor,j.taylor@email.com,555-0110,741 Ash Ct,San Jose,CA,95101,1125.00,200.00,Auto loan
+ACC-011,Toyota Motor Credit Corporation,18900.00,2023-03-30,Joshua,Anderson,josh.a@email.com,555-0111,852 Willow Way,Austin,TX,78701,945.00,150.00,Toyota Camry loan
+ACC-012,Ford Motor Credit Company LLC,16200.00,2023-06-22,Ashley,Thomas,ashley.t@email.com,555-0112,963 Poplar St,Jacksonville,FL,32099,810.00,125.00,Ford F-150 financing
+ACC-013,Verizon Wireless Services LLC,1250.00,2023-08-10,Daniel,Jackson,d.jackson@email.com,555-0113,159 Cherry Ln,San Francisco,CA,94102,62.50,25.00,Unpaid wireless bill
+ACC-014,AT&T Services Inc.,980.00,2023-07-05,Stephanie,White,steph.w@email.com,555-0114,357 Hickory Dr,Columbus,OH,43085,49.00,15.00,Cell phone service
+ACC-015,T-Mobile USA Inc.,750.00,2023-09-01,Ryan,Harris,ryan.h@email.com,555-0115,486 Magnolia Pl,Fort Worth,TX,76102,37.50,10.00,Mobile plan arrears
+ACC-016,Comcast Cable Communications LLC,1850.00,2023-05-18,Nicole,Martin,nicole.m@email.com,555-0116,792 Dogwood Ave,Charlotte,NC,28202,92.50,30.00,Cable and internet
+ACC-017,Charter Communications Inc.,1425.00,2023-04-25,Brandon,Thompson,b.thompson@email.com,555-0117,135 Redwood St,Detroit,MI,48201,71.25,20.00,Spectrum services
+ACC-018,Commonwealth Edison Company,685.00,2023-08-20,Lauren,Garcia,l.garcia@email.com,555-0118,246 Cypress Rd,Memphis,TN,38103,34.25,15.00,Electric utility bill
+ACC-019,Pacific Gas and Electric Company,1200.00,2023-06-30,Kevin,Martinez,k.martinez@email.com,555-0119,468 Sycamore Ln,El Paso,TX,79901,60.00,25.00,PG&E arrears
+ACC-020,Florida Power & Light Company,950.00,2023-07-15,Rachel,Robinson,r.robinson@email.com,555-0120,579 Beech Dr,Seattle,WA,98101,47.50,20.00,FPL past due
+ACC-021,Consolidated Edison Company of New York Inc.,1350.00,2023-05-08,Tyler,Clark,tyler.c@email.com,555-0121,681 Fir St,Denver,CO,80202,67.50,25.00,Con Ed utility debt
+ACC-022,Duke Energy Corporation,825.00,2023-09-12,Megan,Rodriguez,megan.r@email.com,555-0122,793 Larch Ave,Washington,DC,20001,41.25,15.00,Duke Energy balance
+ACC-023,HCA Healthcare Inc.,8500.00,2023-02-14,Jason,Lewis,jason.l@email.com,555-0123,147 Palm Ct,Boston,MA,02108,425.00,150.00,Hospital medical bill
+ACC-024,Community Health Systems Inc.,6200.00,2023-04-20,Samantha,Lee,sam.lee@email.com,555-0124,258 Cactus Rd,Nashville,TN,37201,310.00,100.00,Emergency room visit
+ACC-025,Navient Solutions LLC,35000.00,2023-01-15,Andrew,Walker,a.walker@email.com,555-0125,369 Ivy Ln,Portland,OR,97201,1750.00,300.00,Student loan default
+ACC-026,SLM Corporation,28500.00,2023-03-10,Brittany,Hall,brittany.h@email.com,555-0126,741 Rose St,Las Vegas,NV,89101,1425.00,250.00,Sallie Mae student loan
+ACC-027,Target Corporation,1850.00,2023-08-25,Jordan,Allen,jordan.a@email.com,555-0127,852 Tulip Ave,Milwaukee,WI,53202,92.50,30.00,Target RedCard
+ACC-028,Macy's Inc.,2400.00,2023-06-18,Taylor,Young,taylor.y@email.com,555-0128,963 Daisy Dr,Albuquerque,NM,87101,120.00,40.00,Macy's credit card
+ACC-029,Portfolio Recovery Associates LLC,4500.00,2023-05-05,Cameron,Hernandez,cameron.h@email.com,555-0129,159 Orchid Pl,Tucson,AZ,85701,225.00,75.00,Charged-off credit card
+ACC-030,JPMorgan Chase Bank N.A.,3750.00,2023-07-28,Morgan,King,morgan.k@email.com,555-0130,357 Violet Way,Fresno,CA,93701,187.50,50.00,Chase credit card

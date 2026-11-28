@@ -1,0 +1,10 @@
+export { CallDisposition } from './call-disposition.enum';
+export { CallStatus } from './call-status.enum';
+export { CallbackRequestSource } from './callback-request-source.enum';
+export { CommunicationProvider } from './communication-provider.enum';
+export { CommunicationStatus } from './communication-status.enum';
+export { CommunicationType } from './communication-type.enum';
+export { DispatchMethod } from './dispatch-method.enum';
+export { EmailBounceStatus } from './email-bounce-status.enum';
+export { PreferenceChannel } from './preference-channel.enum';
+export { TemplateType } from './template-type.enum';

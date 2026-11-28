@@ -1,0 +1,1559 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/ops/audits/platform-logs": {
+      "get": {
+        "operationId": "AuditsOpsController_findPlatformLogs",
+        "parameters": [
+          {
+            "name": "targetType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by target entity type (e.g., ORGANIZATION, DEBT)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by target entity ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by action (e.g., ORGANIZATION.ACTIVATED)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Generic search query (matches action, targetId, actor name)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by actor ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List system-level audit logs (Platform Events)",
+        "tags": [
+          "Ops: Audits"
+        ]
+      }
+    },
+    "/ops/audits/stats": {
+      "get": {
+        "operationId": "AuditsOpsController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditSystemStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get audit system health statistics",
+        "tags": [
+          "Ops: Audits"
+        ]
+      }
+    },
+    "/ops/audits/verify/{orgId}": {
+      "get": {
+        "operationId": "AuditsOpsController_verifyChain",
+        "parameters": [
+          {
+            "name": "orgId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainVerificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Verify integrity of an organization's audit chain",
+        "tags": [
+          "Ops: Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}": {
+      "get": {
+        "operationId": "AuditsController_findAll",
+        "parameters": [
+          {
+            "name": "targetType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by target entity type (e.g., ORGANIZATION, DEBT)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by target entity ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by action (e.g., ORGANIZATION.ACTIVATED)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Generic search query (matches action, targetId, actor name)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by actor ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for time range filter (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for time range filter (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List audit logs for an organization",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/entity/{targetType}/{targetId}": {
+      "get": {
+        "operationId": "AuditsController_getEntityHistory",
+        "parameters": [
+          {
+            "name": "targetType",
+            "required": true,
+            "in": "path",
+            "description": "Entity type (e.g., ORGANIZATION, DEBT)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": true,
+            "in": "path",
+            "description": "Entity ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLogResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get audit trail for a specific entity (chain of custody)",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/history/bridge": {
+      "get": {
+        "operationId": "AuditsController_getDeepHistoryBridge",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeepHistoryBridgeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List archival windows for deep-history reads",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/archive/run": {
+      "post": {
+        "operationId": "AuditsController_runArchiveLifecycle",
+        "parameters": [
+          {
+            "name": "olderThanDays",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArchiveLifecycleRunResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Run archival lifecycle for aged hot data",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/verify/{targetType}/{targetId}": {
+      "get": {
+        "operationId": "AuditsController_verifyChain",
+        "parameters": [
+          {
+            "name": "targetType",
+            "required": true,
+            "in": "path",
+            "description": "Entity type (e.g., ORGANIZATION, DEBT)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": true,
+            "in": "path",
+            "description": "Entity ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainVerificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Verify the integrity of an entity's audit chain",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/requests": {
+      "post": {
+        "operationId": "AuditsController_createRequest",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuditRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRequestResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an asynchronous audit generation request",
+        "tags": [
+          "Audits"
+        ]
+      },
+      "get": {
+        "operationId": "AuditsController_findRequests",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by request status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "RUNNING",
+                "SUCCEEDED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "requestType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by request type (e.g., DEBTOR, BULK, CUSTOM)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search text across request type and serialized filters",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRequestListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List audit generation requests for an organization",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/requests/{requestId}": {
+      "get": {
+        "operationId": "AuditsController_findRequestById",
+        "parameters": [
+          {
+            "name": "requestId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRequestResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single audit generation request by ID",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/requests/{requestId}/artifact": {
+      "get": {
+        "operationId": "AuditsController_getRequestArtifact",
+        "parameters": [
+          {
+            "name": "requestId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRequestArtifactResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fetch generated artifact payload for an audit request",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/compliance-briefs/run-nightly": {
+      "post": {
+        "operationId": "AuditsController_runNightlyComplianceBrief",
+        "parameters": [
+          {
+            "name": "briefDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceBriefResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate nightly compliance and anomaly brief",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/compliance-briefs/latest": {
+      "get": {
+        "operationId": "AuditsController_getLatestComplianceBrief",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceBriefResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get latest compliance and anomaly brief",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/metrics/operational": {
+      "get": {
+        "operationId": "AuditsController_getOperationalMetrics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditOperationalMetricsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get operational metrics for the audits pipeline",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/checks/correctness": {
+      "get": {
+        "operationId": "AuditsController_runCorrectnessChecks",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditCorrectnessCheckResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Run focused correctness checks for audits pipeline",
+        "tags": [
+          "Audits"
+        ]
+      }
+    },
+    "/v1/audits/orgs/{organizationId}/{id}": {
+      "get": {
+        "operationId": "AuditsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a single audit log by ID",
+        "tags": [
+          "Audits"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Audits API",
+    "description": "The Audits Microservice API - Compliance record-keeping, immutable history, and chain of custody verification",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Audits",
+      "description": "Immutable system action logs and chain verification"
+    },
+    {
+      "name": "Internal",
+      "description": "Internal endpoints for service-to-service communication"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "AuditLogResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Audit log ID"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID"
+          },
+          "eventId": {
+            "type": "string",
+            "description": "Event ID (idempotency key)"
+          },
+          "actorSnapshot": {
+            "type": "object",
+            "description": "Snapshot of the actor at time of action"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action performed (e.g., ORGANIZATION.ACTIVATED)"
+          },
+          "targetType": {
+            "type": "string",
+            "description": "Target entity type (e.g., ORGANIZATION, DEBT)"
+          },
+          "targetId": {
+            "type": "string",
+            "description": "Target entity ID"
+          },
+          "changes": {
+            "type": "object",
+            "description": "Field changes (old/new values)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata (IP, correlation ID, etc.)"
+          },
+          "prevHash": {
+            "type": "string",
+            "description": "Hash of the previous record in the chain"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp of the action"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "eventId",
+          "actorSnapshot",
+          "action",
+          "targetType",
+          "targetId",
+          "createdAt"
+        ]
+      },
+      "AuditLogListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of audit logs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLogResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of records matching the query"
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Items per page"
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "AuditSystemStatsMetricsDto": {
+        "type": "object",
+        "properties": {
+          "totalLogs": {
+            "type": "number",
+            "description": "Total number of audit logs ingested"
+          },
+          "logsToday": {
+            "type": "number",
+            "description": "Number of logs ingested today (since midnight UTC)"
+          },
+          "lastLogAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp of the most recent log",
+            "nullable": true
+          }
+        },
+        "required": [
+          "totalLogs",
+          "logsToday"
+        ]
+      },
+      "AuditSystemStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "System status",
+            "example": "active"
+          },
+          "service": {
+            "type": "string",
+            "description": "Service name",
+            "example": "api-audits"
+          },
+          "mode": {
+            "type": "string",
+            "description": "Current operating mode",
+            "example": "hash-chain-v1"
+          },
+          "infrastructure": {
+            "type": "object",
+            "description": "Infrastructure health info"
+          },
+          "metrics": {
+            "description": "Key performance metrics",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AuditSystemStatsMetricsDto"
+              }
+            ]
+          },
+          "generatedAt": {
+            "type": "object",
+            "description": "Report generation timestamp"
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "mode",
+          "infrastructure",
+          "metrics",
+          "generatedAt"
+        ]
+      },
+      "BrokenLinkDto": {
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "description": "ID of the record with the broken link"
+          },
+          "position": {
+            "type": "number",
+            "description": "Position in the chain (0-indexed)"
+          },
+          "issue": {
+            "type": "string",
+            "description": "Description of the issue"
+          },
+          "expectedHash": {
+            "type": "object",
+            "description": "Expected hash value"
+          },
+          "actualHash": {
+            "type": "object",
+            "description": "Actual hash value found"
+          }
+        },
+        "required": [
+          "recordId",
+          "position",
+          "issue"
+        ]
+      },
+      "ChainVerificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "Whether the entire chain is valid"
+          },
+          "totalRecords": {
+            "type": "number",
+            "description": "Total number of records in the chain"
+          },
+          "verifiedRecords": {
+            "type": "number",
+            "description": "Number of records that passed verification"
+          },
+          "brokenLinks": {
+            "description": "Details of any broken links",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrokenLinkDto"
+            }
+          }
+        },
+        "required": [
+          "valid",
+          "totalRecords",
+          "verifiedRecords",
+          "brokenLinks"
+        ]
+      },
+      "AuditArchiveWindowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "rangeStart": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "rangeEnd": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "objectKey": {
+            "type": "string"
+          },
+          "recordCount": {
+            "type": "number"
+          },
+          "checksum": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rangeStart",
+          "rangeEnd",
+          "objectKey",
+          "recordCount",
+          "checksum"
+        ]
+      },
+      "DeepHistoryBridgeResponseDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string"
+          },
+          "archives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditArchiveWindowDto"
+            }
+          }
+        },
+        "required": [
+          "organizationId",
+          "archives"
+        ]
+      },
+      "ArchiveLifecycleRunResponseDto": {
+        "type": "object",
+        "properties": {
+          "createdArchives": {
+            "type": "number"
+          },
+          "cutoffDate": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdArchives",
+          "cutoffDate"
+        ]
+      },
+      "CreateAuditRequestDto": {
+        "type": "object",
+        "properties": {
+          "requestType": {
+            "type": "string",
+            "description": "Audit request category (e.g., DEBTOR, COLLECTOR, PORTFOLIO, BULK, CUSTOM)",
+            "default": "CUSTOM"
+          },
+          "targetType": {
+            "type": "string",
+            "description": "Filter by target entity type (e.g., DEBT, USER, PORTFOLIO)"
+          },
+          "targetId": {
+            "type": "string",
+            "description": "Filter by target entity ID"
+          },
+          "action": {
+            "type": "string",
+            "description": "Filter by action"
+          },
+          "search": {
+            "type": "string",
+            "description": "Generic search query (matches action, target ID, actor)"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Start date for filtering (ISO 8601)"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "End date for filtering (ISO 8601)"
+          },
+          "format": {
+            "type": "string",
+            "description": "Export format",
+            "default": "JSON",
+            "enum": [
+              "JSON",
+              "PDF",
+              "CSV"
+            ]
+          }
+        }
+      },
+      "AuditRequestResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "requestType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "filters": {
+            "type": "object"
+          },
+          "format": {
+            "type": "string"
+          },
+          "requestedBy": {
+            "type": "object"
+          },
+          "recordCount": {
+            "type": "number"
+          },
+          "artifactUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "artifactChecksum": {
+            "type": "string",
+            "nullable": true
+          },
+          "artifactMimeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "artifactSizeBytes": {
+            "type": "number",
+            "nullable": true
+          },
+          "artifactData": {
+            "type": "object",
+            "nullable": true
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "requestType",
+          "status",
+          "format",
+          "requestedBy",
+          "createdAt"
+        ]
+      },
+      "AuditRequestListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditRequestResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "AuditRequestArtifactResponseDto": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "checksum": {
+            "type": "string",
+            "nullable": true
+          },
+          "sizeBytes": {
+            "type": "number",
+            "nullable": true
+          },
+          "content": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "requestId",
+          "format"
+        ]
+      },
+      "ComplianceBriefResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "briefDate": {
+            "type": "string"
+          },
+          "totalLogs": {
+            "type": "number"
+          },
+          "anomalyCount": {
+            "type": "number"
+          },
+          "riskScore": {
+            "type": "number"
+          },
+          "topActions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "summary": {
+            "type": "object",
+            "nullable": true
+          },
+          "generatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "briefDate",
+          "totalLogs",
+          "anomalyCount",
+          "riskScore",
+          "topActions",
+          "generatedAt"
+        ]
+      },
+      "AuditOperationalMetricsResponseDto": {
+        "type": "object",
+        "properties": {
+          "ingestionLagSeconds": {
+            "type": "number"
+          },
+          "duplicateEventRate": {
+            "type": "number"
+          },
+          "chainBreakCount": {
+            "type": "number"
+          },
+          "requestP95Ms": {
+            "type": "number"
+          },
+          "partitionHorizonDays": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ingestionLagSeconds",
+          "duplicateEventRate",
+          "chainBreakCount",
+          "requestP95Ms",
+          "partitionHorizonDays"
+        ]
+      },
+      "AuditCorrectnessCheckResponseDto": {
+        "type": "object",
+        "properties": {
+          "replayIdempotencyHealthy": {
+            "type": "boolean"
+          },
+          "lifecycleHealthy": {
+            "type": "boolean"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "replayIdempotencyHealthy",
+          "lifecycleHealthy",
+          "notes"
+        ]
+      }
+    }
+  }
+}

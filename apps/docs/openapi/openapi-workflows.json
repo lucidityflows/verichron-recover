@@ -1,0 +1,3017 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/ops/events/trigger": {
+      "post": {
+        "operationId": "EventsOpsController_triggerEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event successfully injected into the mesh."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manually trigger a system event (Admin Injection Protocol)",
+        "tags": [
+          "Ops: Events"
+        ]
+      }
+    },
+    "/v1/workflows/rules/orgs/{organizationId}": {
+      "post": {
+        "operationId": "WorkflowRulesController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkflowRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The workflow rule has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new workflow rule",
+        "tags": [
+          "Workflow Rules"
+        ]
+      },
+      "get": {
+        "operationId": "WorkflowRulesController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow rules.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowRuleResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all workflow rules for an organization",
+        "tags": [
+          "Workflow Rules"
+        ]
+      }
+    },
+    "/v1/workflows/rules/orgs/{organizationId}/{ruleId}": {
+      "get": {
+        "operationId": "WorkflowRulesController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific workflow rule by ID",
+        "tags": [
+          "Workflow Rules"
+        ]
+      },
+      "patch": {
+        "operationId": "WorkflowRulesController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkflowRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The workflow rule has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update an existing workflow rule",
+        "tags": [
+          "Workflow Rules"
+        ]
+      },
+      "delete": {
+        "operationId": "WorkflowRulesController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The workflow rule has been successfully deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a workflow rule",
+        "tags": [
+          "Workflow Rules"
+        ]
+      }
+    },
+    "/v1/workflows/rules/orgs/{organizationId}/{ruleId}/toggle": {
+      "patch": {
+        "operationId": "WorkflowRulesController_toggle",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workflow rule status has been successfully toggled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle enable/disable status of a workflow rule",
+        "tags": [
+          "Workflow Rules"
+        ]
+      }
+    },
+    "/v1/workflows/auto-assignment/orgs/{organizationId}": {
+      "post": {
+        "operationId": "AutoAssignmentController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAutoAssignmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The auto-assignment configuration has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoAssignmentConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new auto-assignment configuration",
+        "tags": [
+          "Auto Assignment"
+        ]
+      },
+      "get": {
+        "operationId": "AutoAssignmentController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved auto-assignment configurations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AutoAssignmentConfigResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all auto-assignment configurations for an organization",
+        "tags": [
+          "Auto Assignment"
+        ]
+      }
+    },
+    "/v1/workflows/auto-assignment/orgs/{organizationId}/{configId}": {
+      "get": {
+        "operationId": "AutoAssignmentController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved auto-assignment configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoAssignmentConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific auto-assignment configuration by ID",
+        "tags": [
+          "Auto Assignment"
+        ]
+      },
+      "patch": {
+        "operationId": "AutoAssignmentController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAutoAssignmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The auto-assignment configuration has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoAssignmentConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update an existing auto-assignment configuration",
+        "tags": [
+          "Auto Assignment"
+        ]
+      },
+      "delete": {
+        "operationId": "AutoAssignmentController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The auto-assignment configuration has been successfully deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete an auto-assignment configuration",
+        "tags": [
+          "Auto Assignment"
+        ]
+      }
+    },
+    "/v1/workflows/auto-assignment/orgs/{organizationId}/{configId}/toggle": {
+      "patch": {
+        "operationId": "AutoAssignmentController_toggle",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "configId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto-assignment configuration status has been successfully toggled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoAssignmentConfigResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle enable/disable status of an auto-assignment configuration",
+        "tags": [
+          "Auto Assignment"
+        ]
+      }
+    },
+    "/v1/workflows/escalations/orgs/{organizationId}": {
+      "post": {
+        "operationId": "EscalationRulesController_create",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEscalationRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The escalation rule has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new escalation rule",
+        "tags": [
+          "Escalation Rules"
+        ]
+      },
+      "get": {
+        "operationId": "EscalationRulesController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved escalation rules.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EscalationRuleResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all escalation rules for an organization",
+        "tags": [
+          "Escalation Rules"
+        ]
+      }
+    },
+    "/v1/workflows/escalations/orgs/{organizationId}/{ruleId}": {
+      "get": {
+        "operationId": "EscalationRulesController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved escalation rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific escalation rule by ID",
+        "tags": [
+          "Escalation Rules"
+        ]
+      },
+      "patch": {
+        "operationId": "EscalationRulesController_update",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEscalationRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The escalation rule has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationRuleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update an existing escalation rule",
+        "tags": [
+          "Escalation Rules"
+        ]
+      },
+      "delete": {
+        "operationId": "EscalationRulesController_remove",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The escalation rule has been successfully deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete an escalation rule",
+        "tags": [
+          "Escalation Rules"
+        ]
+      }
+    },
+    "/v1/workflows/executions/orgs/{organizationId}": {
+      "get": {
+        "operationId": "WorkflowExecutionsController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ruleId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow execution history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowExecutionResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get workflow execution history for an organization",
+        "tags": [
+          "Workflow Executions"
+        ]
+      }
+    },
+    "/v1/workflows/executions/orgs/{organizationId}/{executionId}": {
+      "get": {
+        "operationId": "WorkflowExecutionsController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "executionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved detailed workflow execution record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowExecutionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get detailed workflow execution record by ID",
+        "tags": [
+          "Workflow Executions"
+        ]
+      }
+    },
+    "/v1/workflows/analytics/orgs/{organizationId}": {
+      "get": {
+        "operationId": "WorkflowAnalyticsController_getAnalytics",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow analytics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowAnalyticsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get comprehensive workflow analytics for an organization",
+        "tags": [
+          "Workflow Analytics"
+        ]
+      }
+    },
+    "/v1/workflows/templates/orgs/{organizationId}": {
+      "get": {
+        "operationId": "WorkflowTemplatesController_findAll",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowTemplateResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all system-defined workflow templates",
+        "tags": [
+          "Workflow Templates"
+        ]
+      }
+    },
+    "/v1/workflows/templates/orgs/{organizationId}/{templateId}": {
+      "get": {
+        "operationId": "WorkflowTemplatesController_findOne",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "description": "Organization UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "templateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved workflow template.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowTemplateResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific system-defined workflow template by ID",
+        "tags": [
+          "Workflow Templates"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Verichron Workflows API",
+    "description": "The Workflows Microservice API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "TriggerEventDto": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "description": "The type of event to trigger",
+            "example": "DEBTS.PORTFOLIO.IMPORT_COMPLETED"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "Organization ID to scope the event to",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+          },
+          "payload": {
+            "type": "object",
+            "description": "The payload for the event (Must match the expected event DTO schema)",
+            "example": {
+              "portfolioId": "uuid"
+            }
+          }
+        },
+        "required": [
+          "eventType",
+          "organizationId",
+          "payload"
+        ]
+      },
+      "SendEmailConfigDto": {
+        "type": "object",
+        "properties": {
+          "templateId": {
+            "type": "string",
+            "description": "ID of the email template to use"
+          },
+          "templateName": {
+            "type": "string",
+            "description": "Display name of the template"
+          },
+          "delayDays": {
+            "type": "number",
+            "description": "Delay in days before sending the email",
+            "default": 0
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Recipient role or specific address",
+            "example": "DEBTOR"
+          }
+        },
+        "required": [
+          "templateId"
+        ]
+      },
+      "ActionType": {
+        "type": "string",
+        "enum": [
+          "NOTE",
+          "CALL",
+          "EMAIL",
+          "SMS",
+          "LETTER",
+          "PAYMENT",
+          "PAYMENT_PLAN_SETUP",
+          "DISPUTE_FILED",
+          "FOLLOW_UP",
+          "DEFER",
+          "TAG",
+          "ASSIGN",
+          "SETTLEMENT_REQUEST",
+          "SETTLEMENT_APPROVED",
+          "SETTLEMENT_REJECTED",
+          "PROMISE"
+        ],
+        "description": "Type of task to create"
+      },
+      "WorkflowPriority": {
+        "type": "string",
+        "enum": [
+          "LOW",
+          "MEDIUM",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "description": "Priority of the task"
+      },
+      "CreateTaskConfigDto": {
+        "type": "object",
+        "properties": {
+          "taskType": {
+            "description": "Type of task to create",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActionType"
+              }
+            ]
+          },
+          "priority": {
+            "description": "Priority of the task",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowPriority"
+              }
+            ]
+          },
+          "dueDateOffset": {
+            "type": "number",
+            "description": "Due date offset in days from trigger",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Description or notes for the task"
+          },
+          "delayDays": {
+            "type": "number",
+            "description": "Delay in days before creating the task",
+            "default": 0
+          }
+        },
+        "required": [
+          "taskType",
+          "priority"
+        ]
+      },
+      "UpdatePriorityConfigDto": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "description": "New priority level",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowPriority"
+              }
+            ]
+          },
+          "delayDays": {
+            "type": "number",
+            "description": "Delay in days before updating priority",
+            "default": 0
+          }
+        },
+        "required": [
+          "priority"
+        ]
+      },
+      "AssignToCollectorConfigDto": {
+        "type": "object",
+        "properties": {
+          "collectorId": {
+            "type": "string",
+            "description": "Specific collector ID to assign to"
+          },
+          "strategy": {
+            "type": "string",
+            "description": "Assignment strategy if no specific collector",
+            "example": "ROUND_ROBIN"
+          },
+          "delayDays": {
+            "type": "number",
+            "description": "Delay in days before assigning",
+            "default": 0
+          }
+        }
+      },
+      "WorkflowConditionDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field to evaluate (e.g., balance, accountAge)",
+            "example": "balance"
+          },
+          "operator": {
+            "type": "string",
+            "description": "Operator for evaluation",
+            "enum": [
+              "EQUALS",
+              "NOT_EQUALS",
+              "GREATER_THAN",
+              "LESS_THAN",
+              "GREATER_THAN_OR_EQUAL",
+              "LESS_THAN_OR_EQUAL",
+              "CONTAINS",
+              "NOT_CONTAINS",
+              "BETWEEN",
+              "IN",
+              "NOT_IN"
+            ],
+            "example": "GREATER_THAN"
+          },
+          "value": {
+            "description": "Value(s) to compare against. Can be a single value or a tuple for BETWEEN operator.",
+            "example": 1000,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ]
+      },
+      "WorkflowActionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID for the action instance",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of action to perform",
+            "enum": [
+              "ASSIGN_TO_COLLECTOR",
+              "REASSIGN_TO_COLLECTOR",
+              "ESCALATE_TO_MANAGER",
+              "SEND_NOTIFICATION",
+              "UPDATE_PRIORITY",
+              "ADD_TO_QUEUE",
+              "CREATE_TASK",
+              "SEND_EMAIL",
+              "TRIGGER_WEBHOOK"
+            ],
+            "example": "SEND_EMAIL"
+          },
+          "config": {
+            "description": "Action-specific configuration",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SendEmailConfigDto"
+              },
+              {
+                "$ref": "#/components/schemas/CreateTaskConfigDto"
+              },
+              {
+                "$ref": "#/components/schemas/UpdatePriorityConfigDto"
+              },
+              {
+                "$ref": "#/components/schemas/AssignToCollectorConfigDto"
+              }
+            ]
+          },
+          "order": {
+            "type": "number",
+            "description": "Execution order within the rule",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "config",
+          "order"
+        ]
+      },
+      "CreateWorkflowRuleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the workflow rule",
+            "example": "High Balance Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the workflow rule",
+            "example": "Escalates accounts with balance over $5000 that are 30 days past due."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "Type of event that triggers the workflow",
+            "enum": [
+              "ACCOUNT_AGE",
+              "PAYMENT_PROMISE_BROKEN",
+              "CONTACT_ATTEMPT_FAILED",
+              "HIGH_BALANCE",
+              "COMPLIANCE_ALERT",
+              "COLLECTOR_CAPACITY",
+              "TIME_BASED",
+              "CUSTOM",
+              "DEBT_CREATED",
+              "PAYMENT_RECEIVED"
+            ],
+            "example": "HIGH_BALANCE"
+          },
+          "conditions": {
+            "description": "Conditions that must be met for the workflow to execute",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowConditionDto"
+            }
+          },
+          "actions": {
+            "description": "Actions to perform when the workflow triggers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowActionDto"
+            }
+          },
+          "priority": {
+            "type": "string",
+            "description": "Priority of the rule (lower number = higher priority)",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "HIGH"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          }
+        },
+        "required": [
+          "name",
+          "triggerType",
+          "conditions",
+          "actions",
+          "priority",
+          "enabled"
+        ]
+      },
+      "WorkflowRuleResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the workflow rule",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "ID of the organization this rule belongs to",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the workflow rule",
+            "example": "High Balance Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the workflow rule",
+            "example": "Escalates accounts with balance over $5000 that are 30 days past due."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "Type of event that triggers the workflow",
+            "enum": [
+              "ACCOUNT_AGE",
+              "PAYMENT_PROMISE_BROKEN",
+              "CONTACT_ATTEMPT_FAILED",
+              "HIGH_BALANCE",
+              "COMPLIANCE_ALERT",
+              "COLLECTOR_CAPACITY",
+              "TIME_BASED",
+              "CUSTOM",
+              "DEBT_CREATED",
+              "PAYMENT_RECEIVED"
+            ],
+            "example": "HIGH_BALANCE"
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Conditions that must be met for the workflow to execute",
+            "items": {
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "balance"
+                },
+                "operator": {
+                  "enum": [
+                    "EQUALS",
+                    "NOT_EQUALS",
+                    "GREATER_THAN",
+                    "LESS_THAN",
+                    "GREATER_THAN_OR_EQUAL",
+                    "LESS_THAN_OR_EQUAL",
+                    "CONTAINS",
+                    "NOT_CONTAINS",
+                    "BETWEEN",
+                    "IN",
+                    "NOT_IN"
+                  ],
+                  "example": "GREATER_THAN"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  ],
+                  "example": 1000
+                }
+              }
+            }
+          },
+          "actions": {
+            "type": "array",
+            "description": "Actions to perform when the workflow triggers",
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "b1c2d3e4-f5a6-7890-1234-567890abcdef"
+                },
+                "type": {
+                  "enum": [
+                    "ASSIGN_TO_COLLECTOR",
+                    "REASSIGN_TO_COLLECTOR",
+                    "ESCALATE_TO_MANAGER",
+                    "SEND_NOTIFICATION",
+                    "UPDATE_PRIORITY",
+                    "ADD_TO_QUEUE",
+                    "CREATE_TASK",
+                    "SEND_EMAIL",
+                    "TRIGGER_WEBHOOK"
+                  ],
+                  "example": "ASSIGN_TO_COLLECTOR"
+                },
+                "config": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "example": {
+                    "collectorId": "uuid",
+                    "templateId": "uuid"
+                  }
+                },
+                "order": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "priority": {
+            "type": "string",
+            "description": "Priority of the rule (lower number = higher priority)",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "HIGH"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "ID of the user who created the rule",
+            "example": "c1d2e3f4-a5b6-7890-1234-567890abcdef"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the rule was created",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the rule was last updated",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "executionCount": {
+            "type": "number",
+            "description": "Number of times the rule has been executed",
+            "example": 150
+          },
+          "lastExecutedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the rule was last executed",
+            "example": "2023-10-27T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "triggerType",
+          "conditions",
+          "actions",
+          "priority",
+          "enabled",
+          "createdAt",
+          "updatedAt",
+          "executionCount"
+        ]
+      },
+      "UpdateWorkflowRuleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the workflow rule",
+            "example": "High Balance Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the workflow rule",
+            "example": "Escalates accounts with balance over $5000 that are 30 days past due."
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "Type of event that triggers the workflow",
+            "enum": [
+              "ACCOUNT_AGE",
+              "PAYMENT_PROMISE_BROKEN",
+              "CONTACT_ATTEMPT_FAILED",
+              "HIGH_BALANCE",
+              "COMPLIANCE_ALERT",
+              "COLLECTOR_CAPACITY",
+              "TIME_BASED",
+              "CUSTOM",
+              "DEBT_CREATED",
+              "PAYMENT_RECEIVED"
+            ],
+            "example": "HIGH_BALANCE"
+          },
+          "conditions": {
+            "description": "Conditions that must be met for the workflow to execute",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowConditionDto"
+            }
+          },
+          "actions": {
+            "description": "Actions to perform when the workflow triggers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowActionDto"
+            }
+          },
+          "priority": {
+            "type": "string",
+            "description": "Priority of the rule (lower number = higher priority)",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "HIGH"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          }
+        }
+      },
+      "AutoAssignmentFiltersDto": {
+        "type": "object",
+        "properties": {
+          "portfolioIds": {
+            "description": "List of portfolio IDs to filter by",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "balanceRange": {
+            "description": "Balance range [min, max] to filter by",
+            "minItems": 2,
+            "maxItems": 2,
+            "example": [
+              1000,
+              5000
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "accountAgeRange": {
+            "description": "Account age range [min, max] in days to filter by",
+            "minItems": 2,
+            "maxItems": 2,
+            "example": [
+              30,
+              90
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "priority": {
+            "description": "List of priorities to filter by",
+            "example": [
+              "HIGH",
+              "MEDIUM"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateAutoAssignmentDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the auto-assignment configuration",
+            "example": "Round Robin for New Accounts"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the auto-assignment configuration",
+            "example": "Assigns new accounts created today to collectors using a round-robin strategy."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the configuration is enabled",
+            "example": true
+          },
+          "strategy": {
+            "type": "string",
+            "description": "Strategy for assigning accounts",
+            "enum": [
+              "ROUND_ROBIN",
+              "LEAST_WORKLOAD",
+              "SKILL_BASED",
+              "GEOGRAPHIC",
+              "CUSTOM"
+            ],
+            "example": "ROUND_ROBIN"
+          },
+          "filters": {
+            "description": "Filters to determine which accounts are eligible for this assignment configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AutoAssignmentFiltersDto"
+              }
+            ]
+          },
+          "collectorPool": {
+            "description": "List of collector IDs eligible for assignment under this configuration",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "excludeCollectors": {
+            "description": "List of collector IDs to exclude from assignment",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "maxAssignmentsPerDay": {
+            "type": "number",
+            "description": "Maximum number of assignments per collector per day",
+            "example": 50
+          },
+          "workloadThreshold": {
+            "type": "number",
+            "description": "Maximum workload (e.g., number of active accounts) a collector can have before being excluded from assignment",
+            "example": 200
+          },
+          "delayMinutes": {
+            "type": "number",
+            "description": "Optional delay in minutes before executing the assignment (for \"wait and see\" strategies)",
+            "example": 1440,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "name",
+          "enabled",
+          "strategy",
+          "filters",
+          "collectorPool"
+        ]
+      },
+      "AutoAssignmentFiltersResponseDto": {
+        "type": "object",
+        "properties": {
+          "portfolioIds": {
+            "description": "List of portfolio IDs to filter by",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "balanceRange": {
+            "description": "Balance range [min, max] to filter by",
+            "minItems": 2,
+            "maxItems": 2,
+            "example": [
+              1000,
+              5000
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "accountAgeRange": {
+            "description": "Account age range [min, max] in days to filter by",
+            "minItems": 2,
+            "maxItems": 2,
+            "example": [
+              30,
+              90
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "priority": {
+            "description": "List of priorities to filter by",
+            "example": [
+              "HIGH",
+              "MEDIUM"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AutoAssignmentConfigResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the auto-assignment configuration",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "ID of the organization this configuration belongs to",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the auto-assignment configuration",
+            "example": "Round Robin for New Accounts"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the auto-assignment configuration",
+            "example": "Assigns new accounts created today to collectors using a round-robin strategy."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the configuration is enabled",
+            "example": true
+          },
+          "strategy": {
+            "type": "string",
+            "description": "Strategy for assigning accounts",
+            "enum": [
+              "ROUND_ROBIN",
+              "LEAST_WORKLOAD",
+              "SKILL_BASED",
+              "GEOGRAPHIC",
+              "CUSTOM"
+            ],
+            "example": "ROUND_ROBIN"
+          },
+          "filters": {
+            "description": "Filters to determine which accounts are eligible for this assignment configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AutoAssignmentFiltersResponseDto"
+              }
+            ]
+          },
+          "collectorPool": {
+            "description": "List of collector IDs eligible for assignment under this configuration",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "excludeCollectors": {
+            "description": "List of collector IDs to exclude from assignment",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "maxAssignmentsPerDay": {
+            "type": "number",
+            "description": "Maximum number of assignments per collector per day",
+            "example": 50
+          },
+          "workloadThreshold": {
+            "type": "number",
+            "description": "Maximum workload (e.g., number of active accounts) a collector can have before being excluded from assignment",
+            "example": 200
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "ID of the user who created the configuration",
+            "example": "c1d2e3f4-a5b6-7890-1234-567890abcdef"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the configuration was created",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the configuration was last updated",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "delayMinutes": {
+            "type": "number",
+            "description": "Optional delay in minutes before executing the assignment (for \"wait and see\" strategies)",
+            "example": 1440
+          },
+          "consecutiveFailures": {
+            "type": "number",
+            "description": "Number of consecutive failures before auto-disable",
+            "example": 0,
+            "default": 0
+          },
+          "autoDisabled": {
+            "type": "boolean",
+            "description": "Whether the config was automatically disabled due to repeated failures",
+            "example": false,
+            "default": false
+          },
+          "autoDisabledAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the config was automatically disabled",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "autoDisabledReason": {
+            "type": "string",
+            "description": "Reason for auto-disable (includes last error message)",
+            "example": "Automatically disabled after 5 consecutive failures. Last error: Collector not found"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "enabled",
+          "strategy",
+          "filters",
+          "collectorPool",
+          "createdAt",
+          "updatedAt",
+          "consecutiveFailures",
+          "autoDisabled"
+        ]
+      },
+      "UpdateAutoAssignmentDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the auto-assignment configuration",
+            "example": "Round Robin for New Accounts"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the auto-assignment configuration",
+            "example": "Assigns new accounts created today to collectors using a round-robin strategy."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the configuration is enabled",
+            "example": true
+          },
+          "strategy": {
+            "type": "string",
+            "description": "Strategy for assigning accounts",
+            "enum": [
+              "ROUND_ROBIN",
+              "LEAST_WORKLOAD",
+              "SKILL_BASED",
+              "GEOGRAPHIC",
+              "CUSTOM"
+            ],
+            "example": "ROUND_ROBIN"
+          },
+          "filters": {
+            "description": "Filters to determine which accounts are eligible for this assignment configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AutoAssignmentFiltersDto"
+              }
+            ]
+          },
+          "collectorPool": {
+            "description": "List of collector IDs eligible for assignment under this configuration",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "excludeCollectors": {
+            "description": "List of collector IDs to exclude from assignment",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "maxAssignmentsPerDay": {
+            "type": "number",
+            "description": "Maximum number of assignments per collector per day",
+            "example": 50
+          },
+          "workloadThreshold": {
+            "type": "number",
+            "description": "Maximum workload (e.g., number of active accounts) a collector can have before being excluded from assignment",
+            "example": 200
+          },
+          "delayMinutes": {
+            "type": "number",
+            "description": "Optional delay in minutes before executing the assignment (for \"wait and see\" strategies)",
+            "example": 1440,
+            "minimum": 0
+          }
+        }
+      },
+      "WorkflowConditionOperator": {
+        "type": "string",
+        "enum": [
+          "EQUALS",
+          "NOT_EQUALS",
+          "GREATER_THAN",
+          "LESS_THAN",
+          "GREATER_THAN_OR_EQUAL",
+          "LESS_THAN_OR_EQUAL",
+          "CONTAINS",
+          "NOT_CONTAINS",
+          "BETWEEN",
+          "IN",
+          "NOT_IN"
+        ],
+        "description": "Operator for evaluation"
+      },
+      "EscalationTriggerConditionDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field to evaluate (e.g., accountStatus, overdueDays)",
+            "example": "overdueDays"
+          },
+          "operator": {
+            "description": "Operator for evaluation",
+            "example": "GREATER_THAN",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowConditionOperator"
+              }
+            ]
+          },
+          "value": {
+            "description": "Value(s) to compare against. Can be a single value or a tuple for BETWEEN operator.",
+            "example": 30,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ]
+      },
+      "EscalationEscalateTo": {
+        "type": "string",
+        "enum": [
+          "MANAGER",
+          "SENIOR_COLLECTOR",
+          "CUSTOM_ROLE"
+        ],
+        "description": "Role or type of user to escalate to"
+      },
+      "EscalationNotificationMethod": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "SMS",
+          "IN_APP"
+        ],
+        "description": "Methods to use for notification"
+      },
+      "CreateEscalationRuleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the escalation rule",
+            "example": "High-Risk Account Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the escalation rule",
+            "example": "Escalates accounts overdue by more than 90 days to a manager."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          },
+          "triggerConditions": {
+            "description": "Conditions that must be met for the escalation to trigger",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EscalationTriggerConditionDto"
+            }
+          },
+          "escalateTo": {
+            "description": "Role or type of user to escalate to",
+            "example": "MANAGER",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EscalationEscalateTo"
+              }
+            ]
+          },
+          "escalationTargets": {
+            "description": "List of user IDs (collectors, managers) or roles to notify",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "notificationMethods": {
+            "type": "array",
+            "description": "Methods to use for notification",
+            "example": [
+              "EMAIL",
+              "IN_APP"
+            ],
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/EscalationNotificationMethod"
+            }
+          },
+          "priority": {
+            "description": "Priority of the escalation",
+            "example": "HIGH",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowPriority"
+              }
+            ]
+          },
+          "cooldownHours": {
+            "type": "number",
+            "description": "Cooldown period in hours to prevent duplicate escalations for the same entity",
+            "example": 24,
+            "default": 24,
+            "minimum": 1
+          }
+        },
+        "required": [
+          "name",
+          "enabled",
+          "triggerConditions",
+          "escalateTo",
+          "escalationTargets",
+          "notificationMethods",
+          "priority"
+        ]
+      },
+      "EscalationTriggerConditionResponseDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field to evaluate (e.g., accountStatus, overdueDays)",
+            "example": "overdueDays"
+          },
+          "operator": {
+            "type": "string",
+            "description": "Operator for evaluation",
+            "enum": [
+              "EQUALS",
+              "NOT_EQUALS",
+              "GREATER_THAN",
+              "LESS_THAN",
+              "GREATER_THAN_OR_EQUAL",
+              "LESS_THAN_OR_EQUAL",
+              "CONTAINS",
+              "NOT_CONTAINS",
+              "BETWEEN",
+              "IN",
+              "NOT_IN"
+            ],
+            "example": "GREATER_THAN"
+          },
+          "value": {
+            "description": "Value(s) to compare against. Can be a single value or a tuple for BETWEEN operator.",
+            "example": 30,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ]
+      },
+      "EscalationRuleResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the escalation rule",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "ID of the organization this rule belongs to",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the escalation rule",
+            "example": "High-Risk Account Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the escalation rule",
+            "example": "Escalates accounts overdue by more than 90 days to a manager."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          },
+          "triggerConditions": {
+            "description": "Conditions that must be met for the escalation to trigger",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EscalationTriggerConditionResponseDto"
+            }
+          },
+          "escalateTo": {
+            "type": "string",
+            "description": "Role or type of user to escalate to",
+            "enum": [
+              "MANAGER",
+              "SENIOR_COLLECTOR",
+              "CUSTOM_ROLE"
+            ],
+            "example": "MANAGER"
+          },
+          "escalationTargets": {
+            "description": "List of user IDs (collectors, managers) or roles to notify",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "notificationMethods": {
+            "type": "array",
+            "description": "Methods to use for notification",
+            "example": [
+              "EMAIL",
+              "IN_APP"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "EMAIL",
+                "SMS",
+                "IN_APP"
+              ]
+            }
+          },
+          "priority": {
+            "type": "string",
+            "description": "Priority of the escalation",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "HIGH"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "ID of the user who created the rule",
+            "example": "c1d2e3f4-a5b6-7890-1234-567890abcdef"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the rule was created",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the rule was last updated",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "executionCount": {
+            "type": "number",
+            "description": "Number of times the rule has been executed",
+            "example": 150
+          },
+          "cooldownHours": {
+            "type": "number",
+            "description": "Cooldown period in hours to prevent duplicate escalations",
+            "example": 24,
+            "default": 24
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "enabled",
+          "triggerConditions",
+          "escalateTo",
+          "escalationTargets",
+          "notificationMethods",
+          "priority",
+          "createdAt",
+          "updatedAt",
+          "executionCount",
+          "cooldownHours"
+        ]
+      },
+      "UpdateEscalationRuleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the escalation rule",
+            "example": "High-Risk Account Escalation"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the escalation rule",
+            "example": "Escalates accounts overdue by more than 90 days to a manager."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the rule is enabled",
+            "example": true
+          },
+          "triggerConditions": {
+            "description": "Conditions that must be met for the escalation to trigger",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EscalationTriggerConditionDto"
+            }
+          },
+          "escalateTo": {
+            "description": "Role or type of user to escalate to",
+            "example": "MANAGER",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EscalationEscalateTo"
+              }
+            ]
+          },
+          "escalationTargets": {
+            "description": "List of user IDs (collectors, managers) or roles to notify",
+            "example": [
+              "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            ],
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "notificationMethods": {
+            "type": "array",
+            "description": "Methods to use for notification",
+            "example": [
+              "EMAIL",
+              "IN_APP"
+            ],
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/EscalationNotificationMethod"
+            }
+          },
+          "priority": {
+            "description": "Priority of the escalation",
+            "example": "HIGH",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WorkflowPriority"
+              }
+            ]
+          },
+          "cooldownHours": {
+            "type": "number",
+            "description": "Cooldown period in hours to prevent duplicate escalations for the same entity",
+            "example": 24,
+            "default": 24,
+            "minimum": 1
+          }
+        }
+      },
+      "ActionExecutionResponseDto": {
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string",
+            "description": "ID of the action in the WorkflowRule",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "actionType": {
+            "type": "string",
+            "description": "Type of action performed",
+            "example": "ASSIGN_TO_COLLECTOR"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the action execution",
+            "enum": [
+              "SUCCESS",
+              "FAILED",
+              "SKIPPED",
+              "PENDING",
+              "RUNNING"
+            ],
+            "example": "SUCCESS"
+          },
+          "result": {
+            "type": "string",
+            "description": "Short summary of the action's outcome",
+            "example": "Assigned to John Doe"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if action failed",
+            "example": "Collector not found"
+          },
+          "executedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the action was executed",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duration of the action execution in milliseconds",
+            "example": 120
+          }
+        },
+        "required": [
+          "actionId",
+          "actionType",
+          "status",
+          "executedAt"
+        ]
+      },
+      "WorkflowExecutionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the workflow execution record",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "ID of the organization this execution belongs to",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "ruleId": {
+            "type": "string",
+            "description": "ID of the workflow rule that triggered this execution",
+            "example": "b1c2d3e4-f5a6-7890-1234-567890abcdef"
+          },
+          "ruleName": {
+            "type": "string",
+            "description": "Name of the workflow rule that triggered this execution",
+            "example": "High Balance Escalation"
+          },
+          "triggeredAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp when the workflow was triggered",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "triggeredBy": {
+            "type": "string",
+            "description": "Who or what triggered the workflow (e.g., \"system\" or userId)",
+            "example": "system"
+          },
+          "targetEntityType": {
+            "type": "string",
+            "description": "Type of entity targeted by this workflow",
+            "enum": [
+              "DEBTOR",
+              "ACCOUNT",
+              "COLLECTOR",
+              "PORTFOLIO",
+              "DEBT"
+            ],
+            "example": "DEBTOR"
+          },
+          "targetEntityId": {
+            "type": "string",
+            "description": "ID of the target entity",
+            "example": "c1d2e3f4-a5b6-7890-1234-567890abcdef"
+          },
+          "targetEntityName": {
+            "type": "string",
+            "description": "Name of the target entity for display purposes",
+            "example": "John Doe"
+          },
+          "actionsExecuted": {
+            "description": "List of actions executed as part of this workflow",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActionExecutionResponseDto"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Overall status of the workflow execution",
+            "enum": [
+              "COMPLETED",
+              "PARTIAL",
+              "FAILED",
+              "SKIPPED",
+              "RUNNING",
+              "PENDING"
+            ],
+            "example": "COMPLETED"
+          },
+          "durationMs": {
+            "type": "number",
+            "description": "Total duration of the workflow execution in milliseconds",
+            "example": 1250
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message if the workflow failed",
+            "example": "Failed to send notification: recipient not found"
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "ruleName",
+          "triggeredAt",
+          "triggeredBy",
+          "targetEntityType",
+          "targetEntityId",
+          "actionsExecuted",
+          "status"
+        ]
+      },
+      "TopPerformingRuleDto": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "ID of the top-performing rule",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "ruleName": {
+            "type": "string",
+            "description": "Name of the top-performing rule",
+            "example": "High Balance Escalation"
+          },
+          "executionCount": {
+            "type": "number",
+            "description": "Number of times the rule has been executed",
+            "example": 500
+          },
+          "successRate": {
+            "type": "number",
+            "description": "Success rate of the rule (0-100%)",
+            "example": 95.5
+          },
+          "avgDuration": {
+            "type": "number",
+            "description": "Average duration of rule execution in milliseconds",
+            "example": 250
+          }
+        },
+        "required": [
+          "ruleId",
+          "ruleName",
+          "executionCount",
+          "successRate",
+          "avgDuration"
+        ]
+      },
+      "DailyExecutionStatsDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date for the statistics (ISO format)",
+            "example": "2023-10-27"
+          },
+          "executions": {
+            "type": "number",
+            "description": "Total executions on this date",
+            "example": 120
+          },
+          "successes": {
+            "type": "number",
+            "description": "Number of successful executions on this date",
+            "example": 115
+          },
+          "failures": {
+            "type": "number",
+            "description": "Number of failed executions on this date",
+            "example": 5
+          }
+        },
+        "required": [
+          "date",
+          "executions",
+          "successes",
+          "failures"
+        ]
+      },
+      "WorkflowAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalRules": {
+            "type": "number",
+            "description": "Total number of workflow rules defined",
+            "example": 10
+          },
+          "activeRules": {
+            "type": "number",
+            "description": "Number of currently active/enabled workflow rules",
+            "example": 8
+          },
+          "totalExecutions": {
+            "type": "number",
+            "description": "Total number of workflow executions in the period",
+            "example": 1500
+          },
+          "successRate": {
+            "type": "number",
+            "description": "Overall success rate of workflow executions in the period (0-100%)",
+            "example": 98.5
+          },
+          "topPerformingRules": {
+            "description": "List of top-performing workflow rules by success rate or execution count",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopPerformingRuleDto"
+            }
+          },
+          "recentExecutions": {
+            "description": "List of most recent workflow executions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowExecutionResponseDto"
+            }
+          },
+          "executionsByDay": {
+            "description": "Daily statistics for workflow executions over the period",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyExecutionStatsDto"
+            }
+          }
+        },
+        "required": [
+          "totalRules",
+          "activeRules",
+          "totalExecutions",
+          "successRate",
+          "topPerformingRules",
+          "recentExecutions",
+          "executionsByDay"
+        ]
+      },
+      "WorkflowConditionResponseDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field to evaluate (e.g., balance, accountAge)",
+            "example": "balance"
+          },
+          "operator": {
+            "type": "string",
+            "description": "Operator for evaluation",
+            "enum": [
+              "EQUALS",
+              "NOT_EQUALS",
+              "GREATER_THAN",
+              "LESS_THAN",
+              "GREATER_THAN_OR_EQUAL",
+              "LESS_THAN_OR_EQUAL",
+              "CONTAINS",
+              "NOT_CONTAINS",
+              "BETWEEN",
+              "IN",
+              "NOT_IN"
+            ],
+            "example": "GREATER_THAN"
+          },
+          "value": {
+            "description": "Value(s) to compare against. Can be a single value or a tuple for BETWEEN operator.",
+            "example": 1000,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ]
+      },
+      "WorkflowActionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID for the action instance",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of action to perform",
+            "enum": [
+              "ASSIGN_TO_COLLECTOR",
+              "REASSIGN_TO_COLLECTOR",
+              "ESCALATE_TO_MANAGER",
+              "SEND_NOTIFICATION",
+              "UPDATE_PRIORITY",
+              "ADD_TO_QUEUE",
+              "CREATE_TASK",
+              "SEND_EMAIL",
+              "TRIGGER_WEBHOOK"
+            ],
+            "example": "ASSIGN_TO_COLLECTOR"
+          },
+          "config": {
+            "type": "object",
+            "description": "Action-specific configuration (e.g., collectorId, templateId)",
+            "example": {
+              "collectorId": "uuid",
+              "templateId": "uuid"
+            }
+          },
+          "order": {
+            "type": "number",
+            "description": "Execution order within the rule",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "config",
+          "order"
+        ]
+      },
+      "WorkflowTemplateResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID of the workflow template",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the workflow template",
+            "example": "Standard Dunning Sequence"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the workflow template",
+            "example": "A standard sequence of communications for accounts 30-60-90 days past due."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the template (e.g., assignment, escalation, compliance)",
+            "example": "compliance"
+          },
+          "triggerType": {
+            "type": "string",
+            "description": "Type of event that triggers the workflow defined in this template",
+            "enum": [
+              "ACCOUNT_AGE",
+              "PAYMENT_PROMISE_BROKEN",
+              "CONTACT_ATTEMPT_FAILED",
+              "HIGH_BALANCE",
+              "COMPLIANCE_ALERT",
+              "COLLECTOR_CAPACITY",
+              "TIME_BASED",
+              "CUSTOM",
+              "DEBT_CREATED",
+              "PAYMENT_RECEIVED"
+            ],
+            "example": "DEBT_CREATED"
+          },
+          "defaultConditions": {
+            "description": "Default conditions for the workflow template",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowConditionResponseDto"
+            }
+          },
+          "defaultActions": {
+            "description": "Default actions for the workflow template",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowActionResponseDto"
+            }
+          },
+          "defaultPriority": {
+            "type": "string",
+            "description": "Default priority for rules created from this template",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "example": "MEDIUM"
+          },
+          "isSystemTemplate": {
+            "type": "boolean",
+            "description": "Whether this is a system-defined template",
+            "example": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the template was created",
+            "example": "2023-10-27T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the template was last updated",
+            "example": "2023-10-27T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "triggerType",
+          "defaultConditions",
+          "defaultActions",
+          "defaultPriority",
+          "isSystemTemplate",
+          "createdAt",
+          "updatedAt"
+        ]
+      }
+    }
+  }
+}
